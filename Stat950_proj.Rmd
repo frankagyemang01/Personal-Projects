@@ -1,0 +1,19 @@
+---
+title: "Stat950_Project"
+author: "Frank Agyemang, Bipin Poudel"
+date: "2026-03-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Oil Spillage Project
+
+```{r}
+## Reading in the data
+oil_dat <- read.table("oilspills.dat", header = TRUE)
+
+```
+

@@ -1,0 +1,52 @@
+---
+title: "market_pairs"
+author: "Frank Agyemang"
+date: "2024-08-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+# Install and load necessary packages
+##install.packages("quantmod")
+library(quantmod)
+```
+
+
+```{r}
+ctxr_df <- getSymbols('CTXR', src='yahoo', auto.assign=FALSE)
+chartSeries(ctxr_df, name="CTXR", subset="last 2 years", theme=chartTheme("white"))
+
+```
+
+
+
+```{r}
+wint_df <- getSymbols('WINT', src='yahoo', auto.assign=FALSE)
+chartSeries(wint_df, name="CTXR", subset="last 2 years", theme=chartTheme("white"))
+```
+
+```{r}
+sisi_df <- getSymbols('SISI', src='yahoo', auto.assign=FALSE)
+chartSeries(sisi_df, name="SISI", subset="last 2 years", theme=chartTheme("white"))
+```
+
+```{r}
+om_df <- getSymbols('OM', src='yahoo', auto.assign=FALSE)
+chartSeries(om_df, name="OM", subset="last 2 years", theme=chartTheme("white"))
+```
+
+```{r}
+mynz_df <- getSymbols('MYNZ', src='yahoo', auto.assign=FALSE)
+chartSeries(mynz_df, name="MYNZ", subset="last 2 years", theme=chartTheme("white"))
+```
+
+```{r}
+chrs_df <- getSymbols('CHRS', src='yahoo', auto.assign=FALSE)
+chartSeries(chrs_df, name="CHRS", subset="last 2 years", theme=chartTheme("white"))
+```
+
