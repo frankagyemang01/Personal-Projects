@@ -13,7 +13,79 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r}
 ## Reading in the data
-oil_dat <- read.table("oilspills.dat", header = TRUE)
+oil_dat <- read.table("~/OneDrive/Documents/Personal-Projects/oilspills.dat", header = TRUE)
+```
+
+
+```{r}
+## Exploratory Data Analysis
+plot(oil_dat$year,oil_dat$importexport)
+plot(oil_dat$year,oil_dat$domestic)
+```
+
+```{r}
+
+## Trend equation using sum of squares
+trend_1 <- lm(importexport ~ year,
+            data = oil_dat)
+summary(trend_1)
+```
+
+```{r}
+# Extract variables
+Ni <- oil_dat$spills
+b1 <- oil_dat$importexport
+b2 <- oil_dat$domestic
+
+# Initial values (must give positive lambda)
+alpha <- c(0.1, 0.1)
+
+# Convergence settings
+tol <- 1e-6
+max_iter <- 50
+
+for (iter in 1:max_iter) {
+  
+  # Compute lambda
+  lambda <- alpha[1]*b1 + alpha[2]*b2
+  
+  # Avoid division issues
+  if (any(lambda <= 0)) {
+    stop("Non-positive lambda encountered. Adjust starting values.")
+  }
+  
+  # ---------- SCORE VECTOR ----------
+  U1 <- sum(b1 * (Ni / lambda - 1))
+  U2 <- sum(b2 * (Ni / lambda - 1))
+  U <- c(U1, U2)
+  
+  # ---------- HESSIAN MATRIX ----------
+  H11 <- -sum(Ni * b1^2 / lambda^2)
+  H12 <- -sum(Ni * b1 * b2 / lambda^2)
+  H22 <- -sum(Ni * b2^2 / lambda^2)
+  
+  H <- matrix(c(H11, H12,
+                H12, H22), nrow = 2)
+  
+  # ---------- UPDATE ----------
+  step <- solve(H, U)      # H^{-1} U
+  alpha_new <- alpha - step
+  
+  # ---------- CHECK CONVERGENCE ----------
+  if (max(abs(alpha_new - alpha)) < tol) {
+    cat("Converged in", iter, "iterations\n")
+    break
+  }
+  
+  alpha <- alpha_new
+}
+
+# Final estimates
+alpha
+```
+
+```{r}
+## Fisher Scoring Method
 
 ```
 
