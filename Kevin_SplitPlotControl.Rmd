@@ -1,0 +1,130 @@
+---
+title: "Kevin_SplitPlotplusControl"
+author: "Frank Agyemang"
+date: "2025-05-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading in the data
+```{r}
+fung_exp_orig <- read.csv("Fungicide_Exp_5_Design.csv")
+summary(fung_exp_orig)
+
+# Remove specific columns in the data frame
+fung_exp_sub <- fung_exp_orig[ , !(names(fung_exp_orig) %in% c("ExpNumber","Isolates","Exp_Code", "Full_Exp_Code", "radial_growth", "Dates", "Comments"))]
+ 
+## Treating Categorical variables as factors
+library(dplyr)
+
+fung_exp_sub <- fung_exp_sub %>%
+  mutate(across(c(Species, Treatments, Dilution,), as.factor))
+
+## Average of 4 measurements
+fung_exp_sub$Average <- rowMeans(fung_exp_sub[, c("Measurement.1", "Measurement.2", "Measurement.3", "Measurement.4")])
+head(fung_exp_sub)
+
+# Remove response with missing values
+# Assuming your data frame is called df and your response variable is called 'y_true'
+fung_exp_sub <- fung_exp_sub[!is.na(fung_exp_sub$Average), ]
+
+
+fung_exp_sub <- fung_exp_sub %>%
+  mutate(Control = ifelse(X == 0, "y", "n"))
+
+
+
+write.csv(fung_exp_sub, "fung_exp_sub.csv", row.names = FALSE)
+
+
+```
+
+## Exploratory Data Analysis
+```{r}
+## Histogram of Response
+hist(fung_exp_sub$Average)
+hist(log(fung_exp_sub$Average))
+
+# Load ggplot2
+library(ggplot2)
+library(dplyr)
+
+ggplot(fung_exp_sub, aes(x = Treatments, y = Average, fill = Treatments)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Average Count of Soil Borne Pathogens by Treatments",
+       x = "Species",
+       y = "Average Count") +
+  theme_minimal()
+
+
+# Considering Species and Treatment
+ggplot(fung_exp_sub, aes(x = Treatments, y = Average, fill = Treatments)) +
+  geom_boxplot() +
+  facet_wrap(~ Species) +
+  labs(title = "Response by Treatment within Species") +
+  theme_minimal()
+
+# Considering Species, Treatment and Dosage
+ggplot(fung_exp_sub, aes(x = Treatments, y = Average, fill = Species)) +
+  geom_boxplot() +
+  facet_wrap(~ X) +
+  labs(
+    title = "Boxplot of Response by Species and Treatment (Faceted by Dosage)",
+    x = "Treatments",
+    y = "Average Count"
+  ) +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set2")
+
+# Interaction between Treatment and Species
+with(fung_exp_sub, interaction.plot(
+  x.factor = Species,
+  trace.factor = Treatments,
+  response = Average,
+  type = "b",                     # lines and points
+  col = rainbow(length(unique(Species))),
+  lty = 1,
+  lwd = 2,
+  ylab = "Average Radial Growth",
+  xlab = "Treatments",
+  trace.label = "Treatments",
+  main = "Interaction Plot: Treatments by Species"
+))
+
+
+```
+
+
+## Model
+
+```{r}
+#Nested Design Plus Control
+fung.m1<- lmer(Average ~ Control + Treatments*Species + (1|Treatments:Species:X),data = fung_exp_sub)
+summary(fung.m1)
+anova(fung.m1)
+AIC(fung.m1)
+
+library(glmmTMB)
+
+# Use Tweedie distribution if Response has zero + continuous values
+fung.m2 <- glmmTMB(
+  Average ~ Control + Treatments*Species + (1|Treatments:Species:X),
+  data = fung_exp_sub,
+  family = tweedie(link = "log")
+)
+
+summary(fung.m2)
+
+library(DHARMa)
+sim_res <- simulateResiduals(fung.m2)
+
+# Plot DHARMa results (helps identify deviations from uniform distribution)
+plot(sim_res)
+```
+
+
+
+

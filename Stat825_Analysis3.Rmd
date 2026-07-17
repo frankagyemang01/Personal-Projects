@@ -1,0 +1,164 @@
+---
+title: "heifer"
+author: "Frank Agyemang"
+date: "2024-11-17"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Exploratory data analysis on Heifer data set
+
+```{r}
+heifer <- read.csv("heifer.csv")
+names(heifer)
+# Replace dots with NA
+heifer[heifer == "."] <- NA
+# Remove rows with missing values
+heifer <- na.omit(heifer)
+
+
+
+
+## Reading in Ovini's cleaned Data
+heifer2 <- read.csv("Missing_Removed_Data.csv")
+
+
+# Specify the variables you want to treat as factors
+factor_vars <- c("Development_Treatment","Calan_Treatment","Pen","Calving_Ease","Calf_Vigor","Sire","SEX")
+
+# Convert specified variables to factors
+heifer2[factor_vars] <- lapply(heifer2[factor_vars], as.factor)
+
+
+
+```
+
+
+```{r}
+#Rearranging the variables in the data frame
+heifer <- heifer[c("ID","Birth.date","Pen..","Initial.BW","Final.BW","Calan.Treatment","Development.Treatment","DMI","ADG","Sire","Gest.Length","Calved.First.21.Days","Birth.date.1","X1st.Calf.BW","SEX","Calving.Ease","Calf.Vigor","Final.Calf.BW","HCW","REA","YG","BF")]
+
+
+# Specify the variables you want to treat as factors
+factor_vars <- c("Pen..", "Sire","Calan.Treatment","Development.Treatment","Calved.First.21.Days","SEX","Calving.Ease","Calf.Vigor","Gest.Length")
+num_vars <- c("Initial.BW","Final.BW","X1st.Calf.BW","Final.Calf.BW")
+# Convert specified variables to factors
+heifer[factor_vars] <- lapply(heifer[factor_vars], as.factor)
+heifer[num_vars] <- lapply(heifer[num_vars], as.numeric)
+library(dplyr)
+
+
+
+```
+
+## Exploratory Data Analysis
+To begin with our exploratory data analysis, there are some variables which were not described. Moreover, the names of those variables are difficult to interpret. We will remove those variables and focus on those that were described to answer the researcher's questions. We create a subset data in which variables HCW,REA,YG and BF are eliminated.
+
+We do our exploratory analysis in two folds. First, we will try to understand the relations of variables with the heifers. That is, how the Calan treatment, Pen, etc affects first time heifers. We then move on to understand variables that affect calves.
+```{r}
+heifer_sub <- heifer[,-c(2,8,9,11,12,13,19:22)]
+heifer_sub$DMI <- NULL
+heifer_sub$ADG <- NULL
+
+# Create a new column with the difference between Column2 and Column1
+heifer_sub$Growth_BW <- heifer_sub$Final.BW - heifer_sub$Initial.BW
+heifer_sub$Calf_BW <- heifer_sub$Final.Calf.BW - heifer_sub$X1st.Calf.BW
+heifer_sub$Initial.BW <- NULL
+heifer_sub$Final.BW <- NULL
+
+write.csv(heifer_sub, "heifer_sub.csv", row.names = FALSE)
+```
+
+
+The boxplot below shows the initial birth weight of calves based on the Pens their heifers were sectioned into. The boxplot allows us to determine whether the weight of the heifers had any effect on the weight of the calves since heifers were sectioned based on weight. From the boxplot, we see that calves from heifers in Pens 2 and 4 had on average the highest initial weight while pens 1 and 3 had slightly lower initial calf weight. We plotted pen by initial calf weight because the effect of the pens is better assessed during the birth of the calves. After birth, other factors could affect the final weight of the calves and therefore using final weight was not considered to be efficient.
+
+Next, we make a boxplot showing initial calf weight from heifers receiving different Calan Treatments. From the plot, we also see that MET has a slightly higher initial calf weight on average compared to CON and DDG. Moreover, an important feature of the plot is that CON is a little skewed. We can also see that the variability in initial weight for calves from heifers that were given CON and MET was higher that those from heifers with DDG.
+
+We also look at the boxplot showing the initial weight of calves grouped by SEX. The boxplot shows that calves with STR had on average a higher weight than calves with HFR. Since we do not have any additional information on what STR and HFR mean, we are not able to make any further comments. 
+
+Lastly, we conclude the exploratory analysis by showing a boxplot of initial weight of calf based on the sire assigned to a given heifer. From the plot, we also see that calves from heifers that were assigned to sire 4708 had on average the highest initial birth weight while calves from heifers assigned to sire 261 had on average the lowest initial birth weight.
+```{r}
+## Boxplot showing groupings of heifers based on initial weight
+library(dplyr)
+library(ggplot2)
+
+ggplot(heifer_sub, aes(x = Pen.., y = X1st.Calf.BW, fill = Pen..)) +
+  geom_boxplot() +
+  labs(title = "Boxplot showing initial calf weight from heifers in each pen",
+       x = "Pen",
+       y = "initial calf weight") +
+  theme_minimal()
+
+
+ggplot(heifer_sub, aes(x = Calan.Treatment, y = X1st.Calf.BW, fill = Calan.Treatment)) +
+  geom_boxplot() +
+  labs(title = "Boxplot showing initial calf weight from heifers receiving different Calan Treatments",
+       x = "Calan Treatment",
+       y = "initial calf weight") +
+  theme_minimal()
+
+ggplot(heifer_sub, aes(x = SEX, y = X1st.Calf.BW, fill = SEX)) +
+  geom_boxplot() +
+  labs(title = "Boxplot showing initial calf weight base on their SEX",
+       x = "SEX",
+       y = "X1st.Calf.BW") +
+  theme_minimal()
+
+ggplot(heifer_sub, aes(x = Sire, y = X1st.Calf.BW, fill = Sire)) +
+  geom_boxplot() +
+  labs(title = "Boxplot showing initial calf weight base on the Sire that was assigned to the heifer",
+       x = "Sire",
+       y = "X1st.Calf.BW") +
+  theme_minimal()
+```
+
+
+To really understand and determine how all these factors affect the development of calves we need to take into account both initial and final weight of the calves.
+```{r}
+## Histogram of the growth of heifers
+library(ggplot2)
+ggplot(heifer_sub, aes(x = Calf_BW)) +
+  geom_histogram(binwidth = 10, fill = "blue", color = "black") +
+  labs(title = "Histogram of heifer growth",
+       x = "Calf_BW",
+       y = "Frequency") +
+  theme_minimal()
+```
+
+## Interaction plots
+We now try to determine if there were any two-way interaction effect between calan and pen of the heifers on the initial weight of calves. From the bars, there might be evidence of calan by pen interaction effect on the initial weight of calves. For example, given a particular pens 1 and 2, the difference between the levels of calan treatment is unequal.
+
+Similarly, there seem to be a two-way interaction between sire and calan treatment on the initial weight of calves. The bars for sire 261 and 4708 is different from the others at the various calan treatment.
+```{r}
+# Two-way interaction plot
+ggplot(heifer_sub, aes(x = Calan.Treatment , y = X1st.Calf.BW, fill = Pen.. )) +
+  stat_summary(fun = mean, geom = "bar", position = position_dodge(width = 2)) +
+  facet_grid(. ~ Pen..) +
+  labs(title = "Two-Way Interaction Plot",
+       x = "Calan Treatment",
+       y = "Mean Response") +
+  theme_minimal()
+
+# Two-way interaction plot
+ggplot(heifer_sub, aes(x = Calan.Treatment , y = X1st.Calf.BW, fill = Sire )) +
+  stat_summary(fun = mean, geom = "bar", position = position_dodge(width = 2)) +
+  facet_grid(. ~ Sire) +
+  labs(title = "Two-Way Interaction Plot",
+       x = "Calan Treatment",
+       y = "Mean Response") +
+  theme_minimal()
+```
+
+
+
+
+
+
+
+
+

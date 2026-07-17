@@ -20,7 +20,7 @@ oil_dat <- read.table("~/OneDrive/Documents/Personal-Projects/oilspills.dat", he
 ```{r}
 ## Exploratory Data Analysis
 plot(oil_dat$year,oil_dat$importexport)
-plot(oil_dat$year,oil_dat$domestic)
+plot(oil_dat$year,oil_dat$spills)
 ```
 
 ```{r}
@@ -86,6 +86,39 @@ alpha
 
 ```{r}
 ## Fisher Scoring Method
+alpha <- c(0.1, 0.1)
 
+for (iter in 1:max_iter) {
+  
+  lambda <- alpha[1]*b1 + alpha[2]*b2
+  
+  if (any(lambda <= 0)) stop("Non-positive lambda")
+  
+  # Score
+  U1 <- sum(b1 * (Ni / lambda - 1))
+  U2 <- sum(b2 * (Ni / lambda - 1))
+  U <- c(U1, U2)
+  
+  # Fisher Information (EXPECTED Hessian)
+  I11 <- sum(b1^2 / lambda)
+  I12 <- sum(b1 * b2 / lambda)
+  I22 <- sum(b2^2 / lambda)
+  
+  I <- matrix(c(I11, I12,
+                I12, I22), nrow = 2)
+  
+  # Update
+  step <- solve(I, U)
+  alpha_new <- alpha + step
+  
+  if (max(abs(alpha_new - alpha)) < tol) {
+    cat("Fisher scoring converged in", iter, "iterations\n")
+    break
+  }
+  
+  alpha <- alpha_new
+}
+
+alpha
 ```
 

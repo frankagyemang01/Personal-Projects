@@ -1,0 +1,145 @@
+location_id,plot_id,Rep,Crop,Grass,PGC_Hgt_cm
+FAB_UNL_keystone,b1.cs.grn.rhb.h2,1,Corn,RhB,22.33
+FAB_UNL_keystone,b1.cs.grn.rhb.h1,1,Corn,RhB,20.33
+FAB_UNL_keystone,b1.cs.grn.kbg.h1,1,Corn,KBG,8.67
+FAB_UNL_keystone,b1.cs.grn.kbg.h2,1,Corn,KBG,15
+FAB_UNL_keystone,b1.cs.stv.rhb.h2,2,Corn,RhB,23
+FAB_UNL_keystone,b1.cs.stv.rhb.h1,2,Corn,RhB,15.67
+FAB_UNL_keystone,b1.cs.stv.kbg.h1,2,Corn,KBG,15
+FAB_UNL_keystone,b1.cs.stv.kbg.h2,2,Corn,KBG,19.33
+FAB_UNL_keystone,b1.sc.stv.rhb.v2,2,Soybean ,RhB,26.33
+FAB_UNL_keystone,b1.sc.stv.rhb.v1,2,Soybean ,RhB,25.67
+FAB_UNL_keystone,b1.sc.stv.kbg.v1,2,Soybean ,KBG,13.33
+FAB_UNL_keystone,b1.sc.stv.kbg.v2,2,Soybean ,KBG,33.33
+FAB_UNL_keystone,b1.sc.grn.kbg.v1,1,Soybean ,KBG,12.33
+FAB_UNL_keystone,b1.sc.grn.kbg.v2,1,Soybean ,KBG,17.33
+FAB_UNL_keystone,b1.sc.grn.rhb.v1,1,Soybean ,RhB,11.33
+FAB_UNL_keystone,b1.sc.grn.rhb.v2,1,Soybean ,RhB,14.67
+FAB_UNL_keystone,b1.cc.grn.kbg.h1,1,Corn,KBG,25
+FAB_UNL_keystone,b1.cc.grn.kbg.h2,1,Corn,KBG,11
+FAB_UNL_keystone,b1.cc.grn.rhb.h2,1,Corn,RhB,18
+FAB_UNL_keystone,b1.cc.grn.rhb.h1,1,Corn,RhB,19.33
+FAB_UNL_keystone,b1.cc.stv.rhb.h1,2,Corn,RhB,19
+FAB_UNL_keystone,b1.cc.stv.rhb.h2,2,Corn,RhB,19.67
+FAB_UNL_keystone,b1.cc.stv.kbg.h1,2,Corn,KBG,11.67
+FAB_UNL_keystone,b1.cc.stv.kbg.h2,2,Corn,KBG,11.67
+FAB_UNL_keystone,b2.cs.grn.rhb.h1,3,Corn,RhB,21.33
+FAB_UNL_keystone,b2.cs.grn.rhb.h2,3,Corn,RhB,19.67
+FAB_UNL_keystone,b2.cs.grn.kbg.h2,3,Corn,KBG,17
+FAB_UNL_keystone,b2.cs.grn.kbg.h1,3,Corn,KBG,14.67
+FAB_UNL_keystone,b2.cs.stv.kbg.h2,4,Corn,KBG,20.67
+FAB_UNL_keystone,b2.cs.stv.kbg.h1,4,Corn,KBG,19.33
+FAB_UNL_keystone,b2.cs.stv.rhb.h1,4,Corn,RhB,17.67
+FAB_UNL_keystone,b2.cs.stv.rhb.h2,4,Corn,RhB,21.67
+FAB_UNL_keystone,b2.cc.stv.kbg.h2,4,Corn,KBG,17
+FAB_UNL_keystone,b2.cc.stv.kbg.h1,4,Corn,KBG,12
+FAB_UNL_keystone,b2.cc.stv.rhb.h1,4,Corn,RhB,19
+FAB_UNL_keystone,b2.cc.stv.rhb.h2,4,Corn,RhB,18
+FAB_UNL_keystone,b2.cc.grn.rhb.h2,3,Corn,RhB,21
+FAB_UNL_keystone,b2.cc.grn.rhb.h1,3,Corn,RhB,23
+FAB_UNL_keystone,b2.cc.grn.kbg.h1,3,Corn,KBG,9.67
+FAB_UNL_keystone,b2.cc.grn.kbg.h2,3,Corn,KBG,10
+FAB_UNL_keystone,b2.sc.grn.rhb.v2,3,Soybean ,RhB,19
+FAB_UNL_keystone,b2.sc.grn.rhb.v1,3,Soybean ,RhB,28.67
+FAB_UNL_keystone,b2.sc.grn.kbg.v1,3,Soybean ,KBG,31.33
+FAB_UNL_keystone,b2.sc.grn.kbg.v2,3,Soybean ,KBG,14
+FAB_UNL_keystone,b2.sc.stv.rhb.v2,4,Soybean ,RhB,21.67
+FAB_UNL_keystone,b2.sc.stv.rhb.v1,4,Soybean ,RhB,32.67
+FAB_UNL_keystone,b2.sc.stv.kbg.v1,4,Soybean ,KBG,12.83
+FAB_UNL_keystone,b2.sc.stv.kbg.v2,4,Soybean ,KBG,21
+FAB_UNL_keystone,b3.cc.stv.kbg.h1,6,Corn,KBG,9
+FAB_UNL_keystone,b3.cc.stv.kbg.h2,6,Corn,KBG,9.67
+FAB_UNL_keystone,b3.cc.stv.rhb.h2,6,Corn,RhB,5.33
+FAB_UNL_keystone,b3.cc.stv.rhb.h1,6,Corn,RhB,21
+FAB_UNL_keystone,b3.cc.grn.rhb.h2,5,Corn,RhB,35
+FAB_UNL_keystone,b3.cc.grn.rhb.h1,5,Corn,RhB,31.33
+FAB_UNL_keystone,b3.cc.grn.kbg.h1,5,Corn,KBG,18.67
+FAB_UNL_keystone,b3.cc.grn.kbg.h2,5,Corn,KBG,12
+FAB_UNL_keystone,b3.cs.grn.kbg.h1,5,Corn,KBG,11.33
+FAB_UNL_keystone,b3.cs.grn.kbg.h2,5,Corn,KBG,11
+FAB_UNL_keystone,b3.cs.grn.rhb.h1,5,Corn,RhB,25.33
+FAB_UNL_keystone,b3.cs.grn.rhb.h2,5,Corn,RhB,20.33
+FAB_UNL_keystone,b3.cs.stv.kbg.h1,6,Corn,KBG,10.33
+FAB_UNL_keystone,b3.cs.stv.kbg.h2,6,Corn,KBG,9
+FAB_UNL_keystone,b3.cs.stv.rhb.h1,6,Corn,RhB,30
+FAB_UNL_keystone,b3.cs.stv.rhb.h2,6,Corn,RhB,31.67
+FAB_UNL_keystone,b3.sc.stv.rhb.v1,6,Soybean ,RhB,28.83
+FAB_UNL_keystone,b3.sc.stv.rhb.v2,6,Soybean ,RhB,28.5
+FAB_UNL_keystone,b3.sc.stv.kbg.v1,6,Soybean ,KBG,12.67
+FAB_UNL_keystone,b3.sc.stv.kbg.v2,6,Soybean ,KBG,8
+FAB_UNL_keystone,b3.sc.grn.rhb.v1,5,Soybean ,RhB,39.67
+FAB_UNL_keystone,b3.sc.grn.rhb.v2,5,Soybean ,RhB,35.67
+FAB_UNL_keystone,b3.sc.grn.kbg.v1,5,Soybean ,KBG,16.33
+FAB_UNL_keystone,b3.sc.grn.kbg.v2,5,Soybean ,KBG,15
+FAB_CTV_keystone,b1.cc.stv.kbg.h1,2,Corn,KBG,0
+FAB_CTV_keystone,b1.cc.stv.kbg.h2,2,Corn,KBG,0
+FAB_CTV_keystone,b1.cs.grn.rhb.h1,1,Corn,RhB,27
+FAB_CTV_keystone,b1.cs.grn.rhb.h2,1,Corn,RhB,31
+FAB_CTV_keystone,b2.cc.stv.rhb.h1,4,Corn,RhB,34
+FAB_CTV_keystone,b2.cc.stv.rhb.h2,4,Corn,RhB,28
+FAB_CTV_keystone,b2.sc.stv.kbg.v1,4,Soybean,KBG,0
+FAB_CTV_keystone,b2.sc.stv.kbg.v2,4,Soybean,KBG,17
+FAB_CTV_keystone,b3.sc.grn.rhb.v1,5,Soybean,RhB,42
+FAB_CTV_keystone,b3.sc.grn.rhb.v2,5,Soybean,RhB,42
+FAB_CTV_keystone,b3.cs.stv.kbg.h1,6,Corn,KBG,18
+FAB_CTV_keystone,b3.cs.stv.kbg.h2,6,Corn,KBG,15
+FAB_CTV_keystone,b1.sc.grn.rhb.v1,1,Soybean,RhB,36
+FAB_CTV_keystone,b1.sc.grn.rhb.v2,1,Soybean,RhB,36
+FAB_CTV_keystone,b1.cs.grn.kbg.h1,1,Corn,KBG,0
+FAB_CTV_keystone,b1.cs.grn.kbg.h2,1,Corn,KBG,8
+FAB_CTV_keystone,b2.cc.stv.kbg.h2,4,Corn,KBG,35
+FAB_CTV_keystone,b2.cc.stv.kbg.h1,4,Corn,KBG,10
+FAB_CTV_keystone,b2.cs.grn.rhb.h2,3,Corn,RhB,37
+FAB_CTV_keystone,b2.cs.grn.rhb.h1,3,Corn,RhB,35
+FAB_CTV_keystone,b3.sc.grn.kbg.v1,5,Soybean,KBG,9
+FAB_CTV_keystone,b3.sc.grn.kbg.v2,5,Soybean,KBG,8.5
+FAB_CTV_keystone,b3.cc.grn.rhb.h1,5,Corn,RhB,28
+FAB_CTV_keystone,b3.cc.grn.rhb.h2,5,Corn,RhB,34
+FAB_CTV_keystone,b1.sc.grn.kbg.v2,1,Soybean,KBG,21
+FAB_CTV_keystone,b1.sc.grn.kbg.v1,1,Soybean,KBG,0
+FAB_CTV_keystone,b1.cc.stv.rhb.h2,2,Corn,RhB,34
+FAB_CTV_keystone,b1.cc.stv.rhb.h1,2,Corn,RhB,30
+FAB_CTV_keystone,b2.cs.grn.kbg.h1,3,Corn,KBG,10
+FAB_CTV_keystone,b2.cs.grn.kbg.h2,3,Corn,KBG,10
+FAB_CTV_keystone,b2.sc.stv.rhb.v2,4,Soybean,RhB,28
+FAB_CTV_keystone,b2.sc.stv.rhb.v1,4,Soybean,RhB,35
+FAB_CTV_keystone,b3.cs.stv.rhb.h1,6,Corn,RhB,33
+FAB_CTV_keystone,b3.cs.stv.rhb.h2,6,Corn,RhB,38
+FAB_CTV_keystone,b3.cc.grn.kbg.h2,5,Corn,KBG,20
+FAB_CTV_keystone,b3.cc.grn.kbg.h1,5,Corn,KBG,14
+FAB_CTV_keystone,b1.sc.stv.kbg.v1,2,Soybean,KBG,18
+FAB_CTV_keystone,b1.sc.stv.kbg.v2,2,Soybean,KBG,18
+FAB_CTV_keystone,b1.cc.grn.rhb.h1,1,Corn,RhB,35
+FAB_CTV_keystone,b1.cc.grn.rhb.h2,1,Corn,RhB,39
+FAB_CTV_keystone,b2.cc.grn.rhb.h1,3,Corn,RhB,39
+FAB_CTV_keystone,b2.cc.grn.rhb.h2,3,Corn,RhB,39
+FAB_CTV_keystone,b2.sc.grn.kbg.v2,3,Soybean,KBG,25
+FAB_CTV_keystone,b2.sc.grn.kbg.v1,3,Soybean,KBG,25
+FAB_CTV_keystone,b3.sc.stv.kbg.v1,6,Soybean,KBG,28
+FAB_CTV_keystone,b3.sc.stv.kbg.v2,6,Soybean,KBG,21
+FAB_CTV_keystone,b3.cs.grn.rhb.h1,5,Corn,RhB,36
+FAB_CTV_keystone,b3.cs.grn.rhb.h2,5,Corn,RhB,30
+FAB_CTV_keystone,b1.cc.grn.kbg.h1,1,Corn,KBG,17
+FAB_CTV_keystone,b1.cc.grn.kbg.h2,1,Corn,KBG,20
+FAB_CTV_keystone,b1.cs.stv.rhb.h2,2,Corn,RhB,31
+FAB_CTV_keystone,b1.cs.stv.rhb.h1,2,Corn,RhB,34
+FAB_CTV_keystone,b2.cc.grn.kbg.h2,3,Corn,KBG,20
+FAB_CTV_keystone,b2.cc.grn.kbg.h1,3,Corn,KBG,24
+FAB_CTV_keystone,b2.cs.stv.rhb.h1,4,Corn,RhB,35
+FAB_CTV_keystone,b2.cs.stv.rhb.h2,4,Corn,RhB,35
+FAB_CTV_keystone,b3.sc.stv.rhb.v2,6,Soybean,RhB,42
+FAB_CTV_keystone,b3.sc.stv.rhb.v1,6,Soybean,RhB,42
+FAB_CTV_keystone,b3.cc.stv.kbg.h2,6,Corn,KBG,7
+FAB_CTV_keystone,b3.cc.stv.kbg.h1,6,Corn,KBG,19
+FAB_CTV_keystone,b1.sc.stv.rhb.v1,2,Soybean,RhB,37
+FAB_CTV_keystone,b1.sc.stv.rhb.v2,2,Soybean,RhB,37
+FAB_CTV_keystone,b1.cs.stv.kbg.h1,2,Corn,KBG,7
+FAB_CTV_keystone,b1.cs.stv.kbg.h2,2,Corn,KBG,13
+FAB_CTV_keystone,b2.cs.stv.kbg.h2,4,Corn,KBG,6.5
+FAB_CTV_keystone,b2.cs.stv.kbg.h1,4,Corn,KBG,10
+FAB_CTV_keystone,b2.sc.grn.rhb.v1,3,Soybean,RhB,28
+FAB_CTV_keystone,b2.sc.grn.rhb.v2,3,Soybean,RhB,40
+FAB_CTV_keystone,b3.cs.grn.kbg.h2,5,Corn,KBG,10
+FAB_CTV_keystone,b3.cs.grn.kbg.h1,5,Corn,KBG,9
+FAB_CTV_keystone,b3.cc.stv.rhb.h1,6,Corn,RhB,35
+FAB_CTV_keystone,b3.cc.stv.rhb.h2,6,Corn,RhB,32

@@ -1,0 +1,139 @@
+---
+title: "Lakkana"
+author: "Frank Agyemang"
+date: "2025-02-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Reading In Data
+```{r}
+esa <- read.csv("20250215_ESA_finaldata.csv")
+summary(esa)
+#is.na(esa)
+categorical_vals <- c("ws","treatment","species","attempt","color_id")
+
+#select specific columns by name and treat 
+esa[, categorical_vals] <- lapply(esa[, categorical_vals], as.factor)
+
+```
+
+
+## Correlation pairs on the response variables
+```{r}
+# Load libraries
+library(pheatmap)
+
+# Compute correlation matrix
+cor_matrix <- cor(esa[,c(9:25)], use = "complete.obs")
+
+# Plot heat map
+pheatmap(cor_matrix, main = "Correlation Heatmap")
+```
+
+
+## Principal Component Analysis 
+```{r}
+# mat <- as.matrix(cbind(esa$PPFD,esa$Fo,esa$Fm,esa$Fv.Fm,esa$Fs,esa$Fm.,esa$PhiPS2,esa$PRI,esa$CCI,esa$AirTC_Avg,esa$RH_Avg,esa$VWC_Avg,esa$leaf_temp,esa$VPD,esa$gS,esa$leaf_area,esa$leaf_thick)) 
+# names <- c("PPFD","Fo","Fm","Fv.Fm","Fs","Fm.","PhiPS2","PRI","CCI","AirTC_Avg","RH_Avg","VWC_Avg","leaf_temp","VPD","gS","leaf_area","leaf_thick") 
+# colnames(mat)=names 
+# i = diag(c(rep(1,300)))
+# 
+# ## compute correlation matrix
+# one <- matrix(c(rep(1,300)))
+# m <- (i - one%*%(solve(t(one)%*%one))%*%t(one)) 
+# cov = t(mat)%*%m%*%mat / 299
+# d <- sqrt(solve(diag(diag(cov)))) 
+# corr <- d%*%cov%*%d 
+# colnames(corr)=names
+# rownames(corr)=names 
+# corr
+```
+
+##
+```{r}
+# ecorr <- eigen(corr)         
+#  ## pca on correlation matrix 
+# pctexpcor = 100*(ecorr$values/17) 
+# lcor <- sqrt(ecorr$values);  
+# ecor <- ecorr$vectors
+# rownames(ecor)=names     
+# rrcor <- t(lcor*t(ecor))       
+# ecorr$values
+# vec <- ecorr$vectors
+# vec[,1:6] ##selecting the first 6 PCs
+# pctexpcor
+# ecor[,1:6]
+# sum = (9.392772116 + 1.906616076 + 1.288776054 + 1.071947095 + 0.889440803 + 0.857094777 + 0.619825207 + 0.382407830 + 0.231737427 + 0.123701216 + 0.093999946 + 0.084563521 + 0.033781199 + 0.013935119 + 0.004711675 + 0.003121222 + 0.001568717)
+# pc_4 <- 9.392772116 + 1.906616076 + 1.288776054 + 1.071947095 + 0.889440803 + 0.857094777
+# var_exp <- pc_4/sum
+```
+
+
+
+## Running and Plotting the PCs
+```{r}
+## We use correlation matrix because of the different scales of measurements
+pca=prcomp(esa[,9:25],center=TRUE,scale=TRUE) 
+
+## Getting the Eigen values
+evalues=pca$sdev^2
+print(evalues)
+
+##Percentage explained
+pct=(pca$sdev^2/16)*100
+pct
+##Getting only the first 4 PCs because it explains 92 percent of variation
+pcs=pca$rotation[,1:4]
+pcs
+pcscores= pca$x[,1:4]
+pcscores
+rrcor<-t(pca$sdev*t(pcs)) 
+rrcor
+
+
+plot(pca$scores,pch=scores[,1])
+```
+
+
+## LASSO 
+```{r}
+# Load necessary libraries
+library(glmnet)
+y <- esa$PRI
+
+# Extract predictor variables (all except the response column)
+predictors <- esa[, -16] 
+
+# Converting data frame into matrix
+predictors[] <- lapply(predictors, function(x) if(is.character(x) | is.factor(x)) as.numeric(as.factor(x)) else x)
+
+# Convert to matrix
+mat <- as.matrix(predictors)
+print(mat)
+
+
+# Standardize predictors
+x_standardized <- scale(mat)  
+
+# Fit LASSO model (alpha = 1 for LASSO)
+lasso_model <- glmnet(x_standardized, y, alpha = 1)
+
+# Perform cross-validation to find optimal lambda
+cv_lasso <- cv.glmnet(x_standardized, y, alpha = 1)
+
+# Extract best lambda
+best_lambda <- cv_lasso$lambda.min
+
+# Refit LASSO model with best lambda
+lasso_final <- glmnet(x_standardized, y, alpha = 1, lambda = best_lambda)
+
+# Print coefficients
+coef(lasso_final)
+
+```
+
+

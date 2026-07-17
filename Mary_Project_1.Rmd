@@ -1,0 +1,351 @@
+---
+title: "Mary Kasakamu: Blocked Split-Plot or Repeated-Measures Mixed Model"
+author: "Frank Agyemang : SC3L Consultant"
+format:
+  pdf:
+    pdf-engine: xelatex
+    syntax-highlighting: github
+    code-block-bg: "#f5f5f5"
+    code-block-border-left: "#f5f5f5"
+    code-line-numbers: false
+    toc: true
+    toc-depth: 3
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+An experiment was conducted to determine how two treatments (concrete and rubber) floors affect pigs. Pigs were  randomly placed in pens where some pens had concrete floors and other had rubber floors. The experiment was conducted in 15 weeks with pigs undergoing three gestation (early, medium and late) stages. The ambient temperature for each pen was measured and the surface temperature of each pig was measured. The experimental units are each pen and the sampling unit is each pig. The response variable is the mean surface temperature.
+
+```{r, warning=FALSE, echo=FALSE}
+## Loading all libraries
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(lme4)
+library(lmerTest)
+library(emmeans)
+library(car)
+library(nlme)
+library(knitr)
+```
+
+### Data Preparation
+
+The original data comprised of 11 variables but for this analysis, only 8 of those variables were used for analysis. The Date and Week variables essentially contained the same information with date specifying a particular week. Thus, the variable Date was removed. Also, the mean surface temperature was used as the response variable and thus, the minimum and maximum surface temperatures at a given time period were excluded too. Pen_ID consisted of the ID of a given pen and the ID of individual pigs in a pen. This variable was thus split into two variables, Pen_id and Pig_id. There were 4 pens and 8 pigs in each pen. Qualitative variables were treated as factors and the final data set for analysis consisted of 1305 observations.
+
+```{r, warning=FALSE}
+## Reading in the clean data
+pigs_data <- read.csv("pigs_thermo_data.csv")
+
+## Split Pen_ID into two IDs
+pigs_data <- pigs_data %>%
+  separate(
+    col = Pen_ID,
+    into = c("Pen_ID", "Pig_ID"),
+    sep = "_",
+    convert = TRUE
+  )
+
+## Making Pen_id, Gestation_stage, and Treatment as factors
+factor_vars <- c("Pen_ID", "Treatment", "Gest_stage", "Pig_ID")
+
+# Convert them to factors
+pigs_data[factor_vars] <- lapply(pigs_data[factor_vars], as.factor)
+pigs_data$Time <- NULL
+
+
+pigs_data <- pigs_data %>%
+  mutate(Pig_unique = interaction(Pen_ID, Treatment,
+                                  Pig_ID, drop = TRUE),
+      Pen_Treatment = interaction(Pen_ID,
+                                Treatment, drop = TRUE)
+  )
+```
+
+
+## Exploratory Data Analysis
+
+Before any model was fit to the data, I conducted an exploratory data analysis to understand the distribution of the response variable and identify relevant trends.
+
+Figure 1 shows the boxplot of surface temperature by treatment. From Figure 1, we can see that the mean surface temperature of pigs that received concrete treatment are about the same as those that received rubber treatments. Nevertheless, there are more outlines in the rubber treatment.
+
+```{r, warning=FALSE}
+## Boxplots of predictor variables against surface temperatures
+
+### Treatment
+ggplot(pigs_data, aes(x = Treatment, y = Surf_temp, fill = Treatment)) +
+  geom_boxplot() +
+  labs(
+    title = "Boxplot of surface temperature by Treatment",
+    x = "Treatment",
+    y = "Mean",
+    fill = "Treatment"
+  ) +
+  theme_bw()
+```
+
+Figure 2 shows the boxplot of surface temperature by gestation stage. From the boxplot, the mean surface temperature was highest at the early gestation stage and lowest at the late gestation stage. There were a lot of outliers at the late gestation stage.
+
+```{r}
+### Gestation Stage
+ggplot(pigs_data, aes(x = Gest_stage, y = Surf_temp, fill = Gest_stage)) +
+  geom_boxplot() +
+  labs(
+    title = "Boxplot of surface temperature by gestation stage",
+    x = "Gest_stage",
+    y = "Mean",
+    fill = "Gest_stage"
+  ) +
+  theme_bw()
+```
+Figure 3 shows boxplot of surface temperature by pen ID. Since pen ID serves as blocks, it was reasonable to determine if there are differences in surface temperatures due to blocks. From the boxplot, pen ID 8 had the lowest surface temperature on average, with the rest of the pens having about the same average surface temperatures. Nevertheless, we see a lot of outliers in pen ID 6.
+
+```{r}
+## Pen ID
+ggplot(pigs_data, aes(x = Pen_ID, y = Surf_temp, fill = Pen_ID)) +
+  geom_boxplot() +
+  labs(
+    title = "Boxplot of surface temperature by Pen ID",
+    x = "Pen_ID",
+    y = "Mean",
+    fill = "Pen_ID"
+  ) +
+  theme_bw()
+
+```
+
+Figure 4 shows scatter plots surface temperature by ambient temperature and week respectively. From the plot, the lowest surface temperature was recorded when ambient temperature was between 22.5 and 23.5. Also, the lowest surface temperature was recorded on the tenth week while the highest surface temperature was recorded on the eleventh week.
+
+```{r}
+## Quantitative Variables
+### Ambient Temperature
+ggplot(pigs_data, aes(x = Amb_Temp, y = Surf_temp)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of surface temperature by ambient temperature",
+    x = "Ambient Temperature",
+    y = "Surf_temp"
+  ) +
+  theme_bw()
+
+### Week 
+ggplot(pigs_data, aes(x = Week, y = Surf_temp)) +
+  geom_point() +
+  labs(
+    title = "Scatter Plot of surface temperature by week",
+    x = "Week",
+    y = "Surf_temp"
+  ) +
+  theme_bw()
+```
+
+```{r}
+
+pigs_data <- pigs_data %>%
+  mutate(
+    Pen_ID = as.factor(Pen_ID),
+    Pig_ID = as.factor(Pig_ID),
+    Week = as.numeric(Week)
+  )
+
+ggplot(
+  pigs_data,
+  aes(
+    x = Week,
+    y = Surf_temp,
+    color = Pig_ID,
+    group = interaction(Pen_ID, Pig_ID)
+  )
+) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 1) +
+  facet_wrap(~ Pen_ID) +
+  labs(
+    title = "Trend Lines for Each Pig Within Each Pen Over Time",
+    x = "Week",
+    y = "Surface Temperature",
+    color = "Pig ID"
+  ) +
+  theme_bw()
+```
+
+
+
+```{r}
+
+## Getting the number of pigs in each pen
+pigs_data %>%
+  group_by(Pen_ID) %>%
+  summarise(
+    number_of_pigs = n_distinct(Pig_ID),
+    .groups = "drop"
+  )
+
+## Getting the number of distinct treatment in each pen
+pigs_data %>%
+  group_by(Pen_ID) %>%
+  summarise(
+    number_of_trt = n_distinct(Treatment),
+    .groups = "drop"
+  )
+
+## Checking the number of ambient temperature taken
+pigs_data %>%
+  group_by(Pen_ID,Week, Treatment) %>%
+  summarise(
+    number_of_meas = n_distinct(Amb_Temp),
+    .groups = "drop"
+  )
+```
+
+
+
+## Advance Analysis
+
+The experimental design can be described as a blocked split-plot/repeated-measures mixed model, where Pen is the block, floor treatment is applied within each pen, pigs are nested within Pen × Treatment, and weeks/gestation stages are repeated measurements on each pig. An important information to note is that pig is not the true experimental unit for treatment if the floor treatment is applied to a pen section. The experimental unit for treatment is the Pen × Treatment unit, while pigs are sub-samples/repeated subjects within that unit. 
+
+```{r}
+## Counting the number of repeated measurement
+summary_counts <- pigs_data %>%
+  count(Pen_ID, Treatment, Pig_ID, Week) %>%
+  filter(n > 1)
+
+## Averaging over repeated measurement within a week
+pigs_weekly <- pigs_data %>%
+  group_by(Pen_ID, Treatment, Pig_ID, Week,
+           Gest_stage,Pen_Treatment, Pig_unique) %>%
+  summarise(
+    Surf_temp_mean = mean(Surf_temp, na.rm = TRUE),
+    Amb_Temp_mean = mean(Amb_Temp, na.rm = TRUE),
+    RH_mean = mean(RH, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  arrange(Pen_ID, Treatment, Pig_ID, Week)
+
+## Removing Pig unique id 8
+pigs_weekly <- pigs_weekly %>%
+  filter(Pig_unique != "6.C.8")
+```
+
+For a split plot in time or repeated measures, there are two error components, one for the whole plot factor and one for the split plot factor. In this experiment, the whole plot factor is the treatment and time can be considered as the split plot factor.
+
+Another important consideration is the correlation structure of this design. It is reasonable to assume that weeks 1 and 2 will be more correlated compared to weeks 1 and 10. Thus, we use the auto-regressive (AR1) correlation structure.
+
+Looking at the summary output, we have estimates of both fixed and random effects. For Pen ID (blocks), we have a standard deviation of $0.17$. The standard deviation for Pen treatment nested in each pen ID is $0.01$. Lastly, the standard deviation for a unique pig receiving a treatment in a pen ID is $0.39$.
+
+For fixed effects, we have estimates for intercept, treatment, gestation stage and possible interaction effects. From the table below, the estimate for the intercept, rubber treatment, late gestation stage, mid gestation stage, scaled ambient temperature are $35.34$, $0.48$,$-3.33$,$-2.83$ and $1.23$ respectively. The intercept shows that when all other variables are held constant, the mean surface temperature of pigs will be about $35$ degrees. A unit increment in the value of any of the other variables when other variables are held constant may increase or decrease the mean surface temperature for positive and negative values respectively.
+
+Lastly, we look at the estimates for the interaction terms, rubber treatment by late gestation and rubber treatment by mid gestation stages. We have $-0.43$ and $-0.61$ respectively.
+
+```{r, warning=FALSE}
+## Model 1 with no AR1 correlation structure
+mixed_mod1 <- lme(
+  fixed = Surf_temp_mean ~ Treatment * Gest_stage +
+    scale(Amb_Temp_mean),
+  random = ~ 1 | Pen_ID/Pen_Treatment/Pig_unique,
+  data = pigs_weekly,
+  method = "REML",
+  na.action = na.omit,
+  control = lmeControl(opt = "optim")
+)
+
+mod1_summary <-summary(mixed_mod1)$tTable
+
+kable(
+  mod1_summary,
+  caption = "Random and Fixed Effect Estimates"
+)
+```
+We now look at the ANOVA table to determine which of the terms are statistically significant. From the ANOVA table, intercept, gestation stage, and scaled ambient temperature are statistically significant with p-values less than $0.05$. This means that there is a significant difference between treatments (concrete and rubber floors), gestation stage (early, mid, late), and ambient temperatures.
+
+```{r}
+anova(mixed_mod1)
+```
+
+Lastly, we plot a response curve to determine how ambient temperatures affect surface temperatures. From the plot, we see that an upward trend in surface temperatures in all three gestation stages. Nevertheless, at early gestation stage, pigs that received rubber treatment(shown in light green) have higher surface temperature than those that received a concrete treatment. For the late gestation stage, the surface temperatures for pigs receiving both rubber and concrete treatments are about the same. Lastly, for mid gestation stage, pigs that received concrete treatment had slightly high surface temperature than those that received rubber treatment. It should be noted that each gestation stage also correspond to a season (Spring, Summer,Fall/Winter) and that could explain the results we see. Also, the curves are quadratic in nature and not linear. Therefore, it would be a good idea to determine the peak and turning point of surface temperatures. 
+
+```{r}
+## Getting a response surface plot
+mixed_mod2 <- lme(
+  fixed = Surf_temp_mean ~ Treatment * Gest_stage +
+    Amb_Temp_mean + I(Amb_Temp_mean^2),
+  random = ~ 1 | Pen_ID/Pen_Treatment/Pig_unique,
+  data = pigs_weekly,
+  method = "REML",
+  na.action = na.omit,
+  control = lmeControl(opt = "optim")
+)
+
+temp_mean <- mean(pigs_weekly$Amb_Temp_mean, na.rm = TRUE)
+temp_sd   <- sd(pigs_weekly$Amb_Temp_mean, na.rm = TRUE)
+
+pred_data <- expand.grid(
+  Amb_Temp_mean = seq(
+    min(pigs_weekly$Amb_Temp_mean, na.rm = TRUE),
+    max(pigs_weekly$Amb_Temp_mean, na.rm = TRUE),
+    length.out = 100
+  ),
+  Treatment = levels(pigs_weekly$Treatment),
+  Gest_stage = levels(pigs_weekly$Gest_stage)
+)
+
+pred_data <- pred_data %>%
+  mutate(
+    Amb_Temp_sc = (Amb_Temp_mean - temp_mean) / temp_sd,
+
+    # Needed for predict.lme, even though we predict fixed effects only
+    Pen_ID = levels(pigs_weekly$Pen_ID)[1],
+    Pen_Treatment = levels(pigs_weekly$Pen_Treatment)[1],
+    Pig_unique = levels(pigs_weekly$Pig_unique)[1]
+  )
+
+pred_data$predicted_surface_temp <- predict(
+  mixed_mod2,
+  newdata = pred_data,
+  level = 0
+)
+
+ggplot() +
+  geom_point(
+    data = pigs_weekly,
+    aes(
+      x = Amb_Temp_mean,
+      y = Surf_temp_mean,
+      color = Treatment
+    ),
+    alpha = 0.35,
+    size = 1.8
+  ) +
+  geom_line(
+    data = pred_data,
+    aes(
+      x = Amb_Temp_mean,
+      y = predicted_surface_temp,
+      color = Treatment
+    ),
+    linewidth = 1.2
+  ) +
+  facet_wrap(~ Gest_stage) +
+  labs(
+    title = "Predicted Surface Temperature Response to Ambient Temperature",
+    subtitle = "Blocked repeated-measures mixed model",
+    x = "Ambient Temperature",
+    y = "Predicted Surface Temperature",
+    color = "Treatment"
+  ) +
+  theme_bw()
+```
+
+
+## Conclusion
+
+In conclusion, an experiment was designed to understand how ambient temperature, treatment, and gestation stage affect the surface temperatures of pigs. A split plot/ repeated measures with blocks was used to analyze the data. We see that as ambient temperature increases, surface temperature increases. Also, gestation stage and type of treatment has a significant effect on the surface temperatures of pigs. In future studies, experiment could be set up in a way that each pen would consist of equal number of pigs since in this study, some pens had more pigs that others and that can potentially affect the surface temperatures of pigs.
+

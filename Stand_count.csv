@@ -1,0 +1,325 @@
+"location_id","Rep","Crop","Grass","Standcount"
+"FAB_UNL_keystone","1","Corn","Control",7
+"FAB_UNL_keystone","1","Corn","Control",7
+"FAB_UNL_keystone","1","Corn","RhB",8
+"FAB_UNL_keystone","1","Corn","RhB",7
+"FAB_UNL_keystone","1","Corn","KBG",7
+"FAB_UNL_keystone","1","Corn","KBG",7
+"FAB_UNL_keystone","2","Corn","RhB",7
+"FAB_UNL_keystone","2","Corn","RhB",7
+"FAB_UNL_keystone","2","Corn","KBG",8
+"FAB_UNL_keystone","2","Corn","KBG",7
+"FAB_UNL_keystone","2","Corn","Control",7
+"FAB_UNL_keystone","2","Corn","Control",7
+"FAB_UNL_keystone","2","Soybean ","RhB",26
+"FAB_UNL_keystone","2","Soybean ","RhB",33
+"FAB_UNL_keystone","2","Soybean ","KBG",32
+"FAB_UNL_keystone","2","Soybean ","KBG",26
+"FAB_UNL_keystone","2","Soybean ","Control",33
+"FAB_UNL_keystone","2","Soybean ","Control",27
+"FAB_UNL_keystone","1","Soybean ","KBG",33
+"FAB_UNL_keystone","1","Soybean ","KBG",29
+"FAB_UNL_keystone","1","Soybean ","Control",28
+"FAB_UNL_keystone","1","Soybean ","Control",35
+"FAB_UNL_keystone","1","Soybean ","RhB",35
+"FAB_UNL_keystone","1","Soybean ","RhB",28
+"FAB_UNL_keystone","1","Corn","KBG",7
+"FAB_UNL_keystone","1","Corn","KBG",8
+"FAB_UNL_keystone","1","Corn","Control",7
+"FAB_UNL_keystone","1","Corn","Control",6
+"FAB_UNL_keystone","1","Corn","RhB",7
+"FAB_UNL_keystone","1","Corn","RhB",7
+"FAB_UNL_keystone","2","Corn","Control",7
+"FAB_UNL_keystone","2","Corn","Control",8
+"FAB_UNL_keystone","2","Corn","RhB",7
+"FAB_UNL_keystone","2","Corn","RhB",7
+"FAB_UNL_keystone","2","Corn","KBG",6
+"FAB_UNL_keystone","2","Corn","KBG",8
+"FAB_UNL_keystone","3","Corn","RhB",7
+"FAB_UNL_keystone","3","Corn","RhB",7
+"FAB_UNL_keystone","3","Corn","KBG",7
+"FAB_UNL_keystone","3","Corn","KBG",5
+"FAB_UNL_keystone","3","Corn","Control",7
+"FAB_UNL_keystone","3","Corn","Control",7
+"FAB_UNL_keystone","4","Corn","KBG",7
+"FAB_UNL_keystone","4","Corn","KBG",7
+"FAB_UNL_keystone","4","Corn","Control",7
+"FAB_UNL_keystone","4","Corn","Control",7
+"FAB_UNL_keystone","4","Corn","RhB",7
+"FAB_UNL_keystone","4","Corn","RhB",7
+"FAB_UNL_keystone","4","Corn","KBG",7
+"FAB_UNL_keystone","4","Corn","KBG",6
+"FAB_UNL_keystone","4","Corn","Control",7
+"FAB_UNL_keystone","4","Corn","Control",7
+"FAB_UNL_keystone","4","Corn","RhB",7
+"FAB_UNL_keystone","4","Corn","RhB",7
+"FAB_UNL_keystone","3","Corn","Control",8
+"FAB_UNL_keystone","3","Corn","Control",7
+"FAB_UNL_keystone","3","Corn","RhB",7
+"FAB_UNL_keystone","3","Corn","RhB",7
+"FAB_UNL_keystone","3","Corn","KBG",8
+"FAB_UNL_keystone","3","Corn","KBG",7
+"FAB_UNL_keystone","3","Soybean ","Control",32
+"FAB_UNL_keystone","3","Soybean ","Control",30
+"FAB_UNL_keystone","3","Soybean ","RhB",32
+"FAB_UNL_keystone","3","Soybean ","RhB",34
+"FAB_UNL_keystone","3","Soybean ","KBG",36
+"FAB_UNL_keystone","3","Soybean ","KBG",29
+"FAB_UNL_keystone","4","Soybean ","RhB",27
+"FAB_UNL_keystone","4","Soybean ","RhB",33
+"FAB_UNL_keystone","4","Soybean ","KBG",38
+"FAB_UNL_keystone","4","Soybean ","KBG",25
+"FAB_UNL_keystone","4","Soybean ","Control",35
+"FAB_UNL_keystone","4","Soybean ","Control",29
+"FAB_UNL_keystone","6","Corn","KBG",7
+"FAB_UNL_keystone","6","Corn","KBG",7
+"FAB_UNL_keystone","6","Corn","RhB",7
+"FAB_UNL_keystone","6","Corn","RhB",7
+"FAB_UNL_keystone","6","Corn","Control",7
+"FAB_UNL_keystone","6","Corn","Control",7
+"FAB_UNL_keystone","5","Corn","RhB",7
+"FAB_UNL_keystone","5","Corn","RhB",7
+"FAB_UNL_keystone","5","Corn","KBG",7
+"FAB_UNL_keystone","5","Corn","KBG",7
+"FAB_UNL_keystone","5","Corn","Control",7
+"FAB_UNL_keystone","5","Corn","Control",8
+"FAB_UNL_keystone","5","Corn","Control",7
+"FAB_UNL_keystone","5","Corn","Control",7
+"FAB_UNL_keystone","5","Corn","KBG",6
+"FAB_UNL_keystone","5","Corn","KBG",7
+"FAB_UNL_keystone","5","Corn","RhB",7
+"FAB_UNL_keystone","5","Corn","RhB",7
+"FAB_UNL_keystone","6","Corn","KBG",6
+"FAB_UNL_keystone","6","Corn","KBG",7
+"FAB_UNL_keystone","6","Corn","Control",7
+"FAB_UNL_keystone","6","Corn","Control",6
+"FAB_UNL_keystone","6","Corn","RhB",6
+"FAB_UNL_keystone","6","Corn","RhB",7
+"FAB_UNL_keystone","6","Soybean ","RhB",24
+"FAB_UNL_keystone","6","Soybean ","RhB",25
+"FAB_UNL_keystone","6","Soybean ","Control",29
+"FAB_UNL_keystone","6","Soybean ","Control",42
+"FAB_UNL_keystone","6","Soybean ","KBG",32
+"FAB_UNL_keystone","6","Soybean ","KBG",33
+"FAB_UNL_keystone","5","Soybean ","Control",32
+"FAB_UNL_keystone","5","Soybean ","Control",37
+"FAB_UNL_keystone","5","Soybean ","RhB",32
+"FAB_UNL_keystone","5","Soybean ","RhB",22
+"FAB_UNL_keystone","5","Soybean ","KBG",23
+"FAB_UNL_keystone","5","Soybean ","KBG",19
+"FAB_TLI_keystone","2","Soybean","KBG",11
+"FAB_TLI_keystone","2","Soybean","KBG",11
+"FAB_TLI_keystone","2","Soybean","Control",14
+"FAB_TLI_keystone","2","Soybean","Control",11
+"FAB_TLI_keystone","2","Soybean","RhB",18
+"FAB_TLI_keystone","2","Soybean","RhB",24
+"FAB_TLI_keystone","1","Soybean","Control",22
+"FAB_TLI_keystone","1","Soybean","Control",20
+"FAB_TLI_keystone","1","Soybean","RhB",19
+"FAB_TLI_keystone","1","Soybean","RhB",21
+"FAB_TLI_keystone","1","Soybean","KBG",20
+"FAB_TLI_keystone","1","Soybean","KBG",22
+"FAB_TLI_keystone","1","Corn","RhB",6
+"FAB_TLI_keystone","1","Corn","RhB",3
+"FAB_TLI_keystone","1","Corn","KBG",6
+"FAB_TLI_keystone","1","Corn","KBG",6
+"FAB_TLI_keystone","1","Corn","Control",6
+"FAB_TLI_keystone","1","Corn","Control",6
+"FAB_TLI_keystone","2","Corn","KBG",6
+"FAB_TLI_keystone","2","Corn","KBG",6
+"FAB_TLI_keystone","2","Corn","Control",7
+"FAB_TLI_keystone","2","Corn","Control",6
+"FAB_TLI_keystone","2","Corn","RhB",6
+"FAB_TLI_keystone","2","Corn","RhB",6
+"FAB_TLI_keystone","2","Corn","Control",6
+"FAB_TLI_keystone","2","Corn","Control",7
+"FAB_TLI_keystone","2","Corn","RhB",6
+"FAB_TLI_keystone","2","Corn","RhB",6
+"FAB_TLI_keystone","2","Corn","KBG",6
+"FAB_TLI_keystone","2","Corn","KBG",4
+"FAB_TLI_keystone","1","Corn","RhB",7
+"FAB_TLI_keystone","1","Corn","RhB",6
+"FAB_TLI_keystone","1","Corn","KBG",6
+"FAB_TLI_keystone","1","Corn","KBG",7
+"FAB_TLI_keystone","1","Corn","Control",6
+"FAB_TLI_keystone","1","Corn","Control",7
+"FAB_TLI_keystone","3","Corn","KBG",7
+"FAB_TLI_keystone","3","Corn","KBG",7
+"FAB_TLI_keystone","3","Corn","Control",6
+"FAB_TLI_keystone","3","Corn","Control",7
+"FAB_TLI_keystone","3","Corn","RhB",5
+"FAB_TLI_keystone","3","Corn","RhB",7
+"FAB_TLI_keystone","4","Corn","Control",7
+"FAB_TLI_keystone","4","Corn","Control",6
+"FAB_TLI_keystone","4","Corn","KBG",6
+"FAB_TLI_keystone","4","Corn","KBG",6
+"FAB_TLI_keystone","4","Corn","RhB",7
+"FAB_TLI_keystone","4","Corn","RhB",7
+"FAB_TLI_keystone","4","Corn","RhB",6
+"FAB_TLI_keystone","4","Corn","RhB",6
+"FAB_TLI_keystone","4","Corn","KBG",6
+"FAB_TLI_keystone","4","Corn","KBG",6
+"FAB_TLI_keystone","4","Corn","Control",7
+"FAB_TLI_keystone","4","Corn","Control",6
+"FAB_TLI_keystone","3","Corn","RhB",6
+"FAB_TLI_keystone","3","Corn","RhB",7
+"FAB_TLI_keystone","3","Corn","Control",6
+"FAB_TLI_keystone","3","Corn","Control",7
+"FAB_TLI_keystone","3","Corn","KBG",6
+"FAB_TLI_keystone","3","Corn","KBG",6
+"FAB_TLI_keystone","3","Soybean","Control",18
+"FAB_TLI_keystone","3","Soybean","Control",19
+"FAB_TLI_keystone","3","Soybean","RhB",20
+"FAB_TLI_keystone","3","Soybean","RhB",19
+"FAB_TLI_keystone","3","Soybean","KBG",18
+"FAB_TLI_keystone","3","Soybean","KBG",22
+"FAB_TLI_keystone","4","Soybean","KBG",19
+"FAB_TLI_keystone","4","Soybean","KBG",17
+"FAB_TLI_keystone","4","Soybean","RhB",18
+"FAB_TLI_keystone","4","Soybean","RhB",20
+"FAB_TLI_keystone","4","Soybean","Control",18
+"FAB_TLI_keystone","4","Soybean","Control",19
+"FAB_TLI_keystone","6","Corn","KBG",6
+"FAB_TLI_keystone","6","Corn","KBG",6
+"FAB_TLI_keystone","6","Corn","RhB",6
+"FAB_TLI_keystone","6","Corn","RhB",6
+"FAB_TLI_keystone","6","Corn","Control",6
+"FAB_TLI_keystone","6","Corn","Control",6
+"FAB_TLI_keystone","5","Corn","Control",6
+"FAB_TLI_keystone","5","Corn","Control",6
+"FAB_TLI_keystone","5","Corn","RhB",6
+"FAB_TLI_keystone","5","Corn","RhB",6
+"FAB_TLI_keystone","5","Corn","KBG",6
+"FAB_TLI_keystone","5","Corn","KBG",6
+"FAB_TLI_keystone","5","Soybean","RhB",20
+"FAB_TLI_keystone","5","Soybean","RhB",18
+"FAB_TLI_keystone","5","Soybean","Control",17
+"FAB_TLI_keystone","5","Soybean","Control",21
+"FAB_TLI_keystone","5","Soybean","KBG",21
+"FAB_TLI_keystone","5","Soybean","KBG",18
+"FAB_TLI_keystone","6","Soybean","RhB",20
+"FAB_TLI_keystone","6","Soybean","RhB",21
+"FAB_TLI_keystone","6","Soybean","KBG",20
+"FAB_TLI_keystone","6","Soybean","KBG",16
+"FAB_TLI_keystone","6","Soybean","Control",6
+"FAB_TLI_keystone","6","Soybean","Control",9
+"FAB_TLI_keystone","6","Corn","Control",6
+"FAB_TLI_keystone","6","Corn","Control",6
+"FAB_TLI_keystone","6","Corn","KBG",6
+"FAB_TLI_keystone","6","Corn","KBG",6
+"FAB_TLI_keystone","6","Corn","RhB",6
+"FAB_TLI_keystone","6","Corn","RhB",6
+"FAB_TLI_keystone","5","Corn","KBG",6
+"FAB_TLI_keystone","5","Corn","KBG",6
+"FAB_TLI_keystone","5","Corn","Control",6
+"FAB_TLI_keystone","5","Corn","Control",6
+"FAB_TLI_keystone","5","Corn","RhB",6
+"FAB_TLI_keystone","5","Corn","RhB",6
+"FAB_CTV_keystone","1","Soybean","Control",16
+"FAB_CTV_keystone","1","Soybean","Control",12
+"FAB_CTV_keystone","2","Corn","KBG",3
+"FAB_CTV_keystone","2","Corn","KBG",4
+"FAB_CTV_keystone","1","Corn","RhB",4
+"FAB_CTV_keystone","1","Corn","RhB",4
+"FAB_CTV_keystone","4","Corn","RhB",4
+"FAB_CTV_keystone","4","Corn","RhB",4
+"FAB_CTV_keystone","3","Corn","Control",4
+"FAB_CTV_keystone","3","Corn","Control",4
+"FAB_CTV_keystone","4","Soybean","KBG",15
+"FAB_CTV_keystone","4","Soybean","KBG",13
+"FAB_CTV_keystone","5","Soybean","RhB",14
+"FAB_CTV_keystone","5","Soybean","RhB",12
+"FAB_CTV_keystone","6","Corn","KBG",4
+"FAB_CTV_keystone","6","Corn","KBG",4
+"FAB_CTV_keystone","5","Corn","Control",4
+"FAB_CTV_keystone","5","Corn","Control",4
+"FAB_CTV_keystone","1","Soybean","RhB",15
+"FAB_CTV_keystone","1","Soybean","RhB",12
+"FAB_CTV_keystone","2","Corn","Control",4
+"FAB_CTV_keystone","2","Corn","Control",4
+"FAB_CTV_keystone","1","Corn","KBG",4
+"FAB_CTV_keystone","1","Corn","KBG",4
+"FAB_CTV_keystone","4","Corn","KBG",4
+"FAB_CTV_keystone","4","Corn","KBG",4
+"FAB_CTV_keystone","3","Corn","RhB",4
+"FAB_CTV_keystone","3","Corn","RhB",4
+"FAB_CTV_keystone","4","Soybean","Control",15
+"FAB_CTV_keystone","4","Soybean","Control",13
+"FAB_CTV_keystone","5","Soybean","KBG",16
+"FAB_CTV_keystone","5","Soybean","KBG",13
+"FAB_CTV_keystone","6","Corn","Control",4
+"FAB_CTV_keystone","6","Corn","Control",4
+"FAB_CTV_keystone","5","Corn","RhB",4
+"FAB_CTV_keystone","5","Corn","RhB",4
+"FAB_CTV_keystone","1","Soybean","KBG",14
+"FAB_CTV_keystone","1","Soybean","KBG",16
+"FAB_CTV_keystone","2","Corn","RhB",4
+"FAB_CTV_keystone","2","Corn","RhB",4
+"FAB_CTV_keystone","1","Corn","Control",4
+"FAB_CTV_keystone","1","Corn","Control",4
+"FAB_CTV_keystone","4","Corn","Control",4
+"FAB_CTV_keystone","4","Corn","Control",4
+"FAB_CTV_keystone","3","Corn","KBG",4
+"FAB_CTV_keystone","3","Corn","KBG",4
+"FAB_CTV_keystone","4","Soybean","RhB",15
+"FAB_CTV_keystone","4","Soybean","RhB",14
+"FAB_CTV_keystone","5","Soybean","Control",13
+"FAB_CTV_keystone","5","Soybean","Control",14
+"FAB_CTV_keystone","6","Corn","RhB",4
+"FAB_CTV_keystone","6","Corn","RhB",4
+"FAB_CTV_keystone","5","Corn","KBG",4
+"FAB_CTV_keystone","5","Corn","KBG",4
+"FAB_CTV_keystone","2","Soybean","KBG",15
+"FAB_CTV_keystone","2","Soybean","KBG",15
+"FAB_CTV_keystone","1","Corn","RhB",4
+"FAB_CTV_keystone","1","Corn","RhB",4
+"FAB_CTV_keystone","2","Corn","Control",4
+"FAB_CTV_keystone","2","Corn","Control",4
+"FAB_CTV_keystone","3","Corn","RhB",4
+"FAB_CTV_keystone","3","Corn","RhB",4
+"FAB_CTV_keystone","4","Corn","Control",4
+"FAB_CTV_keystone","4","Corn","Control",3
+"FAB_CTV_keystone","3","Soybean","KBG",14
+"FAB_CTV_keystone","3","Soybean","KBG",15
+"FAB_CTV_keystone","6","Soybean","KBG",15
+"FAB_CTV_keystone","6","Soybean","KBG",12
+"FAB_CTV_keystone","5","Corn","RhB",4
+"FAB_CTV_keystone","5","Corn","RhB",3
+"FAB_CTV_keystone","6","Corn","Control",4
+"FAB_CTV_keystone","6","Corn","Control",4
+"FAB_CTV_keystone","2","Soybean","Control",14
+"FAB_CTV_keystone","2","Soybean","Control",15
+"FAB_CTV_keystone","1","Corn","KBG",5
+"FAB_CTV_keystone","1","Corn","KBG",5
+"FAB_CTV_keystone","2","Corn","RhB",4
+"FAB_CTV_keystone","2","Corn","RhB",4
+"FAB_CTV_keystone","3","Corn","KBG",4
+"FAB_CTV_keystone","3","Corn","KBG",4
+"FAB_CTV_keystone","4","Corn","RhB",4
+"FAB_CTV_keystone","4","Corn","RhB",4
+"FAB_CTV_keystone","3","Soybean","Control",13
+"FAB_CTV_keystone","3","Soybean","Control",16
+"FAB_CTV_keystone","6","Soybean","RhB",13
+"FAB_CTV_keystone","6","Soybean","RhB",14
+"FAB_CTV_keystone","5","Corn","Control",4
+"FAB_CTV_keystone","5","Corn","Control",4
+"FAB_CTV_keystone","6","Corn","KBG",4
+"FAB_CTV_keystone","6","Corn","KBG",4
+"FAB_CTV_keystone","2","Soybean","RhB",15
+"FAB_CTV_keystone","2","Soybean","RhB",13
+"FAB_CTV_keystone","1","Corn","Control",5
+"FAB_CTV_keystone","1","Corn","Control",5
+"FAB_CTV_keystone","2","Corn","KBG",4
+"FAB_CTV_keystone","2","Corn","KBG",4
+"FAB_CTV_keystone","3","Corn","Control",4
+"FAB_CTV_keystone","3","Corn","Control",4
+"FAB_CTV_keystone","4","Corn","KBG",4
+"FAB_CTV_keystone","4","Corn","KBG",4
+"FAB_CTV_keystone","3","Soybean","RhB",13
+"FAB_CTV_keystone","3","Soybean","RhB",13
+"FAB_CTV_keystone","6","Soybean","Control",16
+"FAB_CTV_keystone","6","Soybean","Control",13
+"FAB_CTV_keystone","5","Corn","KBG",4
+"FAB_CTV_keystone","5","Corn","KBG",4
+"FAB_CTV_keystone","6","Corn","RhB",4
+"FAB_CTV_keystone","6","Corn","RhB",4

@@ -1,0 +1,125 @@
+---
+title: " Split Plot Design With Control: A Case Study in R"
+author: "Frank Agyemang"
+format:
+  html: default
+  pdf: default
+editor: visual
+execute: 
+  warning: false
+  message: false
+  echo: false
+---
+
+
+So far, we have considered Completely Randomized Designs and Randomized Complete Block Designs with Control. Nevertheless, there are situations where we may have a nested design with a Control. We consider the simplest case of a nested design which is the Split-plot with a Control. For example, we can consider an experiment with two factors, Crop rotation method and Perennial grass treatment. Due to resource limitation, the researcher conducts the experiment using a split-plot design where Crop rotation method is the whole plot factor with three levels and three replicates and Perennial grass treatment is the split-plot factor with three levels, where one level is the control.
+
+We like to point out that for split-plot design, it can be tricky and extremely difficult in setting up a control treatment that leads to an analysis of this form. This is because an experimenter may decide to set one of the levels of the whole plot factor as control or may set up one of the levels of the split-plot factor as a control. In most cases, we are likely to see the latter from the consulting desk.This raises the question of how analyzing a split-plot design without a control differs from that with a control treatment. Upon careful observation, the difference arises when treatment comparisons are made. Nevertheless, there are a lot of instances where we may see that wherever we had a control, the value for the response was significantly different than the other treatments. In such instances, one may have to pause and think about how the contrast statements may be written.
+
+Again, the analysis is the same as the traditional split-plot design. The only difference is that, one must first check for whole plot by split-plot interaction effect. If there is no significant interaction effect, then it is reasonable to write contrasts that compare the effects of treatments to that of the control. We illustrate the concept using an example below.
+
+\newpage
+
+### Example
+
+An experiment is conducted to evaluate the effect of two temperatures (20 C and 30 C) and four levels of a plant nutrient (0 55 70 85 grams) on dry matter of potted juniper bushes. Since this was a new study, the researcher wanted to know the effect on the plants if no nutrients were applied. Four growth chambers are available. Two chambers are randomly assigned to each temperature and within each growth chamber a juniper plant is randomly assigned to each nutrient level. The major intent of the study is to determine if shape of the response to nutrient differs for the two temperatures.
+
+### R Code
+
+```{r, warning=FALSE, message=FALSE,echo=FALSE}
+library(dplyr)
+library(fBasics)
+library(doBy)
+library(emmeans)
+library(car)
+library(lme4)
+library(lmerTest)
+# Creating the data frame
+dat <- matrix(c(20, 1, 40.2, 75.7, 77.8, 67.6, 20, 2, 48.0, 68.9, 72.7, 60.1,
+30, 3, 42.7, 57.8, 67.5, 63.7, 30, 4, 50.8, 58.4, 67.7, 71.8),nrow=6)
+
+y <- vec(dat[3:6,])
+
+temp <- vec(cbind(rep(20,8),rep(30,8)))
+temp <- factor(temp)
+chamber <- vec(cbind(rep(1,4),rep(2,4),rep(3,4),rep(4,4)))
+blk <- chamber%%2 
+chamber <- factor(chamber)
+nutr <- vec(rep(1:4,4))
+nutr <- ordered(factor(nutr))
+a <- data.frame(blk,temp,chamber,nutr,y)
+
+## Print the first six rows
+head(a)
+
+```
+
+In the data set above, for the factor "nutrient", levels (1,2,3,4) are equivalent to (0,55,70,85) respectively, where 0 represents the control. A closer look shows that, dry matter was lower when no nutrients were applied. This is one of many examples where one may see that the value for the control treatment may be significantly high or low regardless of the main plot factor. In these instances, one may likely find that the interaction effect between the whole plot and split plot factors is not significant. We show in the subsequent results.
+
+\newpage
+
+With a split plot design with a control, the interaction plot may not necessarily be informative depending on the objective of the study and interpretation of results. We show two interaction plots. The first with temperature on the x-axis illustrates that there is some interaction among treatments but not with the control. The second interaction plot shows interaction for both whole plot and split plot factors and it is difficult to determine if interaction is as a results of treatments in the split plot or everything including the control. My recommendation is to always try both ways to get a better idea. The interaction plots are shown below. Nevertheless, an anova will determine if the interaction is significant.
+
+## R Code
+
+```{r, warning=FALSE,fig.cap="\\label{fig:fig1}Interaction plots of temperature by nutrientients", message=FALSE,echo=FALSE}
+
+# Interaction plot
+interaction.plot(a$temp,a$nutr,a$y,fun=mean)
+interaction.plot(a$nutr,a$temp,a$y,fun=mean)
+
+
+```
+
+\newpage
+
+Next, we show the ANOVA table in figure and we can see that temp is not statistically significant but temp\*nutrient interaction effect marginally significant, p-values are 0.2754 and 0.06495 respectively at $\alpha = 0.05$. There is a significant difference in effect among levels of nutrient, $p-value = 0.0005$. Recall, from the second interaction plot, we can see that the treatments 2, 3 and 4 interact with the whole plot but the control (treatment 1) does not interact with the whole plot. This might explain this marginal significance.
+
+## R Code
+
+```{r, warning=FALSE, message=FALSE,echo=FALSE}
+
+## Note: lmerTest must be installed to obtain p-values from lmer
+result <-lmer( y ~ temp * nutr + (1|temp:chamber) ,data=a)
+anova(result,type = "III")
+
+```
+
+\newpage
+
+We also take a look at the variance components for the main plot and split-plot. We see that the variance for temp:chamber, the main plot, is 2.137 and that for the residual is 17.923. That is, we can say that there isn't a lot of variation among the main plot factors but there is a large variation among split-plot factor. Thus, it makes sense that the split-plot factor, nutrient, is statistically significant.
+
+## R Code
+
+```{r,warning=FALSE, message=FALSE,echo=FALSE}
+
+## Summary function to show the variance for whole plot and residual
+summary(result,split=list(nutr=list(Linear=1, Quad=2))) 
+```
+
+Just like every split-plot design, including the ones with a control, the researcher was interested in determining whether there was some difference in effect among the split plot factor and the anova table showed that at least one treatment differed from the others. It is only reasonable to compare treatments nested within each main effect. Using the emmeans function in r, we obtain results as provided in the pairs(lsms) statement.
+
+## R Code
+
+```{r,warning=FALSE, message=FALSE,echo=FALSE}
+## Least Square Means
+lsms <- emmeans(result,list(~nutr*temp))
+lsms
+## Differences of Least Square Means
+pairs(lsms)
+```
+
+From the table above, we see that at 20 degree temperature there is a significant difference in effect between nutrientient 1 and nutrientient 2, nutrientient 1 and nutrientient 3, nutrientient 1 and nutrientient 4. The p-values are shown in the last column of the table above. We want to reiterate that level 1 of nutrient is the control and thus we see that there is a significant difference in effect between the control and the treatments, p-values are 0.0063, 0.0037, and 0.0359 respectively. For temperature at 30 degrees, we also see a significant difference in effect between nutrient 1 and nutrient 3, nutrient 1 and nutrient 4, p-values are 0.0280 and 0.0271 respectively. There is no significant difference between nutrient 1 and nutrient 2 at temperature 30 degrees, p-value is 0.2808.
+
+Nevertheless, within a particular level for the whole plot, all other treatments are not significantly different from the other except interaction effects.
+
+```{r,warning=FALSE, message=FALSE,echo=FALSE}
+# Contrast comparing control and the treatments
+contrast(lsms, list("Control_vs_Treatments" = c(1, -1/3, -1/3, -1/3)), by = "temp")
+```
+
+Lastly, with this kind of experiment, a researcher would also be interested in comparing the average effect of the treatments within each whole plot factor to the control. Again, we want to state that this is only reasonable if there is no significant whole plot by split-plot interaction effect. Using the contrast statement and with our contrast coefficients, we see that there is a significant difference in effect between control and treatments. The mean estimate for difference in treatments and control at 20 degrees temperature is -26.4 with p-value 0.0003 and at 30 degrees temperature, we have an estimate of -17.7 with p-value 0.0022.
+
+## Conclusion
+
+The analysis of a split-plot design with a control is the same as the traditional split-plot design. If a researcher includes a control in a study, then he or she only needs to write contrast statements to compare the control to other treatments under the condition that there is no interaction between the control and the whole plot treatment factor. In the example presented in this report, we saw that there was not interaction between the control and whole plot factor and thus, comparison of the control to the other treatments in the split plot factor was reasonable. Another question that may be asked is if comparison can be made between control and other treatments and not just the split plot treatment. Further research is being carried out to understand its feasibility.

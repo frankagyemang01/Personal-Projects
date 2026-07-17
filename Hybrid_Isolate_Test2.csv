@@ -1,0 +1,76 @@
+﻿Plant number,Hybrid,Hybrid number,Treatment,Crown Rot Rating,Crown Rot Percentage
+101,Sweet Corn,Golden Cross Bantam ,F. verticillioides,2,20
+102,Sweet Corn,Golden Cross Bantam ,Sterile Toothpick,3,24
+103,Sweet Corn,Golden Cross Bantam ,F. solani,4,30
+104,Sweet Corn,Golden Cross Bantam ,F. graminearum,4,35
+105,Sweet Corn,Golden Cross Bantam ,F. boothii,5,41
+106,Susceptible Dent ,DKC 51-25,F. graminearum,2,25
+107,Susceptible Dent ,DKC 51-25,F. boothii,1,10
+108,Susceptible Dent ,DKC 51-25,Sterile Toothpick,1,5
+109,Susceptible Dent ,DKC 51-25,F. solani,3,41
+110,Susceptible Dent ,DKC 51-25,F. verticillioides,0,0
+111,Resistant Dent,DKC 56-65,F. solani,2,21
+112,Resistant Dent,DKC 56-65,F. graminearum,1,15
+113,Resistant Dent,DKC 56-65,F. boothii,2,20
+114,Resistant Dent,DKC 56-65,Sterile Toothpick,1,5
+115,Resistant Dent,DKC 56-65,F. verticillioides,3,41
+201,Sweet Corn,Golden Cross Bantam ,F. graminearum,4,60
+202,Sweet Corn,Golden Cross Bantam ,F. boothii,4,62
+203,Sweet Corn,Golden Cross Bantam ,F. solani,3,45
+204,Sweet Corn,Golden Cross Bantam ,Sterile Toothpick,1,10
+205,Sweet Corn,Golden Cross Bantam ,F. verticillioides,2,20
+206,Susceptible Dent ,DKC 51-25,F. solani,0,0
+207,Susceptible Dent ,DKC 51-25,Sterile Toothpick,1,10
+208,Susceptible Dent ,DKC 51-25,F. verticillioides,2,30
+209,Susceptible Dent ,DKC 51-25,F. boothii,1,5
+210,Susceptible Dent ,DKC 51-25,F. graminearum,1,5
+211,Resistant Dent,DKC 56-65,F. verticillioides,3,45
+212,Resistant Dent,DKC 56-65,F. solani,2,21
+213,Resistant Dent,DKC 56-65,F. graminearum,3,41
+214,Resistant Dent,DKC 56-65,Sterile Toothpick,1,10
+215,Resistant Dent,DKC 56-65,F. boothii,2,23
+301,Sweet Corn,Golden Cross Bantam ,F. solani,3,43
+302,Sweet Corn,Golden Cross Bantam ,F. verticillioides,3,50
+303,Sweet Corn,Golden Cross Bantam ,Sterile Toothpick,0,0
+304,Sweet Corn,Golden Cross Bantam ,F. boothii,3,60
+305,Sweet Corn,Golden Cross Bantam ,F. graminearum,1,5
+306,Susceptible Dent ,DKC 51-25,F. boothii,4,65
+307,Susceptible Dent ,DKC 51-25,F. graminearum,3,55
+308,Susceptible Dent ,DKC 51-25,F. solani,4,70
+309,Susceptible Dent ,DKC 51-25,Sterile Toothpick,1,2
+310,Susceptible Dent ,DKC 51-25,F. verticillioides,4,62
+311,Resistant Dent,DKC 56-65,Sterile Toothpick,1,10
+312,Resistant Dent,DKC 56-65,F. boothii,3,50
+313,Resistant Dent,DKC 56-65,F. verticillioides,3,45
+314,Resistant Dent,DKC 56-65,F. graminearum,2,25
+315,Resistant Dent,DKC 56-65,F. solani,2,30
+401,Sweet Corn,Golden Cross Bantam ,F. boothii,5,85
+402,Sweet Corn,Golden Cross Bantam ,F. graminearum,2,25
+403,Sweet Corn,Golden Cross Bantam ,F. verticillioides,2,32
+404,Sweet Corn,Golden Cross Bantam ,F. solani,4,70
+405,Sweet Corn,Golden Cross Bantam ,Sterile Toothpick,1,15
+406,Susceptible Dent ,DKC 51-25,F. verticillioides,2,21
+407,Susceptible Dent ,DKC 51-25,Sterile Toothpick,1,5
+408,Susceptible Dent ,DKC 51-25,F. solani,3,50
+409,Susceptible Dent ,DKC 51-25,F. boothii,3,45
+410,Susceptible Dent ,DKC 51-25,F. graminearum,1,15
+411,Resistant Dent,DKC 56-65,F. graminearum,1,10
+412,Resistant Dent,DKC 56-65,F. solani,1,5
+413,Resistant Dent,DKC 56-65,Sterile Toothpick,1,1
+414,Resistant Dent,DKC 56-65,F. verticillioides,2,25
+415,Resistant Dent,DKC 56-65,F. boothii,2,35
+501,Sweet Corn,Golden Cross Bantam ,Sterile Toothpick,1,5
+502,Sweet Corn,Golden Cross Bantam ,F. solani,2,30
+503,Sweet Corn,Golden Cross Bantam ,F. graminearum,1,18
+504,Sweet Corn,Golden Cross Bantam ,F. verticillioides,2,38
+505,Sweet Corn,Golden Cross Bantam ,F. boothii,3,41
+506,Susceptible Dent ,DKC 51-25,F. solani,4,65
+507,Susceptible Dent ,DKC 51-25,F. verticillioides,2,30
+508,Susceptible Dent ,DKC 51-25,F. boothii,1,17
+509,Susceptible Dent ,DKC 51-25,Sterile Toothpick,1,1
+510,Susceptible Dent ,DKC 51-25,F. graminearum,4,60
+511,Resistant Dent,DKC 56-65,F. boothii,2,31
+512,Resistant Dent,DKC 56-65,Sterile Toothpick,1,1
+513,Resistant Dent,DKC 56-65,F. verticillioides,2,25
+514,Resistant Dent,DKC 56-65,F. solani,1,10
+515,Resistant Dent,DKC 56-65,F. graminearum,0,0

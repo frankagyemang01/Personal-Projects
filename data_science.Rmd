@@ -1,0 +1,23 @@
+---
+title: "Data_Science"
+author: "Frank Agyemang"
+date: "2025-02-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Science 
+```{r}
+data <- read.csv("landfweb_0.csv")
+summary(data)
+```
+
+
+```{r}
+library(tidyr)
+clean_data <- drop_na(data)
+```
+

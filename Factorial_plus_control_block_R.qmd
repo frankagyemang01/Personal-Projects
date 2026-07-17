@@ -1,0 +1,342 @@
+---
+title: "Exploring a 2 × 2 Factorial Design With Control and Blocks: A Case Study in R"
+author: Frank Agyemang, Dr. Reka Howard, Dr. Walter Stroup, Prof. Erin Blankship
+format: 
+  html: default
+  pdf: default
+editor: visual
+execute: 
+  warning: false
+  message: false
+  echo: false
+---
+
+We extend our discussion of a 2 × 2 factorial design with control to a 2 × 2 factorial design with control and blocks. If blocks are used, treatments are randomized within each block. This results in a randomized complete block design (RCBD), where each treatment (including control if embedded) appears once per block.
+
+Recall, in a 2 × 2 factorial design with control presented in the chapter 1, the four factorial combinations were: A1B1, A1B2, A2B1, A2B2. The control treatment (C) was treated as a fifth, independent treatment, outside the factorial combinations. It was not associated with any level of factor A or B. The control is usually included as a reference, not involved in interaction effects. For a 2 × 2 factorial with control and blocks, this allows the analysis to:
+
+1.  Control for block-to-block variation
+
+2.  Compare each factorial treatment to the control within and across blocks
+
+3.  Estimate main effects and interaction effects within the factorial structure
+
+4.  Maintain orthogonality between blocks and treatments
+
+\newpage
+
+We present the general framework of the anova structure for this design and later illustrate with an example how to implement the techniques on a real data. The analysis of variance for a 2 × 2 factorial design with control and blocks is shown using the R. The data.frame(.) function in R creates the data frame with source of variation and degrees of freedom. The anova table presented in this chapter is similar to the one in the previous chapter. The only addition this time is the extra source of variation, which is the block and its corresponding degrees of freedom.
+
+```{r echo=TRUE, warning=FALSE}
+# Define symbolic expressions or general \n structure of factorial with control and block
+anova_table <- data.frame(
+  Source = c("Block", "Factor A", "Factor B",
+             "A × B", "Control", "Error", "Total"),
+  Degrees_of_Freedom = c(
+    "r - 1",
+    "a - 1",
+    "b - 1",
+    "(a - 1)(b - 1)",
+    "1",
+    "n - [r + ab]",
+    "n - 1"
+  )
+)
+
+# Print the table
+print(anova_table, row.names = FALSE)
+
+```
+
+\newpage
+
+## **Example**
+
+Researchers are interested in evaluating the effect of two drugs on blood pressure. They want to know whether the drug type (soluble vs. non-soluble) and dosage (10 units vs. 15 units) influence outcomes. A control group (placebo) is also included to serve as a baseline for comparison and the study is conducted in five clinics. Furthermore, to reduce variability arising from different clinics and other extraneous factors, the experiment is conducted as a randomized complete block design where clinics are considered as blocks.
+
+The R code below presents a summary table which describes how the experiment was conducted, that is, the type of treatments, and replicates per clinics. From the output below, we have five replicates of each treatment combination. This is because each treatment combination appears once in each clinic(block). We also have five replicates of the control.
+
+```{r echo=TRUE, warning=FALSE}
+# Create the data frame
+drug_table <- data.frame(
+  `Drug Type` = c("Soluble", "Soluble",
+                  "Non-soluble", "Non-soluble",
+                  "No Drug"),
+  Dosage = c(10, 15, 10, 15, 0),
+  Description = c("Treatment A1B1", "Treatment A1B2",
+                  "Treatment A2B1", "Treatment A2B2", "Control"),
+  `Replicates per Clinic (Block)` = c(
+    "1 per clinic × 5 clinics = 5",
+    "5",
+    "5",
+    "5",
+    "5 (1 in each clinic)"
+  ),
+  check.names = FALSE  # To allow special characters in column names
+)
+
+# Print the table
+print(drug_table, row.names = FALSE)
+
+```
+
+\newpage
+
+In this RCBD, each clinic receives all treatments, including the control exactly once, which are randomly assigned within the clinic. We present the anova table using R. We see that the sources of variation are clinic, drug type, dosage, drug type × dosage, control, Error from experimental units. We also show the degrees of freedom in the table below. We see from the output that the degree of freedom for clinic is 4. The degrees of freedom for drug type and dosage are 1 respectively, as well as their interaction. Lastly, the degrees of freedom for the control and error terms are 1 and 9 respectively. We use the print(.) to print our results as we did in the previous chapter.
+
+```{r echo=TRUE, warning=FALSE}
+# Create the data frame
+anova_df <- data.frame(
+  Source = c(
+    "Block (Clinic)",
+    "Drug Type",
+    "Dosage",
+    "Drug Type × Dosage",
+    "Control",
+    "Error",
+    "Total"
+  ),
+  `Degrees of Freedom (DF)` = c(
+    "5 – 1 = 4",
+    "2 – 1 = 1",
+    "2 – 1 = 1",
+    "(2 – 1)(2 – 1) = 1",
+    "1",
+    "25 – (9) = 16",
+    "25 – 1 = 24"
+  ),
+  check.names = FALSE  # Allows special characters in column names
+)
+```
+
+\newpage
+
+```{r echo=TRUE, warning=FALSE}
+# Print the table
+print(anova_df, row.names = FALSE)
+
+```
+
+## **Model**
+
+Next, we present the statistical model for the design above. The model below is similar to the model in chapter 1. In this model, we include the block term. Note that we do not assume block by interaction in this model. Also, blocks are considered fixed.
+
+$y_{ijk} = \mu + \beta_{i} + \tau_{jl} + \delta_{kl} + \tau\delta_{jkl} + control_{l} + \epsilon_{ijkl}$
+
+where,
+
+$y_{ijk}$ is the blood pressure of the kth individual using the ith drug type at the jth dose
+
+$\mu$ is the intercept
+
+$\beta_{i}$ is the effect from the ith block, block is considered fixed
+
+$\tau_{jl}$ is the effect from the jth drug type nested in the Control
+
+$\delta_{kl}$ is the effect from the kth dose level nested in the control
+
+$\tau\delta_{jkl}$ is the interaction between drug type and dosage level in the Control
+
+$control_{l}$ is the control
+
+$\epsilon_{ijkl}$ is the residual, $\epsilon_{ijkl}$ \~ $N(0,\sigma^{2})$
+
+\newpage
+
+Recall, for a 2 × 2 factorial design with a control, we created a control variable that nests the treatment combination. In this section, we also create a control variable that nests the treatments and control. Where "n" indicates there is no control and "y" indicates otherwise just as we showed in chapter 1. The goal is to allow for comparison between treatments and the control.
+
+The R code below shows the data frame including the control variable. In the R code, we have 5 clinics with 5 treatments in each clinics. As we showed in the previous chapter, data was also simulated from the Gaussian distribution. The only addition here is the block term and variance that includes clinic level effects. Also, we use the set.seed(.) to store the simulated data for reproducibility.
+
+```{r echo=TRUE, warning=FALSE}
+set.seed(123)
+
+# Define the base structure
+Block <- rep(1:5, each = 5)
+Drug <- rep(c("Soluble", "Soluble",
+              "Non-soluble", "Non-soluble", "Control"), times = 5)
+Dosage <- rep(c(10, 15, 10, 15, 0), times = 5)
+Control <- ifelse(Drug == "Control", "y", "n")
+
+# Number of blocks
+n_blocks <- length(unique(Block))
+
+# Generate random block effects ~ N(0, sigma_b^2)
+sigma_block <- 2
+block_effects <- rnorm(n_blocks, mean = 0, sd = sigma_block)
+
+# Generate BloodPressure values with block as a random effect
+BloodPressure <- numeric(length(Block))
+
+for (i in seq_along(Block)) {
+  
+  base <- 130  # overall mean
+  
+  drug_effect <- if (Drug[i] == "Soluble") {
+    if (Dosage[i] == 10) -1.5 else -2
+  } else if (Drug[i] == "Non-soluble") {
+    if (Dosage[i] == 10) 4 else 5
+  } else {
+    0  # control
+  }
+  
+  BloodPressure[i] <- base +
+    drug_effect +
+    block_effects[Block[i]] +     # random block effect
+    rnorm(1, mean = 0, sd = 1)    # residual error
+}
+
+# Create the data frame
+df <- data.frame(
+  Block = factor(Block),
+  Drug = factor(Drug),
+  Dosage = factor(Dosage),
+  BloodPressure = round(BloodPressure, 4),
+  Control = factor(Control)
+)
+
+# Print the dataset
+print(df)
+
+```
+
+\newpage
+
+We explore the data for the treatment and control through a boxplot. Based on the boxplots of blood pressure stratified by drug formulation and dosage shown below, clear differences in the distributional characteristics of the treatments were observed. For both soluble and non-soluble formulations, the boxplots indicate moderate spread in blood pressure values, with the interquartile ranges (IQRs) capturing most of the observed variability within each dosage level. The soluble treatments exhibited relatively lower median blood pressure values compared with the non-soluble treatments at corresponding dosages, suggesting a stronger blood-pressure--lowering effect. In contrast, the non-soluble formulations showed higher medians and slightly wider IQRs, particularly at the higher dosage level, indicating greater variability in response.
+
+The control group displayed the widest overall spread among the treatments, with a higher median blood pressure and longer whiskers, reflecting increased variability in the absence of treatment. Across treatments, the distributions appeared approximately symmetric, although mild right-skewness was evident for some non-soluble dosage groups, as indicated by longer upper whiskers.
+
+```{r}
+library(ggplot2)
+
+ggplot(df, aes(x = Drug,
+                          y = BloodPressure,
+                          fill = Dosage)) +
+  geom_boxplot(position = position_dodge(width = 0.8)) +
+  labs(
+    x = "Drug",
+    y = "BloodPressure",
+    fill = "Dosage"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major.y = element_line(),
+    panel.grid.minor.y = element_blank()
+  )
+
+```
+
+\newpage
+
+Next, we take a look at the interaction plot. In particular, we are interested to see if there is an interaction between drug type and dosage. From the plot, we see that there is an interaction between drug and dosage. This is shown by the red and blue line. We need to confirm from the anova table.
+
+```{r}
+df_sub <- subset(df, Drug != "Control")
+
+# Base R interaction plot
+interaction.plot(
+  x.factor = df_sub$Drug,
+  trace.factor = df_sub$Dosage,
+  response = df_sub$BloodPressure,
+  type = "b",
+  col = c("blue", "red"),
+  lty = 1,
+  lwd = 2,
+  pch = 16,
+  ylab = "Average Blood Pressure",
+  xlab = "Drug",
+  trace.label = "Dosage",
+  main = "Interaction Plot of Drug and Dosage (with Control Reference)"
+)
+
+# Add control mean line
+abline(h = mean(df$BloodPressure[df$Drug == "Control"]),
+       col = "darkgreen", lty = 2, lwd = 2)
+
+legend("topleft", legend = "Control Mean", col = "darkgreen",
+       lty = 2, lwd = 2, bty = "n")
+```
+
+The table below shows the variance components for clinic (block) and residual if clinic were to be treated as random. Looking at the table, the variance for clinic(block) is $2.721$ and the variance for residual is $1.067$. The block variance measures how much of the total variability in the response variable is being explained by the block. In this example, we see that a larger proportion of the total variation is due to the block.
+
+```{r, warning=FALSE}
+library(lme4)
+library(emmeans)
+# Fit linear mixed model with random block
+model.random <- lmer(
+  BloodPressure ~ Control + Drug + Dosage + Drug:Dosage + (1|Block),
+  data = df,
+  REML = TRUE
+)
+
+summary(model.random)
+```
+
+\newpage
+
+Next, we obtain the ANOVA table that shows the sources of variations, degrees of freedom, F-values and p-values. From the output shown below, we see that the sources of variation are control, drug, dosage and drug by dosage interaction effect all nested in the control variable. Recall that the variable called control is created to identify the actual treatments and the control group. Therefore, "Control : Drug" for example means that the source of variation for drug type not including the control group. We know that we have two level for drug type : Soluble and Non-soluble. Thus, the degrees of freedom for each of these sources of variation are correct.
+
+To identify which terms are statistically significant, we take a look at the F-values and the p-values. F-values that are far greater than $1$ can be considered to be statistically significant. We see that the p-values corresponding to those values are also statistically significant. For the interaction term, we have a p-value of $0.05650$. That can be considered as marginally significant. The only term that is not statistically significant is Dosage which has a p-value of $0.35188$. This is because it has an F-value of $0.9195$ which is less than $1$.
+
+```{r echo=TRUE,warning = FALSE}
+library(lmerTest)
+library(lme4)
+library(emmeans)
+# Fit mixed model with random block
+model.random <- lmer(BloodPressure ~ Control + 
+                       Drug:Control + Dosage:Control +
+                       Drug:Dosage:Control +
+                       (1|Block), data = df)
+# Anova for mixed model
+anova(model.random,ddf="Kenward-Roger")
+
+```
+
+\newpage
+
+Next, we show the estimated marginal means table also in the output below. The estimated mean for non-soluble and soluble drugs at 10 percent dosage level were $134$ and $129$ respectively. Also, for non-soluble and soluble drugs at 15 percent dosage, the estimated means were $135$ and $129$ respectively. Lastly, the estimate for control is $130$, which is higher than all other treatment combinations. There is one thing that is obvious from these estimates. That is, the estimated mean value for control group is different from those from the treatment. In particular, the value for the control group is less than those in the non-soluble group but larger than those in the soluble group.
+
+```{r echo=TRUE, warning= FALSE}
+library(lme4)
+library(emmeans)
+# EMMs
+emm <- emmeans(model.random, ~ Drug:Dosage | Control)
+emm
+```
+
+\newpage
+
+We also show the main effect of treatment versus control. We see from the output that there is a significant difference between treatment and control group. The p-value is $0.0118$. Now this comparison is usually of importance in these types of design. Recall, we created a variable "Control" with entries "y" for where we had a control and "n" otherwise. We are able to compare the control group to the treatments because of this variable.
+
+```{r echo=TRUE,warning=FALSE}
+# Control vs Treatment main effect
+lsm_control <- emmeans(model.random, ~ Control)
+contrast(lsm_control, method = "pairwise")
+```
+
+Next, we also compare the main effects of drug. We do this for completeness. Nevertheless, when there is a significant interaction effect like the one we have in this example, the main effect is meaningless. It is advisable to obtain the simple effects. For drug type, we again see a significant difference in effect between non-soluble drug and soluble drug. The p-value is less than $0.0001$.
+
+```{r echo=TRUE,warning=FALSE}
+# Compare main effect of drugs without considering the control group
+lsm_nested_trt <- emmeans(model.random, ~ Drug | Control)
+contrast(lsm_nested_trt, method = "pairwise")
+```
+
+Next, we show the contrast comparing each level of drug by dosage combination. This is known as the simple effect where we look at the difference between two levels of a treatment at a given level of another treatment. From the output below, we see that the difference between Non-soluble drug and Soluble at a dosage of 10 and 15 units is statistically significant. The p-values are less than $0.0001$ respectively. This means that whether a drug is soluble or not affects blood pressure, nevertheless, we do not have any statistical evidence to determine whether increasing the dosage from 10 to 15 units has makes a difference on blood pressure. This is shown by the p-values $0.1853$ and $0.8643$ for dosage at 10 units compared to dosage at 15 units when soluble and non-soluble drugs are considered respectively.
+
+```{r echo=TRUE,warning=FALSE}
+lsm_nested_trt_pct <- emmeans(model.random, ~ Drug:Dosage | Control)
+contrast(lsm_nested_trt_pct, method = "pairwise")
+```
+
+With multiple comparison, we may stand the chance of making a type 1 error. In cases where we are interested in comparing treatments to control, we can use the Dunnett test to control for such error. In the r code below, the Dunnet test is used as an adjustment, using the adjust parameter in the pairs(.) function in R. We obtain the same results as before.
+
+```{r echo=TRUE,warning=FALSE}
+# Dunnett test
+pairs(lsm_control, adjust = "dunnett")
+pairs(lsm_nested_trt, adjust = "dunnett")
+pairs(lsm_nested_trt_pct, adjust = "dunnett")
+```
+
+## Conclusion
+
+In conclusion, we can see that there is a significant difference in effect between treatments and control. This is shown in the contrast statements above where the estimate between no control "n" and control "y" is $1.47$ with a p-value of $0.0151$. Also, notice that for the control group, we do not get any estimates because there is nothing to compare within the control group. Lastly, taking a look at the contrast statements for just the treatments, we see a significant difference in effect between non-soluble and soluble drug when dosage is at 10 and 15 units respectively but not for dosage. We see that the 2 × 2 factorial with control and block allowed us to efficiently account for the variation arising from clinics(blocks) while objectively comparing treatments and control. Also, analyzing the data with the appropriate model allowed us to make the right inference.

@@ -1,0 +1,97 @@
+Concentration,Treatment,Density
+0,PBS,0.456
+0,PBS,0.54
+0,PBS,0.426
+0,PBS,0.464
+1,PBS,0.572
+1,PBS,0.463
+1,PBS,0.951
+1,PBS,1.139
+2,PBS,1.141
+2,PBS,0.737
+2,PBS,0.765
+2,PBS,0.657
+3,PBS,0.48
+3,PBS,0.682
+3,PBS,0.607
+3,PBS,0.326
+4,PBS,0.686
+4,PBS,0.246
+4,PBS,0.468
+4,PBS,0.491
+5,PBS,0.601
+5,PBS,0.421
+5,PBS,0.427
+5,PBS,0.29
+0,Coconut ,1.2
+0,Coconut ,1.265
+0,Coconut ,1.175
+0,Coconut ,0.88
+1,Coconut ,1.093
+1,Coconut ,1.113
+1,Coconut ,0.941
+1,Coconut ,1.103
+2,Coconut ,1.076
+2,Coconut ,0.846
+2,Coconut ,0.779
+2,Coconut ,0.763
+3,Coconut ,0.889
+3,Coconut ,1.163
+3,Coconut ,0.833
+3,Coconut ,0.686
+4,Coconut ,0.82
+4,Coconut ,0.819
+4,Coconut ,0.746
+4,Coconut ,0.797
+5,Coconut ,0.83
+5,Coconut ,0.875
+5,Coconut ,0.824
+5,Coconut ,0.668
+0,Chlorhexidine,0.282
+0,Chlorhexidine,0.256
+0,Chlorhexidine,0.219
+0,Chlorhexidine,0.199
+1,Chlorhexidine,0.22
+1,Chlorhexidine,0.2
+1,Chlorhexidine,0.305
+1,Chlorhexidine,0.297
+2,Chlorhexidine,0.196
+2,Chlorhexidine,0.163
+2,Chlorhexidine,0.18
+2,Chlorhexidine,0.117
+3,Chlorhexidine,0.202
+3,Chlorhexidine,0.135
+3,Chlorhexidine,0.142
+3,Chlorhexidine,0.139
+4,Chlorhexidine,0.134
+4,Chlorhexidine,0.157
+4,Chlorhexidine,0.174
+4,Chlorhexidine,0.139
+5,Chlorhexidine,0.076
+5,Chlorhexidine,0.091
+5,Chlorhexidine,0.286
+5,Chlorhexidine,0.073
+0,Nothing,0.665
+0,Nothing,0.683
+0,Nothing,0.771
+0,Nothing,0.781
+1,Nothing,0.632
+1,Nothing,0.676
+1,Nothing,0.861
+1,Nothing,0.696
+2,Nothing,0.656
+2,Nothing,0.784
+2,Nothing,0.643
+2,Nothing,0.659
+3,Nothing,0.5
+3,Nothing,0.53
+3,Nothing,0.561
+3,Nothing,0.601
+4,Nothing,0.492
+4,Nothing,0.479
+4,Nothing,0.412
+4,Nothing,0.566
+5,Nothing,0.456
+5,Nothing,0.443
+5,Nothing,0.852
+5,Nothing,0.69

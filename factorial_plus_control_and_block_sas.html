@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Frank Agyemang">
+<meta name="author" content="Dr.&nbsp;Reka Howard">
+<meta name="author" content="Dr.&nbsp;Walter Stroup">
+<meta name="author" content="Dr.&nbsp;Erin Blankenship">
+
+<title>Exploring a 2 by 2 Factorial with Control: A Case Study In SAS</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="factorial_plus_control_and_block_sas_files/libs/clipboard/clipboard.min.js"></script>
+<script src="factorial_plus_control_and_block_sas_files/libs/quarto-html/quarto.js"></script>
+<script src="factorial_plus_control_and_block_sas_files/libs/quarto-html/popper.min.js"></script>
+<script src="factorial_plus_control_and_block_sas_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="factorial_plus_control_and_block_sas_files/libs/quarto-html/anchor.min.js"></script>
+<link href="factorial_plus_control_and_block_sas_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="factorial_plus_control_and_block_sas_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="factorial_plus_control_and_block_sas_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="factorial_plus_control_and_block_sas_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="factorial_plus_control_and_block_sas_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><strong>Introduction</strong></a></li>
+  <li><a href="#statistical-challenge" id="toc-statistical-challenge" class="nav-link" data-scroll-target="#statistical-challenge">Statistical Challenge</a></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">Exploratory Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#data-description" id="toc-data-description" class="nav-link" data-scroll-target="#data-description">Data Description</a></li>
+  </ul></li>
+  <li><a href="#advanced-analysis" id="toc-advanced-analysis" class="nav-link" data-scroll-target="#advanced-analysis">Advanced Analysis</a>
+  <ul class="collapse">
+  <li><a href="#statistical-model" id="toc-statistical-model" class="nav-link" data-scroll-target="#statistical-model">Statistical Model</a></li>
+  <li><a href="#simple-effects" id="toc-simple-effects" class="nav-link" data-scroll-target="#simple-effects">Simple Effects</a></li>
+  </ul></li>
+  <li><a href="#exploratory-data-analysis-1" id="toc-exploratory-data-analysis-1" class="nav-link" data-scroll-target="#exploratory-data-analysis-1">Exploratory Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#data-description-1" id="toc-data-description-1" class="nav-link" data-scroll-target="#data-description-1">Data Description</a></li>
+  </ul></li>
+  <li><a href="#advanced-analysis-1" id="toc-advanced-analysis-1" class="nav-link" data-scroll-target="#advanced-analysis-1">Advanced Analysis</a>
+  <ul class="collapse">
+  <li><a href="#statistical-model-1" id="toc-statistical-model-1" class="nav-link" data-scroll-target="#statistical-model-1">Statistical Model</a></li>
+  <li><a href="#simple-effects-1" id="toc-simple-effects-1" class="nav-link" data-scroll-target="#simple-effects-1">Simple Effects</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><strong>Conclusion</strong></a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="factorial_plus_control_and_block_sas.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Exploring a 2 by 2 Factorial with Control: A Case Study In SAS</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Authors</div>
+    <div class="quarto-title-meta-contents">
+             <p>Frank Agyemang </p>
+             <p>Dr.&nbsp;Reka Howard </p>
+             <p>Dr.&nbsp;Walter Stroup </p>
+             <p>Dr.&nbsp;Erin Blankenship </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction"><strong>Introduction</strong></h2>
+<p>Factorial experiments are widely used in scientific research for evaluating the effects of multiple factors simultaneously. The simplest form of the factorial design is a 2 × 2 factorial design which involves two factors. For each factor we have two levels, resulting in four treatment combinations. However, in many practical scenarios, researchers may wish to compare these treatments not only among themselves but also against a standard or baseline treatment referred to as a control. In such cases, a 2 × 2 factorial design plus a control is adopted. There is an important difference between the traditional factorial design with a control and the problem which we attempt to address in this chapter. With the traditional factorial design with a control, we see all possible combinations of the factor levels including the control. For example, we may consider an experiment with two factors, type of fertilizer and irrigation each with two levels respectively. If A and B are the levels of fertilizer types and the levels of irrigation are Yes and No, where the latter is a control. Then for a traditional 2 × 2 factorial design with control, we would have all possible combinations: (A, Yes), (A, No), (B, Yes) and (B, No). Nevertheless, the type of problems that we try to address in this chapter involves a 2 × 2 factorial design where the control is serves as the fifth treatment. We begin this chapter with a detailed discussion on a 2 × 2 factorial design plus control as the fifth treatment and extend our discussion to a 2 × 2 factorial design plus control and blocks for a better understanding of our readers.</p>
+<p>In this chapter, we illustrate the concept of a 2 × 2 factorial design plus control, where the control is considered as the fifth treatment using the example below. Researchers are interested in evaluating the effects of two drugs on blood pressure. They would like to determine if a Soluble or Non-soluble form makes a difference. Another factor that affects performance of the drug is dosage (10 units and 15 units). Because this is a new study, they also chose a Control group to serve as reference. In this experiment, the control group refers to experimental units that did not receive any of the treatments.</p>
+<p>A 2 × 2 factorial design plus control may also be utilized in experiments where methods are being tested for the first time or in new areas of study. In the case where methods are being tested for the first time, researchers may be interested in comparing the main effects of treatments with control. In the example we consider, we are interested in determining if the treatments are able to reduce blood pressure at all. In such instances, the control group serves as a baseline and enables us to answer such a question. That is, if we find out that the blood pressure of individuals taking any of the drugs at different concentrations are on average lower than those in the control group, then we know that taking a drug is at least better than taking nothing at all. Also, in situations where there may be a significant interaction effect, we can compare each treatment combination with the control.</p>
+</section>
+<section id="statistical-challenge" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-challenge">Statistical Challenge</h2>
+<p>As we stated in the introduction, with a 2 × 2 factorial design plus a control, the control is considered as the fifth treatment and does not appear in any other treatment combination unlike the traditional 2 × 2 factorial design with control.</p>
+<p>The statistical challenge is that the control is not part of the factorial structure and thus, it creates a non-orthogonal or partially unbalanced design. This is a problem because the control does not contribute to the estimation of the main effects and interaction effects of factors. Nevertheless, the control shares the same experimental error term with the treatments. When the traditional 2 × 2 factorial design is used to analyze these kinds of experiments, the implication is that the control contributes to the marginal means and also, both main effects and interactions are interpretable and balanced. This is incorrect.</p>
+<p>The 2 × 2 factorial design plus control enables the mean of the control to be estimated separately and computes factorial means only from the four factorial cells. Moreover, the variance of factorial effects are estimated only from factorial units and thus, control observations do not influence variance.</p>
+</section>
+<section id="exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
+<p>In our example used to demonstrate the ideas in this chapter, we first conduct an exploratory data analysis to understand how data were generated, the type and description of the variables. We only present information that will be useful to the reader when using this design. We show the histogram which gives us information about the distribution of the response. We also show the interaction plot and boxplot for all treatment combinations and the control.</p>
+<p>Recall, the objective of the study is to evaluate the effects of two drugs on blood pressure. They would like to determine if a Soluble or Non-soluble form makes a difference. Another factor that affects performance of the drug is dosage (10 units and 15 units).</p>
+<section id="data-description" class="level3">
+<h3 class="anchored" data-anchor-id="data-description">Data Description</h3>
+<p>Data were simulated from the normal distribution with mean of <span class="math inline">\(0\)</span> and variance of <span class="math inline">\(5\)</span>. To set up the 2 × 2 factorial design plus control in R, we first set up the treatment combination of drug type and dosage as a traditional factorial design and only add the control as an additional factor.</p>
+<p>There were 15 observations with three replicates from each treatment combination and the control. Both drug type (Soluble and Non-soluble) and dosage (10 units and 15 units) were considered as qualitative variables. The response variable in this experiment is blood pressure. Each individual in this experiment is considered as an experimental unit.</p>
+<pre class="sas"><code>/* creates a data frame*/
+Data bpdata; 
+/* variables or column names*/
+INPUT drug$ dosage BloodPressure control$;
+/* conditional statement identifying control and treatments*/
+if drug='control' then do;
+drug ='contrl';
+forms = 0;
+formn = 0;
+end;
+else if drug ='Soluble' then do;
+forms = dosage;
+formn = 0;
+end;
+else if drug='Non-sol' then do;
+forms = 0;
+formn = dosage;
+end;
+
+cards;
+Soluble 10 128.1037837 n
+Soluble 10 125.178207 n
+Soluble 10 128.8657724 n
+Non-sol 10 136.3624454 n
+Non-sol 10 131.8548772 n
+Non-sol 10 129.1857283 n
+Soluble 15 127.9855594 n
+Soluble 15 125.6000534 n
+Soluble 15 124.2751741 n
+Non-sol 15 136.5107568 n
+Non-sol 15 131.021518 n
+Non-sol 15 124.2247298 n
+control 0 132.8951812 y
+control 0 138.8245481 y
+control 0 140.3308106 y
+
+;
+/*prints data*/
+proc print; 
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="control1.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Data for 2 by 2 factorial with control</figcaption>
+</figure>
+</div>
+<p>Figure 1 shows the relative frequency density plot which displays the distribution of blood pressure measurements in the data. The x-axis represents blood pressure values, while the y-axis shows relative frequency density, meaning the total area under the bars sums to one. Most observations are concentrated between approximately <span class="math inline">\(124\)</span> and <span class="math inline">\(136\)</span>, indicating this range contains the highest relative density of measurements. The distribution shows moderate spread, with fewer observations at the higher end near 140 mmHg, suggesting slight right-skewness. No extreme outliers are apparent, although the density decreases toward the upper tail. Overall, the plot suggests that blood pressure values are clustered around the mid-120s to mid-130s, with relatively low variability outside this range.</p>
+<p>Figure 2 displays the distribution of blood pressure across different drug types (Soluble, Non-soluble, and Control) at three dosage levels (0, 10, and 15 units). At dosage 0, the control group exhibits the highest median blood pressure, with values centered around the upper 130s, and relatively low variability. This suggests elevated blood pressure levels in the absence of treatment. No soluble or non-soluble drug groups are present at this dosage level.</p>
+<p>At dosage 10, both soluble and non-soluble drugs show reduced median blood pressure compared to the control at dosage 0. The soluble drug group has the lowest median blood pressure and a relatively narrow interquartile range, indicating more consistent responses. In contrast, the non-soluble drug group shows a higher median and greater variability, suggesting less uniform treatment effects.</p>
+<p>At dosage 15, the soluble drug continues to demonstrate the lowest median blood pressure with minimal variability, indicating a strong and consistent treatment effect. The non-soluble drug group again shows higher median values and a wider spread, with observations extending across a broader range, reflecting increased variability in response.</p>
+<pre class="sas"><code>proc sgplot data=bpdata;
+    vbox BloodPressure / category=drug group=dosage;
+    yaxis grid;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="temp1.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Boxplot of BloodPressure</figcaption>
+</figure>
+</div>
+<p>Figure 3 shows the interaction plot for drug type and dosage. The data for this example was generated to have no interaction and thus, we show this for completeness. The absence of an interaction for a 2 × 2 factorial design is usually illustrated by parallel lines. From the interaction plot shown in Figure 3, we see parallel lines which shows there is no interaction between the two factors.</p>
+<p>This implies that the effect of one factor, say drug type on blood pressure, is the same at all levels of dosage. Thus, the two factors are independent of each other. Nevertheless, we need to look at the ANOVA table.</p>
+<pre class="sas"><code>data bp_plot;
+    set bpdata;
+    if drug ^= "contrl";
+run;
+
+/* Compute mean BloodPressure for Drug × Dosage */
+proc means data=bp_plot noprint;
+    class drug dosage;
+    var BloodPressure;
+    output out=means_plot mean=MeanBP;
+run;
+
+/* Remove _TYPE_ and _FREQ_ rows from PROC MEANS */
+data means_plot_clean;
+    set means_plot;
+    if _TYPE_ = 3; /* Keeps only Drug × Dosage combos */
+run;
+
+/* Get Control mean */
+proc means data=bpdata noprint;
+    where drug = "contrl";
+    var BloodPressure;
+    output out=control_mean mean=ControlMean;
+run;
+
+/* Add ControlMean to all rows for plotting */
+data plot_ready;
+    if _n_ = 1 then set control_mean;
+    set means_plot_clean;
+run;
+
+/* Interaction Plot with Control Mean Line */
+proc sgplot data=plot_ready;
+    series x=drug y=MeanBP 
+      / group=dosage lineattrs=(thickness=2) markers;
+    refline ControlMean 
+      / axis=y lineattrs=(color=darkgreen pattern=shortdash thickness=2)
+      label="Control Mean";
+    yaxis label="Average Blood Pressure";
+    xaxis label="drug";
+    keylegend / location=inside position=topright across=1;
+    title "Interaction Plot of Drug and Dosage (with Control Reference)";
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="interactio_fact_ctrl.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Interaction Plot of Drug and Dosage with Control as reference</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="advanced-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="advanced-analysis">Advanced Analysis</h2>
+<p>Recall, the main objective of the experiment is to understand how drug type and dosage levels affect blood pressure and also how the treatments perform in comparison to the control. Thus, we seek to answer two important questions with a single model.</p>
+<p>The statistical model thus seek to evaluate whether average blood pressure of individuals taking a soluble drug differs from the blood pressure of individuals with non-soluble drug. Moreover, the model enables us to compare average blood pressure when a treatment was administered to that of the control group who did not receive any treatment all.</p>
+<p>Similarly, we are able to evaluate the effect of the dosage levels and compare their effect on blood pressure. In this chapter, we consider a simple linear model with assumption that blood pressure is independent and identically distributed and that we have homogeneous variance.</p>
+<section id="statistical-model" class="level3">
+<h3 class="anchored" data-anchor-id="statistical-model">Statistical Model</h3>
+<p>The linear model for a factorial design plus control is given as</p>
+<p><span class="math display">\[
+Y_{ijkl} = \mu + \alpha_i + \beta_j + (\alpha \beta)_{ij} + \gamma I_k +\varepsilon_{ijkl}
+\]</span></p>
+<p>with,</p>
+<p><span class="math display">\[
+I_k =
+\begin{cases}
+1 &amp; \text{if the observation belongs to the control treatment} \\
+0 &amp; \text{if the observation belongs to one of the factorial treatments},
+\end{cases}
+\]</span></p>
+<p>for <span class="math inline">\(i= 1,2\)</span>, <span class="math inline">\(j= 1,2,3\)</span> and <span class="math inline">\(k= 0,1\)</span>, where:</p>
+<p><span class="math inline">\(y_{ijkl}\)</span> is the blood pressure of the <span class="math inline">\(lth\)</span> individual using the <span class="math inline">\(ith\)</span> type of drug at the <span class="math inline">\(jth\)</span> dose, </p>
+<p><span class="math inline">\(\mu\)</span> represents the baseline mean of the factorial treatments, </p>
+<p><span class="math inline">\(\alpha_i\)</span> is the effect of the <span class="math inline">\(ith\)</span> drug type, </p>
+<p><span class="math inline">\(\beta_j\)</span> is the effect of the <span class="math inline">\(jth\)</span> dosage, </p>
+<p><span class="math inline">\((\alpha\beta)_{ij}\)</span> is their interaction effect, </p>
+<p><span class="math inline">\(\gamma\)</span> measures the difference between the control treatment and the factorial baseline, and </p>
+<p><span class="math inline">\(\varepsilon_{ijkl}\)</span> are assumed to be independently and normally distributed with mean zero and constant variance <span class="math inline">\(\sigma^2\)</span>.</p>
+<p>Table 3 shows the ANOVA table when the data are analyzed as a traditional 2 by 2 factorial design. Note that, analyzing the experiment in this manner is incorrect. Looking at Figure 4, we see that there is a significant effect of dosage with p-value = <span class="math inline">\(0.02\)</span>. This is because the control is embedded in dosage and thus the estimated mean for dosage includes that of control. With this result, a researcher may believe that dosage of the drug was significant and may continue to explore which dosage led to the highest effect.</p>
+<pre class="sas"><code>/* Traditional factorial design */
+proc glimmix data = bpdata1; 
+class drug dosage;
+model BloodPressure = drug dosage 
+  drug*dosage / solution ddfm=kr;  
+lsmeans drug dosage drug*dosage;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="temp2.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">ANOVA for traditional 2 by 2 factorial design</figcaption>
+</figure>
+</div>
+<p>Table 4 takes a look at the correct model. From Table 4, we see that the p-value for the control shown in the ANOVA table is statistically significant, p-value = <span class="math inline">\(0.01\)</span> and the p-value for dosage by drug interaction term is <span class="math inline">\(0.92\)</span>. These values correspond to the interaction plot we saw earlier. Since there is no significant interaction effect, we can look at the main effects for Drug (soluble or non-soluble) to determine if there is any significant difference.</p>
+<pre class="sas"><code>proc glimmix data = bpdata; 
+class drug dosage control;
+model BloodPressure =  control drug(control) dosage(control)
+  drug*dosage(control)/solution ddfm=kr;  
+lsmeans control drug(control) dosage(control);
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="temp3.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">ANOVA for corrected 2 by 2 factorial design</figcaption>
+</figure>
+</div>
+<p>We proceed with further analysis by looking at the main and simple effects of only the correct model. Table 5 shows the estimated marginal means for drug type. For drug type soluble and non-soluble, the estimated marginal means are <span class="math inline">\(127\)</span> and <span class="math inline">\(132\)</span> respectively with standard error <span class="math inline">\(1.57\)</span>. The estimated mean for the control group is <span class="math inline">\(137\)</span> with standard error of <span class="math inline">\(2.22\)</span>. The 95 percent confidence intervals are also shown in the last two columns of the same table.</p>
+<pre class="sas"><code> ## lsmeans statement to obtain estimated marginal means
+lsmeans drug(control) / diff= control adjust=dunnett cl;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="temp4.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Estimated marginal means</figcaption>
+</figure>
+</div>
+<p>Table 6 shows the estimated marginal means for dosage. When dosage levels are at 10 and 15 units, the estimated marginal means are <span class="math inline">\(130\)</span> and <span class="math inline">\(128\)</span> respectively with standard error <span class="math inline">\(1.57\)</span>. The estimated mean for the control group is again <span class="math inline">\(137\)</span> with standard error of <span class="math inline">\(2.22\)</span> indicating that the control group did not receive any treatment.</p>
+<pre class="sas"><code> ## lsmeans statement to obtain estimated marginal means
+lsmeans dosage(control) / diff= control adjust=dunnett cl;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="temp5.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Estimated marginal means</figcaption>
+</figure>
+</div>
+</section>
+<section id="simple-effects" class="level3">
+<h3 class="anchored" data-anchor-id="simple-effects">Simple Effects</h3>
+<p>Next, we show the simple effects of drug and dosage. A simple effect refers to the effect of one treatment factor at a specific level of another factor. One typically would need to look at simple effects if there is a significant interaction effect. It is used in factorial experiments to understand how factors interact. In our example, there was no significant interaction effect but we show the results here for completeness.</p>
+<p>From Table 7, the simple effect for dosage at 10 and 15 units when a soluble drug is used are <span class="math inline">\(127\)</span> and <span class="math inline">\(126\)</span> respectively. For non-soluble drug, the simple effect of dosage at 10 and 15 units are <span class="math inline">\(132\)</span> and <span class="math inline">\(131\)</span> respectively. Looking at the simple effects, we see a lower blood pressure when the drug is soluble. Nevertheless, without any drug or dosage, the blood pressure is high.</p>
+<pre class="sas"><code> ## lsmeans statement to obtain estimated marginal means
+lsmeans dosage*drug(control) / diff= control adjust=dunnett cl;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="temp6.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Simple effects</figcaption>
+</figure>
+</div>
+<p>The same results are obtained when we find the simple effect of drug type at given dosage levels. At dosage level of 10 units, the simple effect for soluble and non-soluble drugs are <span class="math inline">\(127\)</span> and <span class="math inline">\(132\)</span> respectively. While at a dosage level of 15 units, the simple effects of soluble and non-soluble drugs are <span class="math inline">\(126\)</span> and <span class="math inline">\(131\)</span> respectively.</p>
+<p>Recall, the 2 × 2 factorial design plus control enables us to also compare the main effect of treatments to the control group. This is possible because of the variable control in the last column of the data set. It serves as an indicator variable and thus enables the model to average over the values of the treatments and compare them to the control group. From Results 1, we see that on average the estimated blood pressure for individuals receiving a treatment compared to control group was <span class="math inline">\(129\)</span> and <span class="math inline">\(137\)</span> respectively. Thus, the blood pressure for individuals in the control group is higher on average compared to individuals who receive some type of treatment. The difference between the two values is shown by the contrast statement. From output 1, we see that the difference is <span class="math inline">\(8.25\)</span> and with a standard deviation of <span class="math inline">\(2.48\)</span>. The p-value is <span class="math inline">\(0.01\)</span>, showing that there is a statistically significant difference between individuals that received some sort of treatment and the control group at <span class="math inline">\(\alpha = 0.05\)</span>.</p>
+<pre class="sas"><code> ## lsmeans statement to obtain estimated marginal means
+lsmeans control / diff= control adjust=dunnett cl;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="temp7.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Simple effects</figcaption>
+</figure>
+</div>
+<pre class="sas"><code> ## lsmeans statement to obtain estimated marginal means
+lsmeans control / diff= control adjust=dunnett cl;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="temp8.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 9: Difference between treatment and control</figcaption>
+</figure>
+</div>
+<p>Finally, Results 2 shows differences between pairs of treatment. This is obtained by writing contrast statements. Writing contrasts is very useful especially when one has many treatments and may only be interested in a few comparisons. Therefore, we would write some contrast to determine if there is a significant difference between soluble and non-soluble drugs, soluble and control, non-soluble and control. We used the dunnett adjustment to control for family-wise error.</p>
+<p>From output 2, there is no significant difference in effect between soluble and non-soluble drug and between non-soluble drug and control, p-values are <span class="math inline">\(0.13\)</span> and <span class="math inline">\(0.14\)</span> respectively at <span class="math inline">\(5\)</span> percent significance level. Nevertheless, there is a significant difference in effect between soluble drug and the control group, p-value = <span class="math inline">\(0.01\)</span>.</p>
+<pre class="sas"><code> ## lsmeans statement to obtain estimated marginal means
+lsmeans dosage(control) / diff= control adjust=dunnett cl;
+run;</code></pre>
+<p><img src="temp9.png" class="img-fluid" alt="Table 10: Difference between treatment and control"> </p>
+<p>We extend the discussion of a 2 × 2 factorial design plus control to a 2 × 2 factorial design plus control and blocks which is the main focus of this chapter. Recall, earlier the control was treated as a fifth treatment outside the factorial structure. That is, the four factorial combinations were formed from two factors, each with two levels, while the control treatment served as a separate reference group.</p>
+<p>When blocks are added to this design, treatments are randomized within each block. This produces a randomized complete block design (RCBD), where each block contains all four factorial treatment combinations and the control. The main purpose of including blocks is to account for variability among groups of experimental units that may be similar within blocks but different across blocks. We consider a second example where clinics serve as blocks because patients within the same clinic may be more alike than patients from different clinics.</p>
+<p>For a 2 × 2 factorial design plus control and blocks, the analysis allows researchers to control for block-to-block variation, compare the factorial treatments with the control, estimate the main effects of the two factors, and evaluate the interaction between the factors within the factorial portion of the design. The control remains outside the factorial treatment structure and is used as a baseline for comparison.</p>
+<p>Moreover, the addition of blocks introduces another source of variation. In this example, clinics may differ from one another because of differences in patient populations, clinic procedures, or other background conditions. If block effects are ignored, some of this block-to-block variation may be absorbed into the residual error term, which can affect the precision of the estimated treatment effects. Thus, the correct analysis must separate the control from the factorial treatment combinations while also accounting for block variation.</p>
+</section>
+</section>
+<section id="exploratory-data-analysis-1" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis-1">Exploratory Data Analysis</h2>
+<p>For the second example considered, we also simulated a data set to demonstrate a 2 × 2 factorial design plus control and blocks. The study evaluates the effects of two drug-related factors on blood pressure. The first factor is drug type, with two levels: soluble and non-soluble. The second factor is dosage, with two levels: 10 units and 15 units. A control group is included to represent patients who did not receive either treatment.</p>
+<p>The experiment is conducted in five clinics. Each clinic is treated as a block, and each clinic receives all five treatments: the four factorial treatment combinations and the control. The exploratory analysis describes the layout of the study, the simulated data, the distribution of blood pressure, the relationship between drug type and dosage, and the role of blocks in the analysis.</p>
+<section id="data-description-1" class="level3">
+<h3 class="anchored" data-anchor-id="data-description-1">Data Description</h3>
+<p>There are 25 observations in the simulated data set. This includes five clinics, with one observation for each treatment combination within each clinic. Therefore, each of the four factorial treatment combinations has five observations, and the control group also has five observations.</p>
+<p>The response variable again is blood pressure. Drug type and dosage are treated as qualitative variables. The variable <code>Control</code> is used as an indicator variable, where <code>n</code> identifies observations from the factorial treatment combinations and <code>y</code> identifies observations from the control group just as discussed in the previous section. Also, we only show the data used for this example and skip plots for the exploratory data analysis. This is because the plots are similar to the ones shown in Figures 1 and 2.</p>
+<p>Table 9 shows the general sources of variation for a 2 × 2 factorial design with control and blocks. Compared with the previous chapter, the only additional source of variation is the block term.</p>
+<pre class="sas"><code> data anova_table;
+    length Source $15 Degrees_of_Freedom $20;
+    
+    Source = "Block"; 
+    Degrees_of_Freedom = "r - 1"; 
+    output;
+
+    Source = "Factor A"; 
+    Degrees_of_Freedom = "a - 1"; 
+    output;
+
+    Source = "Factor B"; 
+    Degrees_of_Freedom = "b - 1"; 
+    output;
+
+    Source = "A × B"; 
+    Degrees_of_Freedom = "(a - 1)(b - 1)"; 
+    output;
+
+    Source = "Control"; 
+    Degrees_of_Freedom = "1"; 
+    output;
+
+    Source = "Error"; 
+    Degrees_of_Freedom = "n - [r + ab]"; 
+    output;
+
+    Source = "Total"; 
+    Degrees_of_Freedom = "n - 1"; 
+    output;
+run;
+
+proc print data=anova_table noobs;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fact_blk00.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 11: General Structure of ANOVA</figcaption>
+</figure>
+</div>
+<p>Table 10 shows the layout of the experiment. Each clinic contains the four factorial treatment combinations and the control exactly once.</p>
+<pre class="sas"><code>data drug_table;
+    length 
+        Drug_Type $15
+        Dosage 8
+        Description $20
+        Replicates_per_Clinic_Block $30;
+
+    Drug_Type = "Soluble";
+    Dosage = 10;
+    Description = "Soluble at low dosage";
+    Replicates_per_Clinic_Block = "1 per clinic × 5 clinics = 5";
+    output;
+
+    Drug_Type = "Soluble";
+    Dosage = 15;
+    Description = "Soluble at high dosage";
+    Replicates_per_Clinic_Block = "5";
+    output;
+
+    Drug_Type = "Non-soluble";
+    Dosage = 10;
+    Description = "Non-soluble at low dosage";
+    Replicates_per_Clinic_Block = "5";
+    output;
+
+    Drug_Type = "Non-soluble";
+    Dosage = 15;
+    Description = "Non-soluble at high dosage";
+    Replicates_per_Clinic_Block = "5";
+    output;
+
+    Drug_Type = "No Drug";
+    Dosage = 0;
+    Description = "Control";
+    Replicates_per_Clinic_Block = "5 (1 in each clinic)";
+    output;
+run;
+
+proc print data=drug_table noobs label;
+    label 
+        Drug_Type = "Drug Type"
+        Replicates_per_Clinic_Block = "Replicates per Clinic (Block)";
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fact_blk01.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 12: General Structure of Design</figcaption>
+</figure>
+</div>
+<p>Table 11 presents the degrees of freedom for the example. There are five clinics, so the block term has 4 degrees of freedom. Drug type, dosage, their interaction, and the control indicator each have 1 degree of freedom. The remaining 16 degrees of freedom are assigned to error.</p>
+<pre class="sas"><code>data anova_table;
+    length Source $15 Degrees_of_Freedom $20;
+    
+    Source = "Block"; 
+    Degrees_of_Freedom = "5 - 1"; 
+    output;
+
+    Source = "Factor A"; 
+    Degrees_of_Freedom = "2 - 1"; 
+    output;
+
+    Source = "Factor B"; 
+    Degrees_of_Freedom = "2 - 1"; 
+    output;
+
+    Source = "A × B"; 
+    Degrees_of_Freedom = "(2 - 1)(2 - 1)"; 
+    output;
+
+    Source = "Control"; 
+    Degrees_of_Freedom = "1"; 
+    output;
+
+    Source = "Error"; 
+    Degrees_of_Freedom = "25 - [5 + 4]"; 
+    output;
+
+    Source = "Total"; 
+    Degrees_of_Freedom = "25 - 1"; 
+    output;
+run;
+
+proc print data=anova_table noobs;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fact_blk0.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 13: ANOVA</figcaption>
+</figure>
+</div>
+<p>Table 12 shows the simulated data. Each clinic contributes one observation for each treatment combination and one observation for the control.</p>
+<pre class="sas"><code>options ps=64 ls=100;
+
+Data bpdata_block;
+INPUT block drug$ dosage BloodPressure control$;
+if drug='Control' then do;
+drug ='contrl';
+forms = 0;
+formn = 0;
+end;
+else if drug ='Soluble' then do;
+forms = dosage;
+formn = 0;
+end;
+else if drug='Non-sol' then do;
+forms = 0;
+formn = dosage;
+end;
+cards;
+1 Soluble 10 129.0941 n
+1 Soluble 15 127.34 n
+1 Non-sol 10 131.614 n
+1 Non-sol 15 133.1922 n
+1 Control 0 128.4334 y
+2 Soluble 10 129.2637 n
+2 Soluble 15 127.8995 n
+2 Non-sol 10 133.9404 n
+2 Non-sol 15 134.6503 n
+2 Control 0 128.9838 y
+3 Soluble 10 133.4043 n
+3 Soluble 15 131.6153 n
+3 Non-sol 10 135.1508 n
+3 Non-sol 15 138.8188 n
+3 Control 0 132.6446 y
+4 Soluble 10 127.5732 n
+4 Soluble 15 127.923 n
+4 Non-sol 10 133.115 n
+4 Non-sol 15 134.4121 n
+4 Control 0 129.516 y
+5 Soluble 10 127.0719 n
+5 Soluble 15 129.0964 n
+5 Non-sol 10 134.4119 n
+5 Non-sol 15 134.1204 n
+5 Control 0 131.5124 y
+
+;
+proc print; 
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fact_blk1.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 14: Data for 2 by 2 factorial with control and blocks</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="advanced-analysis-1" class="level2">
+<h2 class="anchored" data-anchor-id="advanced-analysis-1">Advanced Analysis</h2>
+<p>In this example, clinics are included as blocks but the objective of the analysis is the same as the one discussed in a 2 × 2 factorial design with control without blocks. The model therefore contains the same factorial treatment structure and control indicator used in the previous chapter, with the addition of a block term.</p>
+<section id="statistical-model-1" class="level3">
+<h3 class="anchored" data-anchor-id="statistical-model-1">Statistical Model</h3>
+<p>The statistical model for a 2 × 2 factorial design with control and blocks is given as</p>
+<p><span class="math display">\[
+Y_{ijkl} = \mu + b_l + \alpha_i + \beta_j + (\alpha\beta)_{ij} + \gamma I_k + \varepsilon_{ijkl},
+\]</span></p>
+<p>with</p>
+<p><span class="math display">\[
+I_k =
+\begin{cases}
+1 &amp; \text{if the observation belongs to the control treatment} \\
+0 &amp; \text{if the observation belongs to one of the factorial treatments},
+\end{cases}
+\]</span></p>
+<p>for</p>
+<p><span class="math inline">\(Y_{ijkl}\)</span> is the blood pressure response for the experimental unit receiving the <span class="math inline">\(ith\)</span> drug type at the <span class="math inline">\(jth\)</span> dosage level in the <span class="math inline">\(lth\)</span> block,</p>
+<p><span class="math inline">\(\mu\)</span> represents the baseline mean of the factorial treatments,</p>
+<p><span class="math inline">\(b_l\)</span> is the effect of the <span class="math inline">\(l\)</span>th block or clinic, assumed to be independently and normally distributed with mean 0 and variance <span class="math inline">\(\sigma^2_{b}\)</span> ,</p>
+<p><span class="math inline">\(\alpha_i\)</span> is the effect of the <span class="math inline">\(i\)</span>th drug type,</p>
+<p><span class="math inline">\(\beta_j\)</span> is the effect of the <span class="math inline">\(j\)</span>th dosage level,</p>
+<p><span class="math inline">\((\alpha\beta)_{ij}\)</span> is the interaction effect between drug type and dosage,</p>
+<p><span class="math inline">\(\gamma\)</span> measures the difference between the control treatment and the factorial baseline,</p>
+<p><span class="math inline">\(\varepsilon_{ijkl}\)</span> is the residual error term, assumed to be independently and normally distributed with mean 0 and constant variance <span class="math inline">\(\sigma^2_{\epsilon}\)</span>,</p>
+<p>The only difference between this model and the model in the previous chapter is the addition of the block term, <span class="math inline">\(b_l\)</span>. No block-by-treatment interaction is assumed. In the R analysis below, clinic is treated as a random block effect to estimate the amount of block-to-block variation.</p>
+<p>The model summary shows the estimated fixed effects and the variance components. The block variance describes how much variability is associated with differences among clinics, while the residual variance describes variation among experimental units after accounting for the model terms.</p>
+<pre class="sas"><code>proc glimmix data = bpdata_block; 
+class block drug dosage control;
+model BloodPressure =  control drug(control) dosage(control)
+  drug*dosage(control)/solution ddfm=kr; 
+random block;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fact_blk4.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 15: Covariance parameter estimates</figcaption>
+</figure>
+</div>
+<p>Table 13 presents the ANOVA table for the mixed model using the Kenward-Roger degrees-of-freedom method. The <code>Control</code> term compares the overall treatment groups with the control group. The <code>Control:Drug</code> and <code>Control:Dosage</code> terms estimate the factorial drug and dosage effects among the treatment observations. The <code>Control:Drug:Dosage</code> term evaluates the interaction between drug type and dosage within the factorial treatment structure.</p>
+<pre class="sas"><code>proc glimmix data = bpdata_block; 
+class block drug dosage control;
+model BloodPressure =  control drug(control) 
+  dosage(control) drug*dosage(control)/solution ddfm=kr; 
+random block;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fact_blk5.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 16: ANOVA table</figcaption>
+</figure>
+</div>
+<p>From Table 13, the control effect is statistically significant, which indicates evidence of a difference between the control group and the treatment groups. The drug type effect is also statistically significant, meaning that soluble and non-soluble drugs differ in their average effect on blood pressure. The dosage effect is not statistically significant. The interaction term is marginal, suggesting that the relationship between dosage and blood pressure may depend somewhat on drug type, although the evidence is not strong at the 5 percent significance level.</p>
+<p>Table 14 shows the estimated marginal means for each drug-by-dosage combination and for the control group. The non-soluble treatments have higher estimated blood pressure values than the soluble treatments at both dosage levels. The control mean is separate from the factorial treatment means because the control is not part of the drug-by-dosage factorial structure.</p>
+<pre class="sas"><code>proc glimmix data = bpdata_block; 
+class block drug dosage control;
+model BloodPressure =  control drug(control)
+  dosage(control) drug*dosage(control)/solution ddfm=kr; 
+lsmeans drug*dosage(control);
+random block;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fact_blk6.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 17: Least square means for drug by dosage(control) treatment</figcaption>
+</figure>
+</div>
+<p>Table 15 compares the overall treatment mean with the control mean. This comparison is important because the control group serves as the baseline for determining whether receiving any treatment differs from receiving no treatment.</p>
+<p>The contrast shows a statistically significant difference between the treatment groups and the control group. This suggests that, on average, the blood pressure response differs between individuals receiving a treatment and those in the control group.</p>
+<pre class="sas"><code>proc glimmix data = bpdata_block; 
+class block drug dosage control;
+model BloodPressure =  control drug(control)
+  dosage(control) drug*dosage(control)/solution ddfm=kr; 
+lsmeans control / diff = control adjust=dunnett cl;
+random block;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fact_blk7.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 18: Treatment vs Control group</figcaption>
+</figure>
+</div>
+</section>
+<section id="simple-effects-1" class="level3">
+<h3 class="anchored" data-anchor-id="simple-effects-1">Simple Effects</h3>
+<p>When an interaction is present or nearly present, it is useful to examine simple effects. A simple effect compares one factor at a specific level of another factor. In this example, simple effects help determine whether soluble and non-soluble drugs differ at each dosage level and whether dosage levels differ within each drug type.</p>
+<p>Table 16 compares the main effect of drug type within the treatment portion of the design. The comparison is shown for completeness, but when the interaction term is considered important, the simple effects should be emphasized.</p>
+<pre class="sas"><code>proc glimmix data = bpdata_block; 
+class block drug dosage control;
+model BloodPressure =  control drug(control) 
+  dosage(control) drug*dosage(control)/solution ddfm=kr;
+contrast 'Soluble vs Non-soluble' drug(control) 1 -1 0; 
+lsmeans drug(control) / diff = control adjust=dunnett cl;
+random block;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fact_blk8.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 19: Differences of drug type effect</figcaption>
+</figure>
+</div>
+<p>Table 17 compares all drug-by-dosage treatment combinations within the factorial portion of the design. These comparisons show that soluble and non-soluble drugs differ at both dosage levels. However, there is not strong evidence that increasing dosage from 10 units to 15 units changes blood pressure within the same drug type.</p>
+<p>Because multiple comparisons increase the chance of a Type I error, the Dunnett adjustment can be used when the main interest is comparing treatments with a control. The code below applies the Dunnett adjustment to the comparisons.</p>
+<pre class="sas"><code>proc glimmix data = bpdata_block; 
+class block drug dosage control;
+model BloodPressure =  control drug(control)
+  dosage(control) drug*dosage(control)/solution ddfm=kr; 
+lsmeans drug*dosage(control) / diff = control adjust=dunnett cl;
+random block;
+run;</code></pre>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="fact_blk9.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Table 20: Differences of drug by dosage type effect</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion"><strong>Conclusion</strong></h2>
+<p>In this chapter, we considered the 2 × 2 factorial design with control and blocks, and how experiments of this nature can be analyzed. We first considered the case without block for easy understanding and extended the concepts to the case where blocks are considered. The first example used to illustrate the concepts in this chapter was about evaluating the effects of two drugs on blood pressure which consisted of two factors and a control group. The second example involved two drug types, two dosage levels, a control group, and five clinics treated as blocks. The purpose of including blocks in the second example was to account for variation among clinics while still comparing the factorial treatments and the control group appropriately. These designs allowed researchers to answer some important questions which are usually present in studies that may be groundbreaking or there may not be enough research already done in that field.</p>
+<p>In both examples, the analysis showed that, without the application of any treatment, blood pressure among individuals may stay high in comparison to when a treatment is administered. Moreover, the type of the drug, whether soluble or not may have an effect on blood pressure. Nevertheless, there was no statistical evidence to support the effect caused by an increase in dosage. Also, for the example and data set used for analysis, there is no interaction between the two factors. Though in this illustration we simulated our data, the concepts are applicable to several studies of this nature. We also want to highlight how analyzing experiments of this nature as a traditional factorial design can change the inference space of the study.</p>
+<p>Overall, the 2 × 2 factorial design with control and blocks allows researchers to separate block-to-block variation from treatment variation. More importantly, both examples also preserve the correct interpretation of the control group as a separate baseline treatment rather than forcing the control into the factorial structure.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

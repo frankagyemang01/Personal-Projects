@@ -1,0 +1,269 @@
+---
+title: "Shabani_Muller"
+author: "Frank Agyemang"
+date: "2025-03-30"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading In the data sets
+In this chunk of code, we read in the data set and show a table containing the proportion of missing values for each of the chemicals even before they are put into group. The goal of this table is to understand how the proportion of missing values affects our estimates and what statistic would be more effecient for inference. For example, using a mean for this data set is not an efficient the data may be skewed and there are also lot of confounding variables.
+```{r}
+# Read a specific sheet
+tadpole_pest <- read.csv("AltEn_tadpoles_2025_pesticide_summary_030425.csv")
+tadpole_det <- read.csv("AltEn_tadpole_detections_with_headers_deidentified.csv")
+tadpole_fin <- read.csv("Tadpole_2021_2024_WetWeight_clean.csv")
+tadpole_fin$ThiamethoxamD <- as.numeric(tadpole_fin$ThiamethoxamD)
+summary(tadpole_fin)
+
+library(dplyr)
+tadpole_final <- tadpole_fin %>%
+  mutate(
+    Neonico = rowSums(tadpole_fin[, c("Clothianidin", "ThiamethoxamD")]),
+    Fungi = rowSums(tadpole_fin[, c("Azoxystrobin", "Carbendazim", "Cyproconazole", "Fluoxastrobin", 
+                    "Fluxapyroxad", "Ipconazole", "Metconazole", "Propiconazole", 
+                    "Pyraclostrobin", "Tebuconazole", "Tetraconazole", "Thiabendazole")]),
+    Herbi = rowSums(tadpole_fin[, c("Acetochlor", "Atrazine", "Dithiopyr", "Flufenacet", 
+                    "Metolachlor..R.and.S.", "Pendimethalin", "Penoxsulam")]),
+    Other = rowSums(tadpole_fin[, c("Cyfluthrin..all.isomers.", "Bifenthrin", "Desthiopro")]),
+    Legacy_Agro = rowSums(tadpole_fin[, c("ppDDD", "ppDDE", "ppDDT", "Pentachloroanisole")])
+  )
+
+
+## Removing variables 
+tadpole_final <- tadpole_final[, -c(9:36)]
+```
+
+
+```{r}
+library(dplyr)
+tadpole_final <- tadpole_final %>%
+  mutate(ID = c(1:175))
+tadpole_final <- tadpole_final %>% select(ID, Collection_date,Site,Specices, everything())
+
+
+# Proportion of missing values in each column
+missing_proportion <- sapply(tadpole_final, function(x) mean(is.na(x)))
+
+
+# Store it in a data frame
+missing_table <- data.frame(
+  Variable = names(missing_proportion),
+  Missing_Proportion = missing_proportion
+)
+# View the table
+print(missing_table)
+```
+
+
+
+
+## Data Cleaning and Exploratory Data Analysis
+```{r}
+#Treating categorical variables as factors
+tadpole_final[, c("Site","Specices","Collection_date","Dev_stage", "ID")] <- lapply(tadpole_final[, c("Site","Specices","Collection_date","Dev_stage","ID")], as.factor)
+
+library(lubridate)
+# Convert Date to Date format and extract year
+tadpole_final$Collection_date <- year(mdy(tadpole_final$Collection_date))
+tadpole_final$Collection_date <- as.factor(tadpole_final$Collection_date)
+tadpole_final_freq <- tadpole_final %>%
+  count(Specices, Collection_date) %>%
+  group_by(Specices, Collection_date) %>%
+  mutate(Relative_Freq = n / sum(n))
+
+
+library(dplyr)
+
+# Define which levels belong to each category
+undeveloped_countries <- c("P25","pre-25","p27","P27","26","27-30","28","30")
+developing_countries <- c("p31","33","34","35","36","37","38","39")
+developed_countries <- c("41")
+
+# Create new category variable
+tadpole_final <- tadpole_final %>%
+  mutate(Dev_stage = case_when(
+    Dev_stage %in% undeveloped_countries ~ "Undeveloped",
+    Dev_stage %in% developing_countries ~ "Developing",
+    Dev_stage %in% developed_countries ~ "Developed",
+    TRUE ~ NA_character_  # or "Other"
+  ))
+
+tadpole_final$Dev_stage <- as.factor(tadpole_final$Dev_stage)
+tadpole_final <- tadpole_final %>% 
+  rename(
+    Mass = Mass..g...dry.weight.,
+    Moisture = X..Moisture,
+    Lipid = X..Lipid
+  )
+write.csv(tadpole_final, "tadpole_final.csv", row.names = FALSE)
+```
+
+
+# Exploratory Data Analysis
+
+```{r}
+library(ggplot2)
+# Histogram of Concentration for the various Chemicals
+hist(tadpole_final$Neonico)
+hist(tadpole_final$Fungi)
+hist(tadpole_final$Herbi)
+hist(tadpole_final$Other)
+hist(tadpole_final$Legacy_Agro)
+
+# Mean Concentration by chemical over Years
+conc_neo <- aggregate(Neonico ~ Collection_date, data = tadpole_final, FUN = mean)
+conc_fung <- aggregate(Fungi ~ Collection_date, data = tadpole_final, FUN = mean)
+conc_herbi <- aggregate(Herbi ~ Collection_date, data = tadpole_final, FUN = mean)
+conc_other <- aggregate(Other ~ Collection_date, data = tadpole_final, FUN = mean)
+conc_leg <- aggregate(Legacy_Agro ~ Collection_date, data = tadpole_final, FUN = mean)
+
+# Plot 
+ggplot(conc_neo, aes(x = Collection_date, y = Neonico)) +
+  geom_point(size = 4, color = "black") +
+  geom_line(group = 1, color = "black") +
+  labs(title = "Mean Plot Of Neonicotinoid Concentration Over the Years", x = "Collection Date", y = "Neonicotinoid Mean Value") +
+  theme_minimal()
+
+ggplot(conc_fung, aes(x = Collection_date, y = Fungi)) +
+  geom_point(size = 4, color = "black") +
+  geom_line(group = 1, color = "black") +
+  labs(title = "Mean Plot Of Fungicide Concentration Over the Years", x = "Collection Date", y = "Fungicide Mean Value") +
+  theme_minimal()
+
+ggplot(conc_herbi, aes(x = Collection_date, y = Herbi)) +
+  geom_point(size = 4, color = "black") +
+  geom_line(group = 1, color = "black") +
+  labs(title = "Mean Plot Of Herbicide Concentration Over the Years", x = "Collection Date", y = "Herbicide Mean Value") +
+  theme_minimal()
+
+ggplot(conc_other, aes(x = Collection_date, y = Other)) +
+  geom_point(size = 4, color = "black") +
+  geom_line(group = 1, color = "black") +
+  labs(title = "Mean Plot Of Other Concentration Over the Years", x = "Collection Date", y = "Other Mean Value") +
+  theme_minimal()
+
+ggplot(conc_leg, aes(x = Collection_date, y = Legacy_Agro)) +
+  geom_point(size = 4, color = "black") +
+  geom_line(group = 1, color = "black") +
+  labs(title = "Mean Plot Of Legacy Concentration Over the Years", x = "Collection Date", y = "Legacy Mean Value") +
+  theme_minimal()
+
+
+
+```
+
+
+## Within year, concentration levels in different sites
+
+```{r}
+conc_neo <- aggregate(Neonico ~ Collection_date +  Site, data = tadpole_final, FUN = mean)
+conc_fung <- aggregate(Fungi ~ Collection_date + Site, data = tadpole_final, FUN = mean)
+conc_herbi <- aggregate(Herbi ~ Collection_date + Site, data = tadpole_final, FUN = mean)
+conc_other <- aggregate(Other ~ Collection_date + Site, data = tadpole_final, FUN = mean)
+conc_leg <- aggregate(Legacy_Agro ~ Collection_date + Site, data = tadpole_final, FUN = mean)
+
+
+
+conc_neo$Collection_date <- as.numeric(conc_neo$Collection_date)
+conc_fung$Collection_date <- as.numeric(conc_fung$Collection_date)
+conc_herbi$Collection_date <- as.numeric(conc_herbi$Collection_date)
+conc_other$Collection_date <- as.numeric(conc_other$Collection_date)
+conc_leg$Collection_date <- as.numeric(conc_leg$Collection_date)
+
+# Plot 1: Mean Neonico concentration per Site across Years
+ggplot(conc_neo, aes(x = Collection_date, y = Neonico, color = Site, group = Site)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Mean Neonico Concentration by Site Across Years",
+       x = "Collection Date",
+       y = "Mean Neonico Concentration") +
+  theme_minimal() +
+  theme(legend.position = "right") +
+  scale_x_continuous(breaks = unique(conc_neo$Collection_date))
+
+# Plot 2:
+ggplot(conc_fung, aes(x = Collection_date, y = Fungi, color = Site, group = Site)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Mean Fungicide Concentration by Site Across Years",
+       x = "Collection Date",
+       y = "Mean Fungicide Concentration") +
+  theme_minimal() +
+  theme(legend.position = "right") +
+  scale_x_continuous(breaks = unique(conc_fung$Collection_date))
+
+#Plot 3:
+ggplot(conc_herbi, aes(x = Collection_date, y = Herbi, color = Site, group = Site)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Mean Herbicide Concentration by Site Across Years",
+       x = "Collection Date",
+       y = "Mean Herbicide Concentration") +
+  theme_minimal() +
+  theme(legend.position = "right") +
+  scale_x_continuous(breaks = unique(conc_herbi$Collection_date))
+
+# Plot 4:
+ggplot(conc_other, aes(x = Collection_date, y = Other, color = Site, group = Site)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Mean Other Concentration by Site Across Years",
+       x = "Collection Date",
+       y = "Mean Other Concentration") +
+  theme_minimal() +
+  theme(legend.position = "right") +
+  scale_x_continuous(breaks = unique(conc_other$Collection_date))
+
+#Plot 5:
+ggplot(conc_leg, aes(x = Collection_date, y = Legacy_Agro, color = Site, group = Site)) +
+  geom_line(size = 1.2) +
+  geom_point(size = 2) +
+  labs(title = "Mean Legacy Agro Concentration by Site Across Years",
+       x = "Collection Date",
+       y = "Mean Lagacy Concentration") +
+  theme_minimal() +
+  theme(legend.position = "right") +
+  scale_x_continuous(breaks = unique(conc_leg$Collection_date))
+```
+
+
+## Regression Models
+```{r}
+Neonico_model <- glm(Neonico ~ Collection_date + Site + Specices + Mass + Moisture , data = tadpole_final, family = Gamma(link = "log"))
+summary(Neonico_model)
+plot(Neonico_model)
+
+fungi_model <- glm(Fungi ~ Collection_date + Site + Specices + Mass + Moisture + Lipid, data = tadpole_final, family = Gamma(link = "log"))
+summary(fungi_model)
+plot(fungi_model)
+
+herbi_model <- glm(Herbi ~ Collection_date + Site + Specices + Mass + Moisture + Lipid, data = tadpole_final, family = Gamma(link = "log"))
+summary(herbi_model)
+plot(herbi_model)
+
+other_model <- glm(Other ~ Collection_date + Site + Specices + Mass + Moisture + Lipid, data = tadpole_final, family = Gamma(link = "log"))
+summary(other_model)
+plot(other_model)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

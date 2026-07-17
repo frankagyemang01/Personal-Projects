@@ -1,0 +1,369 @@
+---
+title: "Qualifiers_code"
+author: "Frank Agyemang"
+date: "2024-05-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Simulation studies
+```{r}
+# Load necessary libraries
+library(deSolve)
+library(ggplot2)
+```
+
+
+```{r}
+sir_equations <- function(time, variables, parameters) {
+  with(as.list(c(variables, parameters)), {
+    dS <- -beta * I * S
+    dI <-  beta * I * S - alpha * I
+    dR <-  alpha * I
+    return(list(c(dS, dI, dR)))
+  })
+}
+
+
+parameters_values <- c(
+  beta  = 0.3, # infectious contact rate (/person/day)
+  alpha = 0.0005    # recovery rate (/day)
+)
+
+initial_values <- c(
+  S = 1000,  # number of susceptibles at time = 0
+  I =   1,  # number of infectious at time = 0
+  R =   0   # number of recovered (and immune) at time = 0
+)
+
+#time points
+time_values <- seq(0, 10)
+ls()
+sir_equations
+
+#ode from desolve package
+sir_values_1 <- ode(
+  y = initial_values,
+  times = time_values,
+  func = sir_equations,
+  parms = parameters_values 
+)
+sir_values_1 <- as.data.frame(sir_values_1)
+sir_values_1
+```
+
+
+```{r}
+with(sir_values_1, {
+# plotting the time series of susceptibles:
+  plot(time, S, type = "l", col = "blue",
+       xlab = "time (days)", ylab = "number of people")
+# adding the time series of infectious:
+  lines(time, I, col = "red")
+# adding the time series of recovered:
+  lines(time, R, col = "green")
+})
+
+# adding a legend:
+legend("right", c("susceptibles", "infectious", "recovered"),
+       col = c("blue", "red", "green"), lty = 1, bty = "n")
+
+
+
+```
+
+
+
+
+## when beta is a vector of values
+```{r}
+sir_equations <- function(time, variables, parameters) {
+  with(as.list(c(variables, parameters)), {
+    dS <- -beta * I * S
+    dI <-  beta * I * S - alpha * I
+    dR <-  alpha * I
+    return(list(c(dS, dI, dR)))
+  })
+}
+
+
+parameters_values <- c(
+  beta  = c( 0.1, 0.2, 0.3, 0.4), # infectious contact rate (/person/day)
+  alpha = 0.0005    # recovery rate (/day)
+)
+
+initial_values <- c(
+  S = 1000,  # number of susceptibles at time = 0
+  I =   1,  # number of infectious at time = 0
+  R =   0   # number of recovered (and immune) at time = 0
+)
+
+#time points
+time_values <- seq(0, 10)
+ls()
+sir_equations
+
+#ode from desolve package
+sir_values <- ode(
+  y = initial_values,
+  times = time_values,
+  func = sir_equations,
+  parms = parameters_values[[]] 
+)
+sir_values <- as.data.frame(sir_values_1)
+sir_values
+
+```
+
+
+```{r}
+# Load necessary libraries
+library(deSolve)
+
+# Define parameters
+N <- 1000  # Total population
+alpha_values <- c(0.0002, 0.0005, 0.0008)  # Recovery rates
+beta_values <- c(0.1, 0.3, 0.5)  # Infection rates
+
+# Function to simulate one realization of the SIR epidemic for given alpha and beta
+simulate_SIR_alpha_beta <- function(alpha, beta) {
+  # Initial conditions: S(0) = N-1, I(0) = 1, R(0) = 0
+  initial_state <- c(S = N-1, I = 1, R = 0)
+  
+  # Time points for simulation (0 to 200 with small intervals)
+  times <- seq(0, 200, by = 0.1)
+  
+  # SIR model function
+  sir_model <- function(time, state, parameters) {
+    with(as.list(c(state, parameters)), {
+      dS <- -beta * S * I / N
+      dI <- beta * S * I / N - alpha * I
+      dR <- alpha * I
+      return(list(c(dS, dI, dR)))
+    })
+  }
+  
+  # Solve the differential equations
+  out <- ode(y = initial_state, times = times, func = sir_model, parms = c(alpha = alpha, beta = beta))
+  
+  # Combine time points with S, I, R values into a data frame
+  df <- data.frame(time = out$time, S = out$y[, "S"], I = out$y[, "I"], R = out$y[, "R"])
+  
+  return(df)
+}
+
+# Create an empty list to store simulation results
+results <- list()
+
+# Perform simulation study for different alpha and beta values
+for (alpha in alpha_values) {
+  for (beta in beta_values) {
+    # Simulate one realization for given alpha and beta
+    result <- simulate_SIR_alpha_beta(alpha, beta)
+    
+    # Store simulation result
+    results[[paste("Alpha =", alpha, ", Beta =", beta)]] <- result
+  }
+}
+
+# Plot the simulation results
+par(mfrow = c(length(alpha_values), length(beta_values)))
+for (i in 1:length(alpha_values)) {
+  for (j in 1:length(beta_values)) {
+    plot(results[[paste("Alpha =", alpha_values[i], ", Beta =", beta_values[j])]]$time, results[[paste("Alpha =", alpha_values[i], ", Beta =", beta_values[j])]]$S, type = "l", col = "blue", xlab = "Time", ylab = "S(t)", main = paste("Susceptible (S), Alpha =", alpha_values[i], ", Beta =", beta_values[j]))
+    plot(results[[paste("Alpha =", alpha_values[i], ", Beta =", beta_values[j])]]$time, results[[paste("Alpha =", alpha_values[i], ", Beta =", beta_values[j])]]$I, type = "l", col = "red", xlab = "Time", ylab = "I(t)", main = paste("Infected (I), Alpha =", alpha_values[i], ", Beta =", beta_values[j]))
+    plot(results[[paste("Alpha =", alpha_values[i], ", Beta =", beta_values[j])]]$time, results[[paste("Alpha =", alpha_values[i], ", Beta =", beta_values[j])]]$R, type = "l", col = "green", xlab = "Time", ylab = "R(t)", main = paste("Recovered (R), Alpha =", alpha_values[i], ", Beta =", beta_values[j]))
+  }
+}
+
+```
+
+
+## Simulation of overdispersed data
+```{r}
+# Load necessary library
+library(MASS)
+
+# Set seed for reproducibility
+set.seed(123)
+
+# Define parameters
+n <- 100  # Number of observations
+mean_count <- 10  # Mean count
+dispersion <- 2  # Dispersion parameter for overdispersion (larger values indicate greater overdispersion)
+
+# Simulate count data
+count_data <- rnbinom(n, mu = mean_count, size = dispersion)
+
+# Print summary statistics
+summary(count_data)
+
+# Plot histogram of simulated count data
+hist(count_data, breaks = 20, main = "Histogram of Simulated Count Data", xlab = "Count")
+
+```
+
+##Analyzing overdispersed data
+```{r}
+# Fit a Poisson GLM with log link function
+glm_model <- glm(count_data ~ 1, family = poisson(link = "log"))
+
+# Extract residuals
+residuals <- resid(glm_model, type = "pearson")
+
+# Plot residuals
+hist(residuals, breaks = 20, main = "Histogram of GLM Residuals", xlab = "Residuals")
+
+# Check for overdispersion
+dispersion_test <- sum(residuals^2) / (length(count_data) - 1)
+dispersion_test
+
+```
+
+
+## Possible models when there is overdispersion
+```{r}
+library(MASS)
+nb_model <- glm.nb(count_data ~ 1)
+summary(nb_model)
+
+#Zero-inflated poisson model
+library(pscl)
+zip_model <- zeroinfl(count_data ~ 1, dist = "poisson")
+summary(zip_model)
+
+
+```
+
+
+```{r}
+# Set the parameters
+c <- 300
+a <- 4
+b <- 25
+h <- 100
+t <- 150
+simulation <- 10000
+count <- 0
+# Simulate n_simulations samples from the gamma distribution
+for (run in 1:simulation) {
+rand_num <- rgamma(c, shape = a, rate = 1/b)
+# Check how many components last at least 100 hours for each sample
+last_100_hours <- rand_num >= h
+total <- sum(last_100_hours)
+# Calculate the proportion of samples where at least 50% of the components last 100 hours
+count <- count + (total>=t)
+}
+prob <- count/simulation
+cat("The estimated probability that at least 50% of the components last 100 hours is", prob, "\n")
+
+
+c <- 100
+a <- 20
+b <- 5
+h <- 100
+t <- 50
+simulation <- 10000
+count <- 0
+# Simulate n_simulations samples from the gamma distribution
+for (run in 1:simulation) {
+rand_num <- rgamma(c, shape = a, rate = 1/b)
+# Check how many components last at least 100 hours for each sample
+last_100_hours <- rand_num >= h
+total <- sum(last_100_hours)
+# Calculate the proportion of samples where at least 50% of the components last 100 hours
+count <- count + (total>=t)
+}
+prob <- count/simulation
+cat("The estimated probability that at least 50% of the components last 100 hours is", prob, "\n")
+
+c <- 100
+a <- 20.7
+b <- 5
+h <- 100
+t <- 50
+simulation <- 10000
+count <- 0
+# Simulate n_simulations samples from the gamma distribution
+for (run in 1:simulation) {
+rand_num <- rgamma(c, shape = a, rate = 1/b)
+# Check how many components last at least 100 hours for each sample
+last_100_hours <- rand_num >= h
+total <- sum(last_100_hours)
+# Calculate the proportion of samples where at least 50% of the components last 100 hours
+count <- count + (total>=t)
+}
+prob <- count/simulation
+cat("The estimated probability that at least 50% of the components last 100 hours is", prob, "\n")
+
+
+n=10000 # Number of simulated data sets (repeated simulatons)
+lambda=141.538
+S2obs=6370.603
+NSamp=13
+
+Pcount=0
+for(run in 1:n){
+Counts=rpois(NSamp,lambda)
+xbar=mean(Counts)
+s2=var(Counts)
+Pcount=Pcount+(s2>=S2obs)
+}
+Pval=Pcount/n
+Pval
+
+```
+
+
+```{r}
+library(ggplot2)
+x1_fac <- seq(from = 1,to = 162)
+log_x1 <- log(x1_fac)
+x1 <- sum(log_x1)
+x2_fac <- seq(from = 1, to = 52)
+log_x2 <- log(x2_fac)
+x2 <- sum(log_x2)
+x3_fac <- seq(from = 1, to = 28)
+log_x3 <- log(x3_fac)
+x3 <- sum(log_x3)
+x4_fac <- seq(from = 1, to = 158)
+log_x4 <- log(x4_fac)
+x4 <- sum(log_x4)
+coeffs <- x1 - x2 - x3 - x4
+likelihood <- function(j){
+coeffs +(162*log((1-j)/2)) + (52*log(j/2))+(28*log(j/2)) +(158*log((1-j)/2))
+}
+ggplot(data.frame(x = c(0,1)),aes(x=x)) +
+stat_function(fun=likelihood) +
+labs(x = "theta", y = "log-likelihood")
+
+
+#Question 2
+library(ggplot2)
+y1_fac <- seq(from = 141,to = 200)
+log_y1 <- log(y1_fac)
+y1 <- sum(log_y1)
+y2_fac <- seq(from = 1, to = 8)
+log_y2 <- log(y2_fac)
+y2 <- sum(log_y2)
+y3_fac <- seq(from = 1, to = 12)
+log_y3 <- log(y3_fac)
+y3 <- sum(log_y3)
+y4_fac <- seq(from = 1, to = 40)
+log_y4 <- log(y4_fac)
+y4 <- sum(log_y4)
+coeff <- y1 - y2 - y3 - y4
+likelihood <- function(j){
+coeff +(140*log((3-(2*j))/4 + (j*j)/4)) + (20*log(j*(2-j)/4))+(12*log(j*(2-j)/4)) +(40*log((1-j)^2/4))
+}
+ggplot(data.frame(x = c(0,1)),aes(x=x)) +
+stat_function(fun=likelihood) +
+labs(x = "theta", y = "log-likelihood")
+
+
+```
+

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>A 2 by 2 Factorial With Control: A Case Study in SAS</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="factorial_plus_control_sas_files/libs/clipboard/clipboard.min.js"></script>
+<script src="factorial_plus_control_sas_files/libs/quarto-html/quarto.js"></script>
+<script src="factorial_plus_control_sas_files/libs/quarto-html/popper.min.js"></script>
+<script src="factorial_plus_control_sas_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="factorial_plus_control_sas_files/libs/quarto-html/anchor.min.js"></script>
+<link href="factorial_plus_control_sas_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="factorial_plus_control_sas_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="factorial_plus_control_sas_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="factorial_plus_control_sas_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="factorial_plus_control_sas_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">A 2 by 2 Factorial With Control: A Case Study in SAS</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction"><strong>Introduction</strong></h2>
+<section id="exploring-a-2-by-2-factorial-with-control-a-case-study-in-sas" class="level3">
+<h3 class="anchored" data-anchor-id="exploring-a-2-by-2-factorial-with-control-a-case-study-in-sas"><strong>Exploring a 2 by 2 Factorial with Control: A Case Study In SAS</strong></h3>
+<p>Factorial experiments are widely used in scientific research for evaluating the interaction effects of multiple factors simultaneously. A 2 × 2 factorial design involves two factors, each at two levels, resulting in four treatment combinations. However, in many practical scenarios, researchers wish to compare these treatments not only among themselves but also against a standard or baseline treatment referred to as a control. In such cases, a 2 × 2 factorial design plus a control is adopted. There is an important difference between the traditional factorial design with a control and a 2 by 2 factorial design plus control. With the traditional factorial design with a control, we see all possible combinations of the factor levels including the control. With a factorial design plus a control, we only see possible combinations of treatments and their factor levels and control is used as a reference or considered the fifth treatment. We illustrate more of this concept using the example below.</p>
+</section>
+<section id="design-structure" class="level3">
+<h3 class="anchored" data-anchor-id="design-structure"><strong>Design Structure</strong></h3>
+<section id="traditional-2-2-factorial-design" class="level4">
+<h4 class="anchored" data-anchor-id="traditional-2-2-factorial-design"><strong>Traditional 2 × 2 Factorial Design</strong></h4>
+<p>In a traditional 2 × 2 factorial design, we have:</p>
+<ol type="1">
+<li><p>Factor A (e.g., Fertilizer type): Level A1 and A2</p></li>
+<li><p>Factor B (e.g., Irrigation regime): Level B1 and B2 This gives us four treatment combinations:</p></li>
+<li><p>A1B1</p></li>
+<li><p>A1B2</p></li>
+<li><p>A2B1</p></li>
+</ol>
+<p>A2B2 All these combinations are part of the factorial structure. If a control treatment (e.g., no fertilizer and no irrigation) is included, it is often embedded into one of the treatment combinations (e.g., A1B1) or replicated in all combinations as a baseline within each cell.</p>
+</section>
+<section id="factorial-plus-control" class="level4">
+<h4 class="anchored" data-anchor-id="factorial-plus-control"><strong>2 × 2 Factorial Plus Control</strong></h4>
+<p>In a factorial plus control design:</p>
+<ol type="1">
+<li><p>The control treatment is treated as a fifth, independent treatment, outside the factorial structure.</p></li>
+<li><p>The four factorial combinations remain the same (A1B1, A1B2, A2B1, A2B2).</p></li>
+<li><p>The control (C) is not associated with any levels of Factor A or B and is treated as its own level in the analysis.</p></li>
+</ol>
+<p>Thus, there are 5 treatment groups in total: the four factorial combinations + 1 control.</p>
+<p>A factorial design with control may be utilized in experiments where new drugs and methods are being tested for the first time or in new areas of study. In the case where treatments or methods are being tested for the first time, researchers may be interested in comparing the main effects of treatments with control, or in situations where they may be a significant interaction effect, compare each treatment with the control. In our example, we will compare each treatment with the control.</p>
+</section>
+<section id="example" class="level4">
+<h4 class="anchored" data-anchor-id="example"><strong>Example</strong></h4>
+<p>Researchers are interested in evaluating the effect of two drugs on blood pressure. They would like to determine if a soluble or non-soluble form makes a difference. Another variable that affects performance of the drug is dosage (10 units and 15 units). Because this is a new study, they also chose a control group (No drug) to serve as reference. There were 3 replicates for each treatment combination and 3 people in the control group.</p>
+<p>In this document, all the analysis are implemented in SAS. Data was simulated from the normal distribution with mean of <span class="math inline">\(0\)</span> and variance of <span class="math inline">\(5\)</span>. To set up a factorial design with control, one must set up the treatment combination as usual and only add the control as an additional factor. In our case, we first set up a 2 × 2 factorial design with the 2 levels in each factor and simulated the data separately. Also, data was simulated for the Control with mean value of 135 for blood pressure and a standard deviation of 5.</p>
+<p>A factorial with control design will require a variable that indicates whether a treatment is a control or not. Thus, in the final data frame, we see another variable called Control with entries “y” or “n”. Where “y” indicates the presence of control and “n” otherwise.</p>
+</section>
+<section id="interpretation-of-code" class="level4">
+<h4 class="anchored" data-anchor-id="interpretation-of-code">Interpretation of Code</h4>
+<p>We interpret each line of code used in setting up the data frame in SAS. The Data statement begins a SAS data step and creates a new dataset called bpdata. The Input statement specifies the structure of the raw data to be read; drug which is a categorical variable and hence the dollar sign, dosage, BloodPressure which is the response variable and control, which is a categorical variable. The variable called control here serves as an indicator variable. This tells us which of the treatment is a control. We also use the If statement which begins a conditional statement that checks whether the drug type is control. If the condition is satisfied, the value of drug is recoded from “control” to “contrl”. Next, new numeric variables forms and formn are created to serve as a dummy variable. If drug type has a factor level of control, we have values for forms and formn as zeros to indicate the absence of treatment in both factors. Similar conditions are applied to the other levels Soluble and non-soluble. Next, we enter our raw data that was simulated. The SAS code and image shows the output from SAS on demand.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"></ul>
+<div class="tab-content">
+
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="statistical-challenge" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-challenge">Statistical Challenge</h2>
+<p>A lot of experiments, usually groundbreaking ones, take one form or shape like this experiment where a control is introduced as reference or baseline. The challenge is that a lot of researchers do not understand the difference between factorial design with control and the traditional factorial design. Thereby analyzing such experiments as the latter. Such analysis is incorrect and only leads to wrong conclusions or inference. We demonstrate this point of view in the subsequent sections where we analyze data using the traditional factorial design and compare it to the factorial plus control design.</p>
+<section id="exploratory-data-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h3>
+<p>As with every data analysis, we conduct an exploratory data analysis to understand some characteristics of the data. We only present information that will be useful to the reader and researcher when using this design. We show the boxplot for the control and all other treatments. The boxplot shows the average blood pressure for control and all other treatment combinations. From the boxplot, we see those participants in the control have on average the highest blood pressure while the soluble drug at a dose of 15 units has the lowest average blood pressure.</p>
+<pre class="sas"><code>proc sgplot data=bpdata;
+    vbox BloodPressure / category=drug group=dosage;
+    yaxis grid;
+run;</code></pre>
+<p><img src="temp1.png" class="img-fluid" alt="Boxplot of BloodPressure"> ::: </p>
+<p>Lastly, we also showed the interaction plot for drug type and dosage. From the interaction plot shown below, we see parallel lines which shows there is no interaction between the two factors.</p>
+<p>For a Completely Randomized Design, the control group is used as reference to all treatment combinations. For a Randomized Complete Block Design, one may need a control group in each block. For example, if we considered clinics as blocks, then there may be a control group in each clinic.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"></ul>
+<div class="tab-content">
+
+</div>
+</div>
+</section>
+</section>
+<section id="model" class="level2">
+<h2 class="anchored" data-anchor-id="model">Model</h2>
+<p>The linear model for a factorial design with control is given as;</p>
+<p><span class="math inline">\(y_{ijk} = \mu + \tau_{ik} + D_{jk} + control_{k} + \epsilon_{ijk}\)</span></p>
+<p>where,</p>
+<p><span class="math inline">\(y_{ijk}\)</span> is the blood pressure of the kth individual using the ith drug type at the jth dose</p>
+<p><span class="math inline">\(\mu\)</span> is the intercept</p>
+<p><span class="math inline">\(\tau_{ik}\)</span> is the effect from the ith drug type nested in the Control</p>
+<p><span class="math inline">\(D_{jk}\)</span> is the effect from the jth dose level nested in the control</p>
+<p><span class="math inline">\(control_{k}\)</span> is the control</p>
+<p><span class="math inline">\(\epsilon_{ijk}\)</span> is the residual, <span class="math inline">\(\epsilon_{ijk}~ N(0,\sigma^{2})\)</span></p>
+<section id="data-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="data-analysis"><strong>Data Analysis</strong></h3>
+<p>For a simple factorial plus a control like the example above, we seek to do these:</p>
+<ol type="1">
+<li><p>Determine whether there is a significant interaction between two treatments factors</p></li>
+<li><p>Compare treatment to the control</p></li>
+<li><p>Compare treatment to each other</p></li>
+</ol>
+<p>We first look at the ANOVA table when the data is analyzed as a 2 by 2 factorial design. Note that, analyzing the experiment in this manner is incorrect. Looking at the table below, we see that there is a significant effect of dosage, p-value = 0.02112. This is because the control is embedded in dosage and thus the estimated mean for dosage includes that of control. With this result, a researcher may believe that dosage of the drug was significant and may continue to explore which dosage led to the highest effect.</p>
+</section>
+<section id="sas-code" class="level3">
+<h3 class="anchored" data-anchor-id="sas-code">SAS Code</h3>
+<p>We also show the estimated marginal means for drug type. We see that for the control group and dosage at <span class="math inline">\(0\)</span>, soluble and non-soluble drug types are non-estimable. This is because both dosage at <span class="math inline">\(0\)</span> and control are all controls and thus, within the control group, no comparison is reasonable.</p>
+</section>
+<section id="sas-code-1" class="level3">
+<h3 class="anchored" data-anchor-id="sas-code-1">SAS Code</h3>
+<p>When we take a look at the correct model, we see that the p-value for the control which is shown in the anova table is statistically significant, <span class="math inline">\(p-value = 0.00765\)</span> and the p-value for dosage by drug interaction term is <span class="math inline">\(0.92069\)</span>. These values correspond to the interaction plot we saw earlier. Since there is no significant interaction effect, we can look at the main effects for Drug (soluble or non-soluble) to determine if there is any significant difference.</p>
+</section>
+<section id="sas-code-2" class="level3">
+<h3 class="anchored" data-anchor-id="sas-code-2">SAS Code</h3>
+<p>When data is analyzed using the correct model, the estimated marginal means for drug type and dosage is shown below. For drug type soluble and non-soluble, the estimated means are <span class="math inline">\(127\)</span> and <span class="math inline">\(132\)</span> respectively with standard error <span class="math inline">\(1.57\)</span>.</p>
+</section>
+</section>
+<section id="sas-code-3" class="level2">
+<h2 class="anchored" data-anchor-id="sas-code-3">SAS Code</h2>
+<section id="simple-effects" class="level3">
+<h3 class="anchored" data-anchor-id="simple-effects">Simple Effects</h3>
+<p>Next, we show the simple of drug and dosage. A simple effect refers to the effect of one factor at a specific level of another factor. One typically would need to look at simple effects if there is a significant interaction effect. It is used in factorial experiments to understand how factors interact. In our example, there was no significant interaction effect but we show the results here for completeness.</p>
+<p>We also show the estimated marginal means comparing the main effect of treatment and control. We see that on average, the estimated blood pressure for treatment compared to control group was 129 and 137 respectively.</p>
+<p>We can also compare treatments of interest like the ones obtained above. Writing contrasts is very useful especially when one has so any treatments and only interested in a few comparisons. Therefore, we would write some contrast to determine if there is a significant difference between soluble and non-soluble drugs, soluble and control, non-soluble and control. We used the dunnett adjustment to control for family-wise error.</p>
+<p>From the table below, there is no significant difference in effect between soluble and non-soluble drug and between non-soluble drug and control, p-values are 0.1314 and 0.1414 respectively at 5% significance level. Nevertheless, there is a significant difference in effect between soluble drug and the control group, p-value = 0.0076.</p>
+</section>
+</section>
+<section id="interpretation" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation"><strong>Interpretation</strong></h2>
+<p>In summary, the above example and results show that without any drug, blood pressure will be high on average.That is, there is a significant difference in effect between control and treatments. Nevertheless, we cannot tell based on the simulated data that a soluble drug may reduce blood pressure better than a non-soluble drug. Moreover, we cannot tell whether increasing the dosage from 10 units to 15 units will decrease blood pressure.</p>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion"><strong>Conclusion</strong></h3>
+<p>The above example illustrates the benefits of designing an experiment in this form. This design allowed researchers to answer some important questions which are usually present in studies that may be groundbreaking or there may not be enough research already done in that field.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

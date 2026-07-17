@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Frank Agyemang">
+<meta name="author" content="Dr.&nbsp;Reka Howard">
+<meta name="author" content="Dr.&nbsp;Walter Stroup">
+<meta name="author" content="Dr.&nbsp;Erin Blankenship">
+
+<title>Exploring a 2 by 2 Factorial with Control: A Case Study In R</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="factorial_plus_control_and_block_R_files/libs/clipboard/clipboard.min.js"></script>
+<script src="factorial_plus_control_and_block_R_files/libs/quarto-html/quarto.js"></script>
+<script src="factorial_plus_control_and_block_R_files/libs/quarto-html/popper.min.js"></script>
+<script src="factorial_plus_control_and_block_R_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="factorial_plus_control_and_block_R_files/libs/quarto-html/anchor.min.js"></script>
+<link href="factorial_plus_control_and_block_R_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="factorial_plus_control_and_block_R_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="factorial_plus_control_and_block_R_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="factorial_plus_control_and_block_R_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="factorial_plus_control_and_block_R_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><strong>Introduction</strong></a></li>
+  <li><a href="#statistical-challenge" id="toc-statistical-challenge" class="nav-link" data-scroll-target="#statistical-challenge">Statistical Challenge</a></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis">Exploratory Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#data-description" id="toc-data-description" class="nav-link" data-scroll-target="#data-description">Data Description</a></li>
+  </ul></li>
+  <li><a href="#advanced-analysis" id="toc-advanced-analysis" class="nav-link" data-scroll-target="#advanced-analysis">Advanced Analysis</a>
+  <ul class="collapse">
+  <li><a href="#statistical-model" id="toc-statistical-model" class="nav-link" data-scroll-target="#statistical-model">Statistical Model</a></li>
+  <li><a href="#simple-effects" id="toc-simple-effects" class="nav-link" data-scroll-target="#simple-effects">Simple Effects</a></li>
+  </ul></li>
+  <li><a href="#exploratory-data-analysis-1" id="toc-exploratory-data-analysis-1" class="nav-link" data-scroll-target="#exploratory-data-analysis-1">Exploratory Data Analysis</a>
+  <ul class="collapse">
+  <li><a href="#data-description-1" id="toc-data-description-1" class="nav-link" data-scroll-target="#data-description-1">Data Description</a></li>
+  </ul></li>
+  <li><a href="#advanced-analysis-1" id="toc-advanced-analysis-1" class="nav-link" data-scroll-target="#advanced-analysis-1">Advanced Analysis</a>
+  <ul class="collapse">
+  <li><a href="#statistical-model-1" id="toc-statistical-model-1" class="nav-link" data-scroll-target="#statistical-model-1">Statistical Model</a></li>
+  <li><a href="#simple-effects-1" id="toc-simple-effects-1" class="nav-link" data-scroll-target="#simple-effects-1">Simple Effects</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="factorial_plus_control_and_block_R.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Exploring a 2 by 2 Factorial with Control: A Case Study In R</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Authors</div>
+    <div class="quarto-title-meta-contents">
+             <p>Frank Agyemang </p>
+             <p>Dr.&nbsp;Reka Howard </p>
+             <p>Dr.&nbsp;Walter Stroup </p>
+             <p>Dr.&nbsp;Erin Blankenship </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div style="page-break-after: always;"></div>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction"><strong>Introduction</strong></h2>
+<p>Factorial experiments are widely used in scientific research for evaluating the effects of multiple factors simultaneously. The simplest form of the factorial design is a 2 × 2 factorial design which involves two factors. For each factor we have two levels, resulting in four treatment combinations. However, in many practical scenarios, researchers may wish to compare these treatments not only among themselves but also against a standard or baseline treatment referred to as a control. In such cases, a 2 × 2 factorial design plus a control is adopted. There is an important difference between the traditional factorial design with a control and the problem which we attempt to address in this chapter. With the traditional factorial design with a control, we see all possible combinations of the factor levels including the control. For example, we may consider an experiment with two factors, type of fertilizer and irrigation each with two levels respectively. If A and B are the levels of fertilizer types and the levels of irrigation are Yes and No, where the latter is a control. Then for a traditional 2 × 2 factorial design with control, we would have all possible combinations: (A, Yes), (A, No), (B, Yes) and (B, No). Nevertheless, the type of problems that we try to address in this chapter involves a 2 × 2 factorial design where the control is serves as the fifth treatment. We begin this chapter with a detailed discussion on a 2 × 2 factorial design plus control as the fifth treatment and extend our discussion to a 2 × 2 factorial design plus control and blocks for a better understanding of our readers.</p>
+<p>In this chapter, we illustrate the concept of a 2 × 2 factorial design plus control, where the control is considered as the fifth treatment using the example below. Researchers are interested in evaluating the effects of two drugs on blood pressure. They would like to determine if a Soluble or Non-soluble form makes a difference. Another factor that affects performance of the drug is dosage (10 units and 15 units). Because this is a new study, they also chose a Control group to serve as reference. In this experiment, the control group refers to experimental units that did not receive any of the treatments.</p>
+<p>A 2 × 2 factorial design plus control may also be utilized in experiments where methods are being tested for the first time or in new areas of study. In the case where methods are being tested for the first time, researchers may be interested in comparing the main effects of treatments with control. In the example we consider, we are interested in determining if the treatments are able to reduce blood pressure at all. In such instances, the control group serves as a baseline and enables us to answer such a question. That is, if we find out that the blood pressure of individuals taking any of the drugs at different concentrations are on average lower than those in the control group, then we know that taking a drug is at least better than taking nothing at all. Also, in situations where there may be a significant interaction effect, we can compare each treatment combination with the control.</p>
+</section>
+<section id="statistical-challenge" class="level2">
+<h2 class="anchored" data-anchor-id="statistical-challenge">Statistical Challenge</h2>
+<p>As we stated in the introduction, with a 2 × 2 factorial design plus a control, the control is considered as the fifth treatment and does not appear in any other treatment combination unlike the traditional 2 × 2 factorial design with control.</p>
+<p>The statistical challenge is that the control is not part of the factorial structure and thus, it creates a non-orthogonal or partially unbalanced design. This is a problem because the control does not contribute to the estimation of the main effects and interaction effects of factors. Nevertheless, the control shares the same experimental error term with the treatments. When the traditional 2 × 2 factorial design is used to analyze these kinds of experiments, the implication is that the control contributes to the marginal means and also, both main effects and interactions are interpretable and balanced. This is incorrect.</p>
+<p>The 2 × 2 factorial design plus control enables the mean of the control to be estimated separately and computes factorial means only from the four factorial cells. Moreover, the variance of factorial effects are estimated only from factorial units and thus, control observations do not influence variance.</p>
+</section>
+<section id="exploratory-data-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis">Exploratory Data Analysis</h2>
+<p>In our example used to demonstrate the ideas in this chapter, we first conduct an exploratory data analysis to understand how data were generated, the type and description of the variables. We only present information that will be useful to the reader when using this design. We show the histogram which gives us information about the distribution of the response. We also show the interaction plot and boxplot for all treatment combinations and the control.</p>
+<p>Recall, the objective of the study is to evaluate the effects of two drugs on blood pressure. They would like to determine if a Soluble or Non-soluble form makes a difference. Another factor that affects performance of the drug is dosage (10 units and 15 units).</p>
+<section id="data-description" class="level3">
+<h3 class="anchored" data-anchor-id="data-description">Data Description</h3>
+<p>Data were simulated from the normal distribution with mean of <span class="math inline">\(0\)</span> and variance of <span class="math inline">\(5\)</span>. To set up the 2 × 2 factorial design plus control in R, we first set up the treatment combination of drug type and dosage as a traditional factorial design and only add the control as an additional factor.</p>
+<p>There were 15 observations with three replicates from each treatment combination and the control. Both drug type (Soluble and Non-soluble) and dosage (10 units and 15 units) were considered as qualitative variables. The response variable in this experiment is blood pressure. Each individual in this experiment is considered as an experimental unit.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the data frame</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>layout <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Drug_Type =</span> <span class="fu">c</span>(<span class="st">"Soluble"</span>, <span class="st">"Soluble"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Non-soluble"</span>, <span class="st">"Non-soluble"</span>, <span class="st">"No Drug"</span>),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Dosage =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">0</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Description =</span> <span class="fu">c</span>(</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Soluble at low dosage"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Soluble at high dosage"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Non-soluble at low dosage"</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Non-soluble at high dosage"</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Control"</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">Replicates =</span> <span class="fu">rep</span>(<span class="dv">3</span>, <span class="dv">5</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Create table</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  layout,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Experimental Drug Layout"</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Drug Type"</span>, <span class="st">"Dosage"</span>, <span class="st">"Description"</span>, <span class="st">"Replicates"</span>)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Experimental Drug Layout</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Drug Type</th>
+<th style="text-align: right;">Dosage</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Replicates</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">Soluble at low dosage</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">Soluble at high dosage</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">Non-soluble at low dosage</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">Non-soluble at high dosage</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">No Drug</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Control</td>
+<td style="text-align: right;">3</td>
+</tr>
+</tbody>
+</table>
+<p> Table 1 shows the layout of the experiment. Drug Type has two levels (Soluble and Non-soluble) and Dosage has two levels (10 and 15 units) with control serving as a reference.</p>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Setting seed for reproducibility</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2025</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Define levels for drug type </span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>drug_type <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Soluble"</span>, <span class="st">"Non-soluble"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Define levels for dosage</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>dosage <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Define number of replicates</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>replicates <span class="ot">&lt;-</span> <span class="dv">3</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate factorial combinations</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>factorial_df <span class="ot">&lt;-</span> <span class="fu">expand.grid</span>(<span class="at">Drug =</span> drug_type,</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                            <span class="at">Dosage =</span> dosage)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>factorial_df <span class="ot">&lt;-</span> factorial_df[<span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="fu">nrow</span>(factorial_df),</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">each =</span> replicates), ]</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate blood pressure (response variable)</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>factorial_df<span class="sc">$</span>BloodPressure <span class="ot">&lt;-</span> <span class="fu">with</span>(factorial_df,</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>                                   <span class="dv">130</span> <span class="sc">-</span>                           </span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">ifelse</span>(Drug <span class="sc">==</span> <span class="st">"Soluble"</span>, <span class="dv">5</span>, <span class="dv">0</span>) <span class="sc">+</span>       </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">ifelse</span>(Dosage <span class="sc">==</span> <span class="dv">15</span>, <span class="dv">3</span>, <span class="dv">0</span>) <span class="sc">+</span>            </span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">ifelse</span>(Drug <span class="sc">==</span> <span class="st">"Soluble"</span> </span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>                                          <span class="sc">&amp;</span> Dosage <span class="sc">==</span> <span class="dv">15</span>, <span class="sc">-</span><span class="dv">2</span>, <span class="dv">0</span>) <span class="sc">+</span>  </span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>                                    <span class="fu">rnorm</span>(<span class="fu">nrow</span>(factorial_df),</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>                                          <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">5</span>)        </span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Add Control group</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>control_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Drug =</span> <span class="st">"control"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Dosage =</span> <span class="dv">0</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">BloodPressure =</span> <span class="fu">rnorm</span>(replicates, <span class="at">mean =</span> <span class="dv">135</span>, <span class="at">sd =</span> <span class="dv">5</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Put the two date frames together by row</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>bp_data <span class="ot">&lt;-</span> <span class="fu">rbind</span>(factorial_df, control_df)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert drug type and dosage to factors since they are qualitative variables</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>bp_data<span class="sc">$</span>Drug <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bp_data<span class="sc">$</span>Drug)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>bp_data<span class="sc">$</span>Dosage <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bp_data<span class="sc">$</span>Dosage)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Creating a new variable Control</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Control serves as an indicator variable for whether control is present or not</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>bp_data <span class="ot">&lt;-</span> bp_data <span class="sc">%&gt;%</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Control =</span> <span class="fu">ifelse</span>( Dosage<span class="sc">==</span> <span class="dv">0</span>, <span class="st">"y"</span>, <span class="st">"n"</span>))</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>bp_data<span class="sc">$</span>Control <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(bp_data<span class="sc">$</span>Control)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Create formatted table</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  bp_data,</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Simulated Blood Pressure Data"</span>,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Drug Type"</span>, <span class="st">"Dosage"</span>, </span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Blood Pressure"</span>, <span class="st">"Control"</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Simulated Blood Pressure Data</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Drug Type</th>
+<th style="text-align: left;">Dosage</th>
+<th style="text-align: right;">Blood Pressure</th>
+<th style="text-align: left;">Control</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">128.1038</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1.1</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">125.1782</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1.2</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">128.8658</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">136.3624</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2.1</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">131.8549</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2.2</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">129.1857</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">127.9856</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3.1</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">125.6001</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3.2</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">124.2752</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">136.5108</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4.1</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">131.0215</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4.2</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">124.2247</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">11</td>
+<td style="text-align: left;">control</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">132.8952</td>
+<td style="text-align: left;">y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">21</td>
+<td style="text-align: left;">control</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">138.8245</td>
+<td style="text-align: left;">y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">31</td>
+<td style="text-align: left;">control</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">140.3308</td>
+<td style="text-align: left;">y</td>
+</tr>
+</tbody>
+</table>
+<p> Table 2 shows the simulated data which has three replicates for each treatment combination.</p>
+</div>
+</div>
+<p>Figure 1 shows the relative frequency density plot which displays the distribution of blood pressure measurements in the data. The x-axis represents blood pressure values, while the y-axis shows relative frequency density, meaning the total area under the bars sums to one. Most observations are concentrated between approximately <span class="math inline">\(124\)</span> and <span class="math inline">\(136\)</span>, indicating this range contains the highest relative density of measurements. The distribution shows moderate spread, with fewer observations at the higher end near 140 mmHg, suggesting slight right-skewness. No extreme outliers are apparent, although the density decreases toward the upper tail. Overall, the plot suggests that blood pressure values are clustered around the mid-120s to mid-130s, with relatively low variability outside this range.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Histogram plot </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bp_data, <span class="fu">aes</span>(<span class="at">x =</span> BloodPressure)) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">bins =</span> <span class="dv">6</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"gray"</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Histogram showing the distribution of blood pressure"</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Blood Pressure"</span>,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Frequency"</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="factorial_plus_control_and_block_R_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption"> Distribution of blood pressure. The x-axis shows blood pressure and the y-axis shows frequency.</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Figure 2 displays the distribution of blood pressure across different drug types (Soluble, Non-soluble, and Control) at three dosage levels (0, 10, and 15 units). At dosage 0, the control group exhibits the highest median blood pressure, with values centered around the upper 130s, and relatively low variability. This suggests elevated blood pressure levels in the absence of treatment. No soluble or non-soluble drug groups are present at this dosage level.</p>
+<p>At dosage 10, both soluble and non-soluble drugs show reduced median blood pressure compared to the control at dosage 0. The soluble drug group has the lowest median blood pressure and a relatively narrow interquartile range, indicating more consistent responses. In contrast, the non-soluble drug group shows a higher median and greater variability, suggesting less uniform treatment effects.</p>
+<p>At dosage 15, the soluble drug continues to demonstrate the lowest median blood pressure with minimal variability, indicating a strong and consistent treatment effect. The non-soluble drug group again shows higher median values and a wider spread, with observations extending across a broader range, reflecting increased variability in response.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create boxplots of blood pressure for each drug type</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(bp_data, <span class="fu">aes</span>(<span class="at">x =</span> Drug, <span class="at">y =</span> BloodPressure, <span class="at">fill =</span> Drug)) <span class="sc">+</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Draw boxplots</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create separate panels for each dosage level</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> Dosage) <span class="sc">+</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add plot title and axis labels</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Boxplot of Blood Pressure by Dosage and Drug Type"</span>,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Drug"</span>,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Blood Pressure"</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Apply a clean theme</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Rotate x-axis labels for better readability</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">vjust =</span> <span class="fl">0.5</span>,</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">hjust =</span> <span class="dv">1</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="factorial_plus_control_and_block_R_files/figure-html/boxplots1-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Distribution of BloodPressure by Drug Type and Dosage</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Figure 3 shows the interaction plot for drug type and dosage. The data for this example was generated to have no interaction and thus, we show this for completeness. The absence of an interaction for a 2 × 2 factorial design is usually illustrated by parallel lines. From the interaction plot shown in Figure 3, we see parallel lines which shows there is no interaction between the two factors.</p>
+<p>This implies that the effect of one factor, say drug type on blood pressure, is the same at all levels of dosage. Thus, the two factors are independent of each other. Nevertheless, we need to look at the ANOVA table.</p>
+<div style="page-break-after: always;"></div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Remove the control group so only factorial treatments are used</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>bp_data_sub <span class="ot">&lt;-</span> <span class="fu">subset</span>(bp_data, Drug <span class="sc">!=</span> <span class="st">"Control"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create interaction plot</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">interaction.plot</span>(</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Factor shown on the x-axis</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x.factor =</span> bp_data_sub<span class="sc">$</span>Drug,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Factor represented by separate lines</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">trace.factor =</span> bp_data_sub<span class="sc">$</span>Dosage,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Response variable</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">response =</span> bp_data_sub<span class="sc">$</span>BloodPressure,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plot points connected by lines</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">"b"</span>,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Line colors for dosage levels</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"blue"</span>, <span class="st">"red"</span>),</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Use different line types:</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2 = dashed line for dosage 10</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1 = solid line for dosage 15</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Line width</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Plotting symbol</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">pch =</span> <span class="dv">16</span>,</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Axis labels and title</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">"Average Blood Pressure"</span>,</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">"Drug"</span>,</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  <span class="at">trace.label =</span> <span class="st">"Dosage"</span>,</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">"Interaction Plot of Drug and Dosage </span><span class="sc">\n</span><span class="st"> (plus control Reference)"</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="co"># Add horizontal line showing control group mean</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">h =</span> <span class="fu">mean</span>(bp_data<span class="sc">$</span>BloodPressure[bp_data<span class="sc">$</span>Drug <span class="sc">==</span> <span class="st">"Control"</span>]),</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">"darkgreen"</span>,</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>  <span class="at">lty =</span> <span class="dv">2</span>,</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Add legend for control mean line</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>  <span class="st">"topleft"</span>,</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend =</span> <span class="st">"Control Mean"</span>,</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">"darkgreen"</span>,</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>  <span class="at">lty =</span> <span class="dv">2</span>,</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>  <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>  <span class="at">bty =</span> <span class="st">"n"</span></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="factorial_plus_control_and_block_R_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Interaction Plot of Drug Type and Dosage plus control as reference (shown in green color)</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+</section>
+</section>
+<section id="advanced-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="advanced-analysis">Advanced Analysis</h2>
+<p>Recall, the main objective of the experiment is to understand how drug type and dosage levels affect blood pressure and also how the treatments perform in comparison to the control. Thus, we seek to answer two important questions with a single model.</p>
+<p>The statistical model thus seek to evaluate whether average blood pressure of individuals taking a soluble drug differs from the blood pressure of individuals with non-soluble drug. Moreover, the model enables us to compare average blood pressure when a treatment was administered to that of the control group who did not receive any treatment all.</p>
+<p>Similarly, we are able to evaluate the effect of the dosage levels and compare their effect on blood pressure. In this chapter, we consider a simple linear model with assumption that blood pressure is independent and identically distributed and that we have homogeneous variance.</p>
+<section id="statistical-model" class="level3">
+<h3 class="anchored" data-anchor-id="statistical-model">Statistical Model</h3>
+<p>The linear model for a factorial design plus control is given as</p>
+<p><span class="math display">\[ Y_{ijkl} = \mu + \alpha_i + \beta_j + (\alpha \beta)_{ij} + \gamma I_k +\varepsilon_{ijkl}\]</span></p>
+<p>with,</p>
+<p><span class="math display">\[
+I_k =
+\begin{cases}
+1 &amp; \text{if the observation belongs to the control treatment} \\
+0 &amp; \text{if the observation belongs to one of the factorial treatments},
+\end{cases}
+\]</span></p>
+<p>for <span class="math inline">\(i= 1,2\)</span>, <span class="math inline">\(j= 1,2,3\)</span> and <span class="math inline">\(k= 0,1\)</span>, where:</p>
+<p><span class="math inline">\(y_{ijkl}\)</span> is the blood pressure of the <span class="math inline">\(lth\)</span> individual using the <span class="math inline">\(ith\)</span> type of drug at the <span class="math inline">\(jth\)</span> dose, </p>
+<p><span class="math inline">\(\mu\)</span> represents the baseline mean of the factorial treatments, </p>
+<p><span class="math inline">\(\alpha_i\)</span> is the effect of the <span class="math inline">\(ith\)</span> drug type, </p>
+<p><span class="math inline">\(\beta_j\)</span> is the effect of the <span class="math inline">\(jth\)</span> dosage, </p>
+<p><span class="math inline">\((\alpha\beta)_{ij}\)</span> is their interaction effect, </p>
+<p><span class="math inline">\(\gamma\)</span> measures the difference between the control treatment and the factorial baseline, and </p>
+<p><span class="math inline">\(\varepsilon_{ijkl}\)</span> are assumed to be independently and normally distributed with mean zero and constant variance <span class="math inline">\(\sigma^2\)</span>.</p>
+<p>Table 3 shows the ANOVA table when the data are analyzed as a traditional 2 by 2 factorial design. Note that, analyzing the experiment in this manner is incorrect. Looking at Figure 4, we see that there is a significant effect of dosage with p-value = <span class="math inline">\(0.02\)</span>. This is because the control is embedded in dosage and thus the estimated mean for dosage includes that of control. With this result, a researcher may believe that dosage of the drug was significant and may continue to explore which dosage led to the highest effect.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Analyzing as a traditional 2 by 2 factorial</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>bp.m0 <span class="ot">&lt;-</span> <span class="fu">lm</span>(BloodPressure <span class="sc">~</span> Dosage <span class="sc">+</span> Drug <span class="sc">+</span> Drug<span class="sc">*</span>Dosage, <span class="at">data =</span> bp_data)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">#summary(bp.m0)</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>anova_tab <span class="ot">&lt;-</span> <span class="fu">anova</span>(bp.m0)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  anova_tab,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"ANOVA Table for 2x2 Factorial Model"</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>ANOVA Table for 2x2 Factorial Model</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">Sum Sq</th>
+<th style="text-align: right;">Mean Sq</th>
+<th style="text-align: right;">F value</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Dosage</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">171.6828239</td>
+<td style="text-align: right;">85.8414119</td>
+<td style="text-align: right;">5.8146609</td>
+<td style="text-align: right;">0.0211245</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Drug</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">70.8175226</td>
+<td style="text-align: right;">70.8175226</td>
+<td style="text-align: right;">4.7969840</td>
+<td style="text-align: right;">0.0533177</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dosage:Drug</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.1539226</td>
+<td style="text-align: right;">0.1539226</td>
+<td style="text-align: right;">0.0104263</td>
+<td style="text-align: right;">0.9206885</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Residuals</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">147.6292669</td>
+<td style="text-align: right;">14.7629267</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+<p> ANOVA table when data is analyzed as a traditional 2 by 2 factorial design</p>
+</div>
+</div>
+<p>Table 4 takes a look at the correct model. From Table 4, we see that the p-value for the control shown in the ANOVA table is statistically significant, p-value = <span class="math inline">\(0.01\)</span> and the p-value for dosage by drug interaction term is <span class="math inline">\(0.92\)</span>. These values correspond to the interaction plot we saw earlier. Since there is no significant interaction effect, we can look at the main effects for Drug (soluble or non-soluble) to determine if there is any significant difference.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Analyzing as a traditional 2 by 2 factorial plus control</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>bp.m1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(BloodPressure <span class="sc">~</span> Control <span class="sc">+</span> Dosage <span class="sc">+</span> Drug <span class="sc">+</span> Drug<span class="sc">*</span>Dosage, <span class="at">data =</span> bp_data)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">#summary(bp.m1)</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>anova_tab1 <span class="ot">&lt;-</span> <span class="fu">anova</span>(bp.m1)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  anova_tab1,</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"ANOVA Table for 2x2 Factorial Model"</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>ANOVA Table for 2x2 Factorial Model</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Df</th>
+<th style="text-align: right;">Sum Sq</th>
+<th style="text-align: right;">Mean Sq</th>
+<th style="text-align: right;">F value</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Control</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">163.4607459</td>
+<td style="text-align: right;">163.4607459</td>
+<td style="text-align: right;">11.0723808</td>
+<td style="text-align: right;">0.0076498</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dosage</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">8.2220780</td>
+<td style="text-align: right;">8.2220780</td>
+<td style="text-align: right;">0.5569409</td>
+<td style="text-align: right;">0.4726749</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Drug</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">70.8175226</td>
+<td style="text-align: right;">70.8175226</td>
+<td style="text-align: right;">4.7969840</td>
+<td style="text-align: right;">0.0533177</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dosage:Drug</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0.1539226</td>
+<td style="text-align: right;">0.1539226</td>
+<td style="text-align: right;">0.0104263</td>
+<td style="text-align: right;">0.9206885</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Residuals</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">147.6292669</td>
+<td style="text-align: right;">14.7629267</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+<p> ANOVA table when data is analyzed using 2 by 2 factorial design plus control</p>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<p>We proceed with further analysis by looking at the main and simple effects of only the correct model. Table 5 shows the estimated marginal means for drug type. For drug type soluble and non-soluble, the estimated marginal means are <span class="math inline">\(127\)</span> and <span class="math inline">\(132\)</span> respectively with standard error <span class="math inline">\(1.57\)</span>. The estimated mean for the control group is <span class="math inline">\(137\)</span> with standard error of <span class="math inline">\(2.22\)</span>. The 95 percent confidence intervals are also shown in the last two columns of the same table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimated marginal means for drug type incorrect model</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>bp.m1.emmeans<span class="ot">&lt;-</span> <span class="fu">emmeans</span> (bp.m1,  <span class="sc">~</span> Drug)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  bp.m1.emmeans,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Estimated marginal means of drug type(Incorrect Model)"</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Estimated marginal means of drug type(Incorrect Model)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Drug</th>
+<th style="text-align: left;">Control</th>
+<th style="text-align: right;">emmean</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">lower.CL</th>
+<th style="text-align: right;">upper.CL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">126.6681</td>
+<td style="text-align: right;">1.568594</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">123.1730</td>
+<td style="text-align: right;">130.1631</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">131.5267</td>
+<td style="text-align: right;">1.568594</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">128.0316</td>
+<td style="text-align: right;">135.0217</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">control</td>
+<td style="text-align: left;">y</td>
+<td style="text-align: right;">137.3502</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">132.4074</td>
+<td style="text-align: right;">142.2929</td>
+</tr>
+</tbody>
+</table>
+<p> showing the estimated marginal means of drug type when data is analyzed as a 2 by 2 factorial design with a control</p>
+</div>
+</div>
+<p>Table 6 shows the estimated marginal means for dosage. When dosage levels are at 10 and 15 units, the estimated marginal means are <span class="math inline">\(130\)</span> and <span class="math inline">\(128\)</span> respectively with standard error <span class="math inline">\(1.57\)</span>. The estimated mean for the control group is again <span class="math inline">\(137\)</span> with standard error of <span class="math inline">\(2.22\)</span> indicating that the control group did not receive any treatment.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimated marginal means for drug type incorrect model</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>bp.m2.emmeans<span class="ot">&lt;-</span> <span class="fu">emmeans</span> (bp.m1,  <span class="sc">~</span> Dosage)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  bp.m2.emmeans,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Estimated marginal means of drug type(Correct Model)"</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Estimated marginal means of drug type(Correct Model)</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Dosage</th>
+<th style="text-align: left;">Control</th>
+<th style="text-align: right;">emmean</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">lower.CL</th>
+<th style="text-align: right;">upper.CL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">129.9251</td>
+<td style="text-align: right;">1.568594</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">126.4301</td>
+<td style="text-align: right;">133.4202</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">128.2696</td>
+<td style="text-align: right;">1.568594</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">124.7746</td>
+<td style="text-align: right;">131.7647</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">y</td>
+<td style="text-align: right;">137.3502</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">132.4074</td>
+<td style="text-align: right;">142.2929</td>
+</tr>
+</tbody>
+</table>
+<p> showing the estimated marginal means of dosage when data is analyzed as a 2 by 2 factorial design with a control</p>
+</div>
+</div>
+</section>
+<section id="simple-effects" class="level3">
+<h3 class="anchored" data-anchor-id="simple-effects">Simple Effects</h3>
+<p>Next, we show the simple effects of drug and dosage. A simple effect refers to the effect of one treatment factor at a specific level of another factor. One typically would need to look at simple effects if there is a significant interaction effect. It is used in factorial experiments to understand how factors interact. In our example, there was no significant interaction effect but we show the results here for completeness.</p>
+<p>From Table 7, the simple effect for dosage at 10 and 15 units when a soluble drug is used are <span class="math inline">\(127\)</span> and <span class="math inline">\(126\)</span> respectively. For non-soluble drug, the simple effect of dosage at 10 and 15 units are <span class="math inline">\(132\)</span> and <span class="math inline">\(131\)</span> respectively. Looking at the simple effects, we see a lower blood pressure when the drug is soluble. Nevertheless, without any drug or dosage, the blood pressure is high.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple effects for dosage at each drug type level</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>bp.m1.emmeans2 <span class="ot">&lt;-</span> <span class="fu">emmeans</span> (bp.m1,  <span class="sc">~</span> Dosage <span class="sc">|</span> Drug)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  bp.m1.emmeans2,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Simple effects of dosage at the given drug types"</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Simple effects of dosage at the given drug types</caption>
+<colgroup>
+<col style="width: 4%">
+<col style="width: 10%">
+<col style="width: 17%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 4%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Dosage</th>
+<th style="text-align: left;">Drug</th>
+<th style="text-align: left;">Control</th>
+<th style="text-align: right;">emmean</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">lower.CL</th>
+<th style="text-align: right;">upper.CL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">127.3826</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">122.4398</td>
+<td style="text-align: right;">132.3253</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">125.9536</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">121.0109</td>
+<td style="text-align: right;">130.8963</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">132.4677</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">127.5249</td>
+<td style="text-align: right;">137.4104</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">130.5857</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">125.6429</td>
+<td style="text-align: right;">135.5284</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">16</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">control</td>
+<td style="text-align: left;">y</td>
+<td style="text-align: right;">137.3502</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">132.4074</td>
+<td style="text-align: right;">142.2929</td>
+</tr>
+</tbody>
+</table>
+<p> Table showing the simple effects of dosage at the given drug types</p>
+</div>
+</div>
+<p>The same results are obtained when we find the simple effect of drug type at given dosage levels. At dosage level of 10 units, the simple effect for soluble and non-soluble drugs are <span class="math inline">\(127\)</span> and <span class="math inline">\(132\)</span> respectively. While at a dosage level of 15 units, the simple effects of soluble and non-soluble drugs are <span class="math inline">\(126\)</span> and <span class="math inline">\(131\)</span> respectively.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimated marginal means for drug at each dosage level correct model</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>bp.m1.emmeans3 <span class="ot">&lt;-</span> <span class="fu">emmeans</span> (bp.m1,  <span class="sc">~</span> Drug <span class="sc">|</span> Dosage)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  bp.m1.emmeans3,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Simple effects of drug types at the given dosage levels"</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Simple effects of drug types at the given dosage levels</caption>
+<colgroup>
+<col style="width: 4%">
+<col style="width: 17%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 13%">
+<col style="width: 4%">
+<col style="width: 13%">
+<col style="width: 13%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Drug</th>
+<th style="text-align: left;">Dosage</th>
+<th style="text-align: left;">Control</th>
+<th style="text-align: right;">emmean</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">lower.CL</th>
+<th style="text-align: right;">upper.CL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">127.3826</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">122.4398</td>
+<td style="text-align: right;">132.3253</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">132.4677</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">127.5249</td>
+<td style="text-align: right;">137.4104</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">7</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">125.9536</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">121.0109</td>
+<td style="text-align: right;">130.8963</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">130.5857</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">125.6429</td>
+<td style="text-align: right;">135.5284</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">12</td>
+<td style="text-align: left;">control</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">y</td>
+<td style="text-align: right;">137.3502</td>
+<td style="text-align: right;">2.218327</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">132.4074</td>
+<td style="text-align: right;">142.2929</td>
+</tr>
+</tbody>
+</table>
+<p> Table showing the simple effects of drug types at the given dosage levels</p>
+</div>
+</div>
+<p>Recall, the 2 × 2 factorial design plus control enables us to also compare the main effect of treatments to the control group. This is possible because of the variable control in the last column of the data set. It serves as an indicator variable and thus enables the model to average over the values of the treatments and compare them to the control group. From Table 9, we see that on average the estimated blood pressure for individuals receiving a treatment compared to control group was <span class="math inline">\(129\)</span> and <span class="math inline">\(137\)</span> respectively. Thus, the blood pressure for individuals in the control group is higher on average compared to individuals who receive some type of treatment. The difference between the two values is shown by the contrast statement. From Table 9, we see that the difference is <span class="math inline">\(8.25\)</span> and with a standard deviation of <span class="math inline">\(2.48\)</span>. The p-value is <span class="math inline">\(0.01\)</span>, showing that there is a statistically significant difference between individuals that received some sort of treatment and the control group at <span class="math inline">\(\alpha = 0.05\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare main effect of treatment with the control</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>bp.m1.emmeans4 <span class="ot">&lt;-</span> <span class="fu">emmeans</span> (bp.m1,  <span class="sc">~</span> Control)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Difference between treatment and control </span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>summary_means <span class="ot">&lt;-</span> <span class="fu">contrast</span>(bp.m1.emmeans4, <span class="at">method =</span> <span class="st">"trt.vs.ctrl"</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  summary_means,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Comparison of main effect of treatment with the mean"</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Comparison of main effect of treatment with the mean</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">contrast</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">t.ratio</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">y - n</td>
+<td style="text-align: right;">8.252796</td>
+<td style="text-align: right;">2.480165</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">3.327519</td>
+<td style="text-align: right;">0.0076498</td>
+</tr>
+</tbody>
+</table>
+<p> Table showing the average blood pressure of individuals with treatment to the control group</p>
+</div>
+</div>
+<p>Finally, Table 10 shows differences between pairs of treatment. This is obtained by writing contrast statements. Writing contrasts is very useful especially when one has many treatments and may only be interested in a few comparisons. Therefore, we would write some contrast to determine if there is a significant difference between soluble and non-soluble drugs, soluble and control, non-soluble and control. We used the Dunnett adjustment to control for family-wise error.</p>
+<p>From output 2, there is no significant difference in effect between soluble and non-soluble drug and between non-soluble drug and control, p-values are <span class="math inline">\(0.13\)</span> and <span class="math inline">\(0.14\)</span> respectively at <span class="math inline">\(5\)</span> percent significance level. Nevertheless, there is a significant difference in effect between soluble drug and the control group, p-value = <span class="math inline">\(0.01\)</span>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare treatments excluding control</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>summary_means2 <span class="ot">&lt;-</span> <span class="fu">contrast</span>(bp.m1.emmeans4, <span class="at">method =</span> <span class="st">"pairwise"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>         ,<span class="at">adjust =</span> <span class="st">"dunnett"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  summary_means2,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Comparison of main effect of treatment with the mean"</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Comparison of main effect of treatment with the mean</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">contrast</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">t.ratio</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">n - y</td>
+<td style="text-align: right;">-8.252796</td>
+<td style="text-align: right;">2.480165</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">-3.327519</td>
+<td style="text-align: right;">0.0076498</td>
+</tr>
+</tbody>
+</table>
+<p> Shows differences between pairs of treatment</p>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<p>We extend the discussion of a 2 × 2 factorial design plus control to a 2 × 2 factorial design plus control and blocks which is the main focus of this chapter. Recall, earlier the control was treated as a fifth treatment outside the factorial structure. That is, the four factorial combinations were formed from two factors, each with two levels, while the control treatment served as a separate reference group.</p>
+<p>When blocks are added to this design, treatments are randomized within each block. This produces a randomized complete block design (RCBD), where each block contains all four factorial treatment combinations and the control. The main purpose of including blocks is to account for variability among groups of experimental units that may be similar within blocks but different across blocks. We consider a second example where clinics serve as blocks because patients within the same clinic may be more alike than patients from different clinics.</p>
+<p>For a 2 × 2 factorial design plus control and blocks, the analysis allows researchers to control for block-to-block variation, compare the factorial treatments with the control, estimate the main effects of the two factors, and evaluate the interaction between the factors within the factorial portion of the design. The control remains outside the factorial treatment structure and is used as a baseline for comparison.</p>
+<p>Moreover, the addition of blocks introduces another source of variation. In this example, clinics may differ from one another because of differences in patient populations, clinic procedures, or other background conditions. If block effects are ignored, some of this block-to-block variation may be absorbed into the residual error term, which can affect the precision of the estimated treatment effects. Thus, the correct analysis must separate the control from the factorial treatment combinations while also accounting for block variation.</p>
+</section>
+</section>
+<section id="exploratory-data-analysis-1" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis-1">Exploratory Data Analysis</h2>
+<p>For the second example considered, we also simulated a data set to demonstrate a 2 × 2 factorial design plus control and blocks. The study evaluates the effects of two drug-related factors on blood pressure. The first factor is drug type, with two levels: soluble and non-soluble. The second factor is dosage, with two levels: 10 units and 15 units. A control group is included to represent patients who did not receive either treatment.</p>
+<p>The experiment is conducted in five clinics. Each clinic is treated as a block, and each clinic receives all five treatments: the four factorial treatment combinations and the control. The exploratory analysis describes the layout of the study, the simulated data, the distribution of blood pressure, the relationship between drug type and dosage, and the role of blocks in the analysis.</p>
+<section id="data-description-1" class="level3">
+<h3 class="anchored" data-anchor-id="data-description-1">Data Description</h3>
+<p>There are 25 observations in the simulated data set. This includes five clinics, with one observation for each treatment combination within each clinic. Therefore, each of the four factorial treatment combinations has five observations, and the control group also has five observations.</p>
+<p>The response variable again is blood pressure. Drug type and dosage are treated as qualitative variables. The variable <code>control</code> is used as an indicator variable, where <code>n</code> identifies observations from the factorial treatment combinations and <code>y</code> identifies observations from the control group just as discussed in the previous section. Also, we only show the data used for this example and skip plots for the exploratory data analysis. This is because the plots are similar to the ones shown in Figures 1 and 2.</p>
+<p>Table 11 shows the general sources of variation for a 2 × 2 factorial design with control and blocks. Compared with the previous chapter, the only additional source of variation is the block term.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># General ANOVA structure for a 2 x 2 factorial design with control and blocks</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>anova_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Source =</span> <span class="fu">c</span>(<span class="st">"Block"</span>, <span class="st">"Factor A"</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Factor B"</span>, <span class="st">"A × B"</span>, <span class="st">"Control"</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>             <span class="st">"Error"</span>, <span class="st">"Total"</span>),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Degrees_of_Freedom =</span> <span class="fu">c</span>(</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"r - 1"</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"a - 1"</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"b - 1"</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"(a - 1)(b - 1)"</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1"</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"N - [r + ab]"</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"N - 1"</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  anova_table,</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"General ANOVA Structure for a 2 × 2</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="st">  Factorial Design With Control and Blocks"</span>,</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Source"</span>, <span class="st">"Degrees of Freedom"</span>)</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>General ANOVA Structure for a 2 × 2 Factorial Design With Control and Blocks</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Source</th>
+<th style="text-align: left;">Degrees of Freedom</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Block</td>
+<td style="text-align: left;">r - 1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Factor A</td>
+<td style="text-align: left;">a - 1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Factor B</td>
+<td style="text-align: left;">b - 1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">A × B</td>
+<td style="text-align: left;">(a - 1)(b - 1)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Control</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Error</td>
+<td style="text-align: left;">N - [r + ab]</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Total</td>
+<td style="text-align: left;">N - 1</td>
+</tr>
+</tbody>
+</table>
+<p> Table showing the general ANOVA structure for a 2 x 2 factorial design with control and blocks.</p>
+</div>
+</div>
+<p>Table 12 shows the layout of the experiment. Each clinic contains the four factorial treatment combinations and the control exactly once.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the treatment layout table</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>drug_table <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Drug Type</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Soluble"</span>, <span class="st">"Soluble"</span>, <span class="st">"Non-soluble"</span>, <span class="st">"Non-soluble"</span>, <span class="st">"No Drug"</span>),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Dosage =</span> <span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">0</span>),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">Description =</span> <span class="fu">c</span>(</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Soluble at low dosage"</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Soluble at high dosage"</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Non-soluble at low dosage"</span>,</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Non-soluble at high dosage"</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Control"</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Replicates</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1 per clinic × 5 clinics = 5"</span>,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1 per clinic × 5 clinics = 5"</span>,</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1 per clinic × 5 clinics = 5"</span>,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1 per clinic × 5 clinics = 5"</span>,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1 per clinic × 5 clinics = 5"</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>  drug_table,</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Experimental Drug Layout With Clinics</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a><span class="st">  as Blocks"</span>,</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Drug Type"</span>, <span class="st">"Dosage"</span>,</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Description"</span>, <span class="st">"Replicates"</span>)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Experimental Drug Layout With Clinics as Blocks</caption>
+<colgroup>
+<col style="width: 16%">
+<col style="width: 9%">
+<col style="width: 36%">
+<col style="width: 38%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Drug Type</th>
+<th style="text-align: right;">Dosage</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Replicates</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">Soluble at low dosage</td>
+<td style="text-align: left;">1 per clinic × 5 clinics = 5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">Soluble at high dosage</td>
+<td style="text-align: left;">1 per clinic × 5 clinics = 5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: left;">Non-soluble at low dosage</td>
+<td style="text-align: left;">1 per clinic × 5 clinics = 5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: right;">15</td>
+<td style="text-align: left;">Non-soluble at high dosage</td>
+<td style="text-align: left;">1 per clinic × 5 clinics = 5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">No Drug</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: left;">Control</td>
+<td style="text-align: left;">1 per clinic × 5 clinics = 5</td>
+</tr>
+</tbody>
+</table>
+<p> Table showing the experimental drug layout with clinics as blocks.</p>
+</div>
+</div>
+<p>Table 13 presents the degrees of freedom for the example. There are five clinics, so the block term has 4 degrees of freedom. Drug type, dosage, their interaction, and the control indicator each have 1 degree of freedom. The remaining 16 degrees of freedom are assigned to error.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ANOVA degrees of freedom for the example</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>anova_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Source =</span> <span class="fu">c</span>(</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Block (Clinic)"</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Drug Type"</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Dosage"</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Drug Type × Dosage"</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Control"</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Error"</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Total"</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">`</span><span class="at">Degrees of Freedom</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">c</span>(</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"5 - 1 = 4"</span>,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2 - 1 = 1"</span>,</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"2 - 1 = 1"</span>,</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"(2 - 1)(2 - 1) = 1"</span>,</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1"</span>,</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"25 - (5 + 4) = 16"</span>,</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"25 - 1 = 24"</span></span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">check.names =</span> <span class="cn">FALSE</span></span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>  anova_df,</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Degrees of Freedom for the Drug</span></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a><span class="st">  Experiment With Clinics as Blocks"</span>,</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Source"</span>, <span class="st">"Degrees of Freedom"</span>)</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Degrees of Freedom for the Drug Experiment With Clinics as Blocks</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Source</th>
+<th style="text-align: left;">Degrees of Freedom</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Block (Clinic)</td>
+<td style="text-align: left;">5 - 1 = 4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Drug Type</td>
+<td style="text-align: left;">2 - 1 = 1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dosage</td>
+<td style="text-align: left;">2 - 1 = 1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Drug Type × Dosage</td>
+<td style="text-align: left;">(2 - 1)(2 - 1) = 1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Control</td>
+<td style="text-align: left;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Error</td>
+<td style="text-align: left;">25 - (5 + 4) = 16</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Total</td>
+<td style="text-align: left;">25 - 1 = 24</td>
+</tr>
+</tbody>
+</table>
+<p> Table showing the degrees of freedom for the drug experiment with clinics as blocks.</p>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<p>Table 14 shows the simulated data. Each clinic contributes one observation for each treatment combination and one observation for the control.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Define the base structure</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>Block <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>, <span class="at">each =</span> <span class="dv">5</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>Drug <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"Soluble"</span>, <span class="st">"Soluble"</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Non-soluble"</span>, <span class="st">"Non-soluble"</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>              <span class="st">"Control"</span>), <span class="at">times =</span> <span class="dv">5</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>Dosage <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">10</span>, <span class="dv">15</span>, <span class="dv">0</span>), <span class="at">times =</span> <span class="dv">5</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>Control <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(Drug <span class="sc">==</span> <span class="st">"Control"</span>, <span class="st">"y"</span>, <span class="st">"n"</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate clinic-level block effects</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>n_blocks <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(Block))</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>sigma_block <span class="ot">&lt;-</span> <span class="dv">2</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>block_effects <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_blocks, <span class="at">mean =</span> <span class="dv">0</span>,</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>                       <span class="at">sd =</span> sigma_block)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate blood pressure values</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>BloodPressure <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">length</span>(Block))</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="fu">seq_along</span>(Block)) {</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>  base <span class="ot">&lt;-</span> <span class="dv">130</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>  drug_effect <span class="ot">&lt;-</span> <span class="cf">if</span> (Drug[i] <span class="sc">==</span> <span class="st">"Soluble"</span>) {</span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (Dosage[i] <span class="sc">==</span> <span class="dv">10</span>) <span class="sc">-</span><span class="fl">1.5</span> <span class="cf">else</span> <span class="sc">-</span><span class="dv">2</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="cf">if</span> (Drug[i] <span class="sc">==</span> <span class="st">"Non-soluble"</span>) {</span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (Dosage[i] <span class="sc">==</span> <span class="dv">10</span>) <span class="dv">4</span> <span class="cf">else</span> <span class="dv">5</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>  BloodPressure[i] <span class="ot">&lt;-</span> base <span class="sc">+</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>    drug_effect <span class="sc">+</span></span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>    block_effects[Block[i]] <span class="sc">+</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rnorm</span>(<span class="dv">1</span>, <span class="at">mean =</span> <span class="dv">0</span>, <span class="at">sd =</span> <span class="dv">1</span>)</span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the data frame</span></span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>  <span class="at">Block =</span> <span class="fu">factor</span>(Block),</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>  <span class="at">Drug =</span> <span class="fu">factor</span>(Drug),</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>  <span class="at">Dosage =</span> <span class="fu">factor</span>(Dosage),</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>  <span class="at">BloodPressure =</span> <span class="fu">round</span>(BloodPressure, <span class="dv">4</span>),</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>  <span class="at">Control =</span> <span class="fu">factor</span>(Control)</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>  df,</span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Simulated Blood Pressure Data With</span></span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a><span class="st">  Control and Blocks"</span>,</span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Block"</span>, <span class="st">"Drug Type"</span>, <span class="st">"Dosage"</span>,</span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>                <span class="st">"Blood Pressure"</span>, <span class="st">"Control"</span>)</span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Simulated Blood Pressure Data With Control and Blocks</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Block</th>
+<th style="text-align: left;">Drug Type</th>
+<th style="text-align: left;">Dosage</th>
+<th style="text-align: right;">Blood Pressure</th>
+<th style="text-align: left;">Control</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">129.0941</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">127.3400</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">131.6140</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">133.1922</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">Control</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">128.4334</td>
+<td style="text-align: left;">y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">129.2637</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">127.8995</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">133.9404</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">134.6503</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">Control</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">128.9838</td>
+<td style="text-align: left;">y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">133.4043</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">131.6153</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">135.1508</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">138.8188</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">Control</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">132.6446</td>
+<td style="text-align: left;">y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">127.5732</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">127.9230</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">133.1150</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">134.4121</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">4</td>
+<td style="text-align: left;">Control</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">129.5160</td>
+<td style="text-align: left;">y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">127.0719</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">129.0964</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: right;">134.4119</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: right;">134.1204</td>
+<td style="text-align: left;">n</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Control</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: right;">131.5124</td>
+<td style="text-align: left;">y</td>
+</tr>
+</tbody>
+</table>
+<p> Table showing the Simulated Blood Pressure Data With Control and Blocks.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="advanced-analysis-1" class="level2">
+<h2 class="anchored" data-anchor-id="advanced-analysis-1">Advanced Analysis</h2>
+<p>In this example, clinics are included as blocks but the objective of the analysis is the same as the one discussed in a 2 × 2 factorial design plus control without blocks. The model therefore contains the same factorial treatment structure and control indicator used in the previous chapter, with the addition of a block term.</p>
+<section id="statistical-model-1" class="level3">
+<h3 class="anchored" data-anchor-id="statistical-model-1">Statistical Model</h3>
+<p>The statistical model for a 2 × 2 factorial design plus control and blocks is given as</p>
+<p><span class="math display">\[
+Y_{ijkl} = \mu + b_l + \alpha_i + \beta_j + (\alpha\beta)_{ij} + \gamma I_k + \varepsilon_{ijkl},
+\]</span></p>
+<p>with</p>
+<p><span class="math display">\[
+I_k =
+\begin{cases}
+1 &amp; \text{if the observation belongs to the control treatment} \\
+0 &amp; \text{if the observation belongs to one of the factorial treatments},
+\end{cases}
+\]</span></p>
+<p>for</p>
+<p><span class="math inline">\(Y_{ijkl}\)</span> is the blood pressure response for the experimental unit receiving the <span class="math inline">\(ith\)</span> drug type at the <span class="math inline">\(jth\)</span> dosage level in the <span class="math inline">\(lth\)</span> block,</p>
+<p><span class="math inline">\(\mu\)</span> represents the baseline mean of the factorial treatments,</p>
+<p><span class="math inline">\(b_l\)</span> is the effect of the <span class="math inline">\(l\)</span>th block or clinic, assumed to be independently and normally distributed with mean 0 and variance <span class="math inline">\(\sigma^2_{b}\)</span> ,</p>
+<p><span class="math inline">\(\alpha_i\)</span> is the effect of the <span class="math inline">\(i\)</span>th drug type,</p>
+<p><span class="math inline">\(\beta_j\)</span> is the effect of the <span class="math inline">\(j\)</span>th dosage level,</p>
+<p><span class="math inline">\((\alpha\beta)_{ij}\)</span> is the interaction effect between drug type and dosage,</p>
+<p><span class="math inline">\(\gamma\)</span> measures the difference between the control treatment and the factorial baseline,</p>
+<p><span class="math inline">\(\varepsilon_{ijkl}\)</span> is the residual error term, assumed to be independently and normally distributed with mean 0 and constant variance <span class="math inline">\(\sigma^2_{\epsilon}\)</span>,</p>
+<p>The only difference between this model and the model in the previous chapter is the addition of the block term, <span class="math inline">\(b_l\)</span>. No block-by-treatment interaction is assumed. In the R analysis below, clinic is treated as a random block effect to estimate the amount of block-to-block variation.</p>
+<p>The model summary shows the estimated fixed effects and the variance components. The block variance describes how much variability is associated with differences among clinics, while the residual variance describes variation among experimental units after accounting for the model terms.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the mixed model with clinic as a random block effect</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>model.random <span class="ot">&lt;-</span> <span class="fu">lmer</span>(</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  BloodPressure <span class="sc">~</span> Control <span class="sc">+</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    Drug<span class="sc">:</span>Control <span class="sc">+</span> Dosage<span class="sc">:</span>Control <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    Drug<span class="sc">:</span>Dosage<span class="sc">:</span>Control <span class="sc">+</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span> <span class="sc">|</span> Block),</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> df,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">REML =</span> <span class="cn">TRUE</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Get estimates for fixed and variance components</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model.random)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: 
+BloodPressure ~ Control + Drug:Control + Dosage:Control + Drug:Dosage:Control +  
+    (1 | Block)
+   Data: df
+
+REML criterion at convergence: 76.6
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-2.00544 -0.47962  0.02285  0.44543  1.38739 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Block    (Intercept) 2.721    1.650   
+ Residual             1.067    1.033   
+Number of obs: 25, groups:  Block, 5
+
+Fixed effects:
+                                  Estimate Std. Error       df t value Pr(&gt;|t|)
+(Intercept)                       128.7748     0.8704   6.5263 147.954  9.4e-13
+Controly                            1.4432     0.6532  16.0000   2.210   0.0421
+Controln:DrugNon-soluble            6.2639     0.6532  16.0000   9.590  4.9e-08
+Controln:Dosage10                   0.5066     0.6532  16.0000   0.776   0.4493
+Controln:DrugNon-soluble:Dosage10  -1.8989     0.9237  16.0000  -2.056   0.0565
+                                     
+(Intercept)                       ***
+Controly                          *  
+Controln:DrugNon-soluble          ***
+Controln:Dosage10                    
+Controln:DrugNon-soluble:Dosage10 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+            (Intr) Cntrly Cn:DN- Cn:D10
+Controly    -0.375                     
+Cntrln:DrN- -0.375  0.500              
+Cntrln:Ds10 -0.375  0.500  0.500       
+Cnt:DN-:D10  0.265 -0.354 -0.707 -0.707
+fit warnings:
+fixed-effect model matrix is rank deficient so dropping 13 columns / coefficients</code></pre>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<p>Table 15 presents the ANOVA table for the mixed model using the Kenward-Roger degrees-of-freedom method. The <code>control</code> term compares the overall treatment groups with the control group. The <code>control:Drug</code> and <code>control:Dosage</code> terms estimate the factorial drug and dosage effects among the treatment observations. The <code>control:Drug:Dosage</code> term evaluates the interaction between drug type and dosage within the factorial treatment structure.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ANOVA table for the mixed model</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>anova_mix <span class="ot">&lt;-</span> <span class="fu">anova</span>(model.random, <span class="at">ddf =</span> <span class="st">"Kenward-Roger"</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  anova_mix,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"ANOVA table for the mixed model"</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>ANOVA table for the mixed model</caption>
+<colgroup>
+<col style="width: 25%">
+<col style="width: 15%">
+<col style="width: 15%">
+<col style="width: 7%">
+<col style="width: 7%">
+<col style="width: 15%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Sum Sq</th>
+<th style="text-align: right;">Mean Sq</th>
+<th style="text-align: right;">NumDF</th>
+<th style="text-align: right;">DenDF</th>
+<th style="text-align: right;">F value</th>
+<th style="text-align: right;">Pr(&gt;F)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Control</td>
+<td style="text-align: right;">5.2070656</td>
+<td style="text-align: right;">5.2070656</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">4.8821934</td>
+<td style="text-align: right;">0.0420581</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Control:Drug</td>
+<td style="text-align: right;">141.2168940</td>
+<td style="text-align: right;">141.2168940</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">132.4062793</td>
+<td style="text-align: right;">0.0000000</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Control:Dosage</td>
+<td style="text-align: right;">0.9806692</td>
+<td style="text-align: right;">0.9806692</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.9194846</td>
+<td style="text-align: right;">0.3518773</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Control:Drug:Dosage</td>
+<td style="text-align: right;">4.5074664</td>
+<td style="text-align: right;">4.5074664</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">4.2262426</td>
+<td style="text-align: right;">0.0565003</td>
+</tr>
+</tbody>
+</table>
+<p> Shows the ANOVA table for the mixed model.</p>
+</div>
+</div>
+<p>From Table 15, the control effect is statistically significant, which indicates evidence of a difference between the control group and the treatment groups. The drug type effect is also statistically significant, meaning that soluble and non-soluble drugs differ in their average effect on blood pressure. The dosage effect is not statistically significant. The interaction term is statistically significant, suggesting that the relationship between dosage and blood pressure depends somewhat on drug type, at 5 percent significance level.</p>
+<div style="page-break-after: always;"></div>
+<p>Table 17 shows the estimated marginal means for each drug-by-dosage combination and for the control group. The non-soluble treatments have higher estimated blood pressure values than the soluble treatments at both dosage levels. The control mean is separate from the factorial treatment means because the control is not part of the drug-by-dosage factorial structure.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimated marginal means by drug and dosage within the control indicator</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>emm <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(model.random, <span class="sc">~</span> Drug<span class="sc">:</span>Dosage <span class="sc">|</span> Control)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  emm,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Estimated marginal means by drug</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="st">  and dosage within the control"</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Estimated marginal means by drug and dosage within the control</caption>
+<colgroup>
+<col style="width: 3%">
+<col style="width: 15%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 13%">
+<col style="width: 11%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: left;">Drug</th>
+<th style="text-align: left;">Dosage</th>
+<th style="text-align: left;">Control</th>
+<th style="text-align: right;">emmean</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">lower.CL</th>
+<th style="text-align: right;">upper.CL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">5</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">133.6464</td>
+<td style="text-align: right;">0.8703714</td>
+<td style="text-align: right;">6.526307</td>
+<td style="text-align: right;">131.5576</td>
+<td style="text-align: right;">135.7352</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">6</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">129.2814</td>
+<td style="text-align: right;">0.8703714</td>
+<td style="text-align: right;">6.526307</td>
+<td style="text-align: right;">127.1927</td>
+<td style="text-align: right;">131.3702</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">8</td>
+<td style="text-align: left;">Non-soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">135.0388</td>
+<td style="text-align: right;">0.8703714</td>
+<td style="text-align: right;">6.526307</td>
+<td style="text-align: right;">132.9500</td>
+<td style="text-align: right;">137.1275</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">9</td>
+<td style="text-align: left;">Soluble</td>
+<td style="text-align: left;">15</td>
+<td style="text-align: left;">n</td>
+<td style="text-align: right;">128.7748</td>
+<td style="text-align: right;">0.8703714</td>
+<td style="text-align: right;">6.526307</td>
+<td style="text-align: right;">126.6861</td>
+<td style="text-align: right;">130.8636</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">10</td>
+<td style="text-align: left;">Control</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">y</td>
+<td style="text-align: right;">130.2180</td>
+<td style="text-align: right;">0.8703714</td>
+<td style="text-align: right;">6.526307</td>
+<td style="text-align: right;">128.1293</td>
+<td style="text-align: right;">132.3068</td>
+</tr>
+</tbody>
+</table>
+<p> Shows the estimated marginal means by drug and dosage within the control indicator.</p>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<p>Table 15 compares the overall treatment mean with the control mean. This comparison is important because the control group serves as the baseline for determining whether receiving any treatment differs from receiving no treatment.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare the treatment groups with the control group</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>lsm_control <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(model.random, <span class="sc">~</span> Control)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Contrast statement stored in variable contrast_tab</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>contrast_tab <span class="ot">&lt;-</span> <span class="fu">contrast</span>(lsm_control, <span class="at">method =</span> <span class="st">"pairwise"</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  contrast_tab,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Contrast statement comparing</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="st">  treatment groups with the control group"</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Contrast statement comparing treatment groups with the control group</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">contrast</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">t.ratio</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">n - y</td>
+<td style="text-align: right;">1.467325</td>
+<td style="text-align: right;">0.5163677</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">2.841628</td>
+<td style="text-align: right;">0.0117833</td>
+</tr>
+</tbody>
+</table>
+<p> Compares the treatment groups with the control group.</p>
+</div>
+</div>
+<p>The contrast shows a statistically significant difference between the treatment groups and the control group. This suggests that, on average, the blood pressure response differs between individuals receiving a treatment and those in the control group.</p>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="simple-effects-1" class="level3">
+<h3 class="anchored" data-anchor-id="simple-effects-1">Simple Effects</h3>
+<p>When an interaction is present or nearly present, it is useful to examine simple effects. A simple effect compares one factor at a specific level of another factor. In this example, simple effects help determine whether soluble and non-soluble drugs differ at each dosage level and whether dosage levels differ within each drug type.</p>
+<p>Table 18 compares the main effect of drug type within the treatment portion of the design. The comparison is shown for completeness, but when the interaction term is considered important, the simple effects should be emphasized.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compare drug types within the treatment portion of the design</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>lsm_nested_trt <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(model.random,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                          <span class="sc">~</span> Drug <span class="sc">|</span> Control)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>contrast_tab1 <span class="ot">&lt;-</span> <span class="fu">contrast</span>(lsm_nested_trt,</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">method =</span> <span class="st">"pairwise"</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  contrast_tab1,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Contrast statement comparing drug</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="st">  types within the treatment portion of the design"</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Contrast statement comparing drug types within the treatment portion of the design</caption>
+<colgroup>
+<col style="width: 11%">
+<col style="width: 33%">
+<col style="width: 12%">
+<col style="width: 14%">
+<col style="width: 4%">
+<col style="width: 12%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Control</th>
+<th style="text-align: left;">contrast</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">t.ratio</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">n</td>
+<td style="text-align: left;">(Non-soluble) - Soluble</td>
+<td style="text-align: right;">5.31445</td>
+<td style="text-align: right;">0.4618533</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">11.50679</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">y</td>
+<td style="text-align: left;">(nothing)</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+<p> Compares the drug types within the treatment.</p>
+</div>
+</div>
+<p>Table 19 compares all drug-by-dosage treatment combinations within the factorial portion of the design. These comparisons show that soluble and non-soluble drugs differ at both dosage levels. However, there is not strong evidence that increasing dosage from 10 units to 15 units changes blood pressure within the same drug type.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pairwise comparisons among drug-by-dosage treatment combinations</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>lsm_nested_trt_pct <span class="ot">&lt;-</span> <span class="fu">emmeans</span>(model.random,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                              <span class="sc">~</span> Drug<span class="sc">:</span>Dosage <span class="sc">|</span> Control)</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>contrast_tab2 <span class="ot">&lt;-</span> <span class="fu">contrast</span>(lsm_nested_trt_pct, <span class="at">method =</span> <span class="st">"pairwise"</span>)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Print as formatted table</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  contrast_tab2,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Pairwise comparisons among drug-by-dosage</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="st">  treatment combinations"</span></span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<caption>Pairwise comparisons among drug-by-dosage treatment combinations</caption>
+<colgroup>
+<col style="width: 8%">
+<col style="width: 48%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 3%">
+<col style="width: 11%">
+<col style="width: 10%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Control</th>
+<th style="text-align: left;">contrast</th>
+<th style="text-align: right;">estimate</th>
+<th style="text-align: right;">SE</th>
+<th style="text-align: right;">df</th>
+<th style="text-align: right;">t.ratio</th>
+<th style="text-align: right;">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">n</td>
+<td style="text-align: left;">(Non-soluble Dosage10) - Soluble Dosage10</td>
+<td style="text-align: right;">4.36498</td>
+<td style="text-align: right;">0.6531592</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">6.6828733</td>
+<td style="text-align: right;">0.0000285</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">n</td>
+<td style="text-align: left;">(Non-soluble Dosage10) - (Non-soluble Dosage15)</td>
+<td style="text-align: right;">-1.39234</td>
+<td style="text-align: right;">0.6531592</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">-2.1317009</td>
+<td style="text-align: right;">0.1852720</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">n</td>
+<td style="text-align: left;">(Non-soluble Dosage10) - Soluble Dosage15</td>
+<td style="text-align: right;">4.87158</td>
+<td style="text-align: right;">0.6531592</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">7.4584882</td>
+<td style="text-align: right;">0.0000074</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">n</td>
+<td style="text-align: left;">Soluble Dosage10 - (Non-soluble Dosage15)</td>
+<td style="text-align: right;">-5.75732</td>
+<td style="text-align: right;">0.6531592</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">-8.8145742</td>
+<td style="text-align: right;">0.0000009</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">n</td>
+<td style="text-align: left;">Soluble Dosage10 - Soluble Dosage15</td>
+<td style="text-align: right;">0.50660</td>
+<td style="text-align: right;">0.6531592</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">0.7756149</td>
+<td style="text-align: right;">0.8643053</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">n</td>
+<td style="text-align: left;">(Non-soluble Dosage15) - Soluble Dosage15</td>
+<td style="text-align: right;">6.26392</td>
+<td style="text-align: right;">0.6531592</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">9.5901891</td>
+<td style="text-align: right;">0.0000003</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">y</td>
+<td style="text-align: left;">(nothing)</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+<p> Pairwise comparisons among drug-by-dosage treatment.</p>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<p>Because multiple comparisons increase the chance of a Type I error, the Dunnett adjustment can be used when the main interest is comparing treatments with a control. The code below applies the Dunnett adjustment to the comparisons.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dunnett-adjusted comparisons</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pairs</span>(lsm_control, <span class="at">adjust =</span> <span class="st">"dunnett"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast estimate    SE df t.ratio p.value
+ n - y        1.47 0.516 16   2.842  0.0118
+
+Results are averaged over the levels of: Dosage, Drug 
+Degrees-of-freedom method: kenward-roger </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pairs</span>(lsm_nested_trt, <span class="at">adjust =</span> <span class="st">"dunnett"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Control = n:
+ contrast                estimate    SE df t.ratio p.value
+ (Non-soluble) - Soluble     5.31 0.462 16  11.507  &lt;.0001
+
+Control = y:
+ contrast                estimate    SE df t.ratio p.value
+ (nothing)                 nonEst    NA NA      NA      NA
+
+Results are averaged over some or all of the levels of: Dosage 
+Degrees-of-freedom method: kenward-roger </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pairs</span>(lsm_nested_trt_pct, <span class="at">adjust =</span> <span class="st">"dunnett"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Control = n:
+ contrast                                        estimate    SE df t.ratio
+ (Non-soluble Dosage10) - Soluble Dosage10          4.365 0.653 16   6.683
+ (Non-soluble Dosage10) - (Non-soluble Dosage15)   -1.392 0.653 16  -2.132
+ (Non-soluble Dosage10) - Soluble Dosage15          4.872 0.653 16   7.458
+ Soluble Dosage10 - (Non-soluble Dosage15)         -5.757 0.653 16  -8.815
+ Soluble Dosage10 - Soluble Dosage15                0.507 0.653 16   0.776
+ (Non-soluble Dosage15) - Soluble Dosage15          6.264 0.653 16   9.590
+ p.value
+  &lt;.0001
+  0.1977
+  &lt;.0001
+  &lt;.0001
+  0.8823
+  &lt;.0001
+
+Control = y:
+ contrast                                        estimate    SE df t.ratio
+ (nothing)                                         nonEst    NA NA      NA
+ p.value
+      NA
+
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: dunnettx method for varying numbers of tests </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>In this chapter, we considered the 2 × 2 factorial design with control and blocks, and how experiments of this nature can be analyzed. We first considered the case without block for easy understanding and extended the concepts to the case where blocks are considered. The first example used to illustrate the concepts in this chapter was about evaluating the effects of two drugs on blood pressure which consisted of two factors and a control group. The second example involved two drug types, two dosage levels, a control group, and five clinics treated as blocks. The purpose of including blocks in the second example was to account for variation among clinics while still comparing the factorial treatments and the control group appropriately. These designs allowed researchers to answer some important questions which are usually present in studies that may be groundbreaking or there may not be enough research already done in that field.</p>
+<p>Overall, the 2 × 2 factorial design with control and blocks allows researchers to separate block-to-block variation from treatment variation. More importantly, both examples also preserve the correct interpretation of the control group as a separate baseline treatment rather than forcing the control into the factorial structure.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

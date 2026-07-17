@@ -1,0 +1,105 @@
+---
+title: "stat821_F"
+author: "Frank Agyemang"
+date: "2023-09-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Libraries for the factorial Quantitative by Quantitative
+```{r}
+library(gmodels)
+library(doBy)
+```
+
+Reading in the data
+```{r}
+d <- read.csv("file path")
+d$kern <- ordered(factor(d$K))
+d$prot <- ordered(factor(d$P))
+d$trt <- factor(d$t)
+```
+
+Analysis of Variance
+```{r}
+result1 <- aov(y ~ trt,data = d)
+summary(result1)
+```
+
+Breaking out the ANOVA
+```{r}
+klin <- fit.contrast(result1, "trt", c())
+klin
+```
+
+```{r}
+kqua <- fit.contrast(result1, "trt", c())
+kqua
+```
+
+
+```{r}
+plin <- fit.contrast(result1, "trt", c())
+plin
+```
+
+```{r}
+pqua <- fit.contrast(result1, "trt", c())
+pqua
+```
+
+```{r}
+klinxplin <- fit.contrast(result1, "trt", c())
+klinxplin
+```
+
+```{r}
+klinxpqua <- fit.contrast(result1, "trt", c())
+klinxpqua
+```
+
+```{r}
+kquaxplin <- fit.contrast(result1, "trt", c())
+kquaxplin
+```
+
+```{r}
+kquaxpqua <- fit.contrast(result1, "trt", c())
+kquaxpqua
+```
+
+
+
+Fitting the model
+```{r}
+result2 <- aov(y ~ kern + prot + prot*kern, data = d)
+summary(result2)
+summary(result2,split = list(kern = list(Linear = 1, Quad = 2), prot = list(Linear =1, Quad = 2)))
+summaryBy(y ~ kern, data = d, FUN = mean)
+summaryBy(y ~ prot, data = d, FUN = mean)
+summaryBy(y ~ prot + kern, data = d, FUN = mean)
+
+```
+
+
+Fit final model
+```{r}
+result3 <- lm( y ~ I(K) + I(P) + I(P^2) + I(K*P), data = d)
+summary(result3)
+```
+
+Get predictions of 3-D surface
+```{r}
+k <- seq(from = 3, to = 9, by = 0.1)
+p <- seq(from = 5, to = 15, by = 1)
+f <- function(x,y){"fitted model"}
+```
+
+```{r}
+y.pred <- outer(k,p,f)
+persp(k,p,y.pred, phi = 30, theta = -30)
+```
+

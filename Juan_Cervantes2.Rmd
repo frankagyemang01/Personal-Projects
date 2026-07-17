@@ -1,0 +1,231 @@
+---
+title: "JuanCervantes_Data2"
+author: "SC3L Consulting Desk"
+date: "2026-02-19"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Introduction
+
+An experiment was conducted to compare the effect of four treatments (PBS, Coconut oil, Chlohexidin, Nothing) at different concentration levels (no dilution, 1:10, 1:20, 1:40, 1:80, 1:160) on bio-film of X-mutants. The experimental unit was each cell on a petri dish. Treatments were assigned in four sections (columns 1-6 with rows A-D, columns 7-12 with rows A-D, columns 1-6 with rows E-H, columns 7-12 with rows E-H), where within each section, different concentration levels of a given treatment was used. There were 12 columns with each column representing a treatment and level of concentration combination with the first four rows serving as replicates or pseudo-replicates for treatments in each section. The response variable is density of the liquid. For this experiment, a factorial arrangement of treatment with 4 levels of the factor Treatment and 6 level of the factor Concentration levels was used. Thus, we have a 4 by 6 factorial design. We would like to state that this is not fully randomized since treatments seems to be assigned in a systematic order in each cell of the petri dish.
+
+We begin the analysis by performing an exploratory data analysis. The relative frequency density plot, boxplot of density and treatment, and boxplot of density, treatment and concentration are shown in the code below.
+
+
+```{r}
+## Loading required libraries
+
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(car)
+library(stats)
+library(glmmTMB)
+library(emmeans)
+library(lme4)
+library(broom)
+```
+
+
+```{r}
+## Reading in data for the second experiment
+
+mic1 <- read.csv("Juan_Cervantes2.csv")
+
+
+# Making Treatment and Concentration as Factors
+
+mic1$Treatment <- as.factor(mic1$Treatment)
+mic1$Concentration <- as.factor(mic1$Concentration)
+```
+
+
+## Exploratory Data Analysis
+
+The first plot shows the relative frequency density plot which shows the distribution of the full data from experiment 2. From the plot, we see a skewness to the right with majority of the density between 0.7 and 0.8. Also from the plot, there are a few outliers.
+
+
+
+
+```{r, fig.cap="\\label{fig:fig1} Relative Frequency Density Plot Showing the Distribution of the Data"}
+## Relative Frequency Plot
+# Distribution of response
+
+ggplot(mic1, aes(x = Density)) +
+  geom_histogram(aes(y = ..density..), 
+                 bins = 30, 
+                 fill = "steelblue", 
+                 color = "black") +
+  labs(
+    x = "Y",
+    y = "Relative Frequency (Density)",
+    title = "Relative Frequency Density Plot of Density of liquid"
+  ) +
+  theme_minimal()
+```
+
+\newpage
+
+Next, we show the boxplot of density and treatment. The x-axis shows each treatment or section and the y-axis shows the density of the liquid. From the boxplot, Coconut has a higher mean compared to other three treatments. Also, we do not see a lot of variability in Chlohexidin but there are quite some variation in Coconut oil, Nothing and PBS. This is shown by the sizes of the boxplot. 
+
+```{r, fig.cap="\\label{fig:fig2} Boxplot of Density and Treatment"}
+## Boxplot for Treatment
+
+ggplot(mic1, aes(x = Treatment, y = Density, fill = Treatment)) +
+  geom_boxplot(position = position_dodge(0.8)) +
+  labs(x = "Treatment", y = "Density", fill = "Treatment") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+\newpage
+
+We also look at the boxplot of density and treatment by concentration. From this plot, we see that Coconut has at a concentration of 0 and 1. PBS also has a  higher density compared at a concentration of 1 with a lot of variation among the values. Nevertheless, within each treatment, we see that concentration levels have different effects on the density of each liquid. We see that within treatments, there may be variability in the density of liquid at different concentrations. For example, Nothing has a higher variability at concentration level 5, which is shown by the size of the boxplot. 
+
+```{r, fig.cap="\\label{fig:fig3} Boxplot of Density and Treatment at each Concentration level"}
+## Boxplot
+
+ggplot(mic1, aes(x = Treatment, y = Density, fill = Concentration)) +
+  geom_boxplot(position = position_dodge(0.8)) +
+  labs(x = "Treatment", y = "Density", fill = "Concentration") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+\newpage
+
+For a factorial design, an important thing to consider is whether there is an interaction between the two factors. We show this through the interaction plot below. From the plot, there might be a significant interaction between treatment and concentration. Notice that the lines or mean plots are not parallel. Nevertheless, we have to fit a model before arriving at any conclusion.
+
+```{r, fig.cap="\\label{fig:fig4} Interaction Plot of Treatment and Concentration"}
+## Interaction Plot
+# Interaction plot
+with(mic1, interaction.plot(
+  x.factor = Treatment,
+  trace.factor = Concentration,
+  response = Density,
+  type = "b",           
+  col = 1:5,            
+  pch = 19,             
+  xlab = "Treatment",
+  ylab = "Density",
+  trace.label = "Concentration",
+  main = "Interaction plot of Treatment and Concentration"
+))
+```
+
+
+
+## Using Subsetted Data from Experiment 1
+
+We will use a subsetted data from experiment 1 that excludes treatment in section 4, that is, where no treatment was applied. 
+
+
+```{r}
+## Reading in the data
+mic <- read.csv("JuanCervantes.csv")
+mic$Treatment <- as.factor(mic$Treatment)
+mic$Concentration <- as.factor(mic$Concentration)
+
+# Subset the data excluding section 4
+
+mic_sub <- subset(mic, Treatment %in% c("PBS", "Coconut", "Chlohexidin"))
+```
+
+## Exploratory Data Analysis on Subsetted Data
+
+
+```{r, fig.cap="\\label{fig:fig5} Relative Frequency Density Plot Showing the Distribution of Subsetted Data"}
+## Relative Frequency Plot
+# Distribution of response
+ggplot(mic_sub, aes(x = Density)) +
+  geom_histogram(aes(y = ..density..), 
+                 bins = 30, 
+                 fill = "steelblue", 
+                 color = "black") +
+  labs(
+    x = "Y",
+    y = "Relative Frequency (Density)",
+    title = "Relative Frequency Density Plot of Density of liquid"
+  ) +
+  theme_minimal()
+```
+
+\newpage
+
+Next, we show the boxplot of density and treatment. The x-axis shows each treatment or section and the y-axis shows the density of the liquid. From the boxplot, Coconut and PBS have higher means compared to Chlohexidin. We do not see a lot of variability in Chlohexidin but it has a few outliers. Also, there are a few outliers in Coconut oil and PBS treatmenst.  
+
+```{r, fig.cap="\\label{fig:fig6} Boxplot of Density and Treatment in Subsetted Data"}
+## Boxplot for Treatment
+
+ggplot(mic_sub, aes(x = Treatment, y = Density, fill = Treatment)) +
+  geom_boxplot(position = position_dodge(0.8)) +
+  labs(x = "Treatment", y = "Density", fill = "Treatment") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+\newpage
+
+We also look at the boxplot of density and treatment by concentration. From this plot, we see that Chlohexidin at a concentration of zero has a higher mean  compared to other concentration levels for the same treatment. This means that, when Chlohexidin is not diluted, the reduction in the density of X-mutants is low compared to when it is diluted. This raises some concerns about how the experiment might have been set-up and would advise that care should be taken in making any inferences based on this experiment. For Coconut oil and PBS, there does not seem to be much differences in the means at different concentration levels.  
+
+```{r}
+## Boxplot
+
+ggplot(mic_sub, aes(x = Treatment, y = Density, fill = Concentration)) +
+  geom_boxplot(position = position_dodge(0.8)) +
+  labs(x = "Treatment", y = "Density", fill = "Concentration") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+To fit a simple model, we exclude section 4 from the data. This is because the validity of the values recorded are unclear and thus, researcher is advised to replicate the experiment for better understanding.
+
+We fit a hurdle model on the remaining data set and assume a Gamma distribution. Hence we have a Gamma-hurdle model. This is because we have a portion of the data close to zero and a larger portion greater than 4 with no values between the interval. Therefore, we need a model that captures such behavior and in this case, the Gamma-hurdle may be a good alternative. The code and model below shows the results.
+
+```{r}
+
+# Generalized Linear Model 
+
+model.hurdle <- glmmTMB(
+  Density ~ Treatment * Concentration,
+  ziformula = ~ Concentration,
+  family = Gamma(link = "log"),
+  data = mic_sub
+)
+
+# Get anova table
+Anova(
+  model.hurdle,
+  type = 3
+)
+```
+
+From the anova table, Concentration and Treatment by Concentration interaction are both statistically significant with p-values less than 0.0001 respectively. Treatment is not statistically significant. This is shown by the $p-value = 0.8283$. But an important thing to note is that since there is a significant interaction effect between Treatment and concentration, it is not reasonable to even look at the main effect of treatment. That means that even if the p-value for Treatment was significant, it would still not be useful. We can only look at the simple effects, which is the effect of the Treatment at a given level of concentration.
+
+
+Finally, we show the simple effects and table comparing the various treatments at each concentration level. We only print out those treatments that were significantly different from another. That is, those comparisons with p-values less that 0.05. From the output, we only need to look at comparisons that we are interested in because not every one of the comparison below makes sense. For example, those comparisons with p-value of zero is deceptive and we cannot rely on them.
+
+```{r, warning=FALSE}
+# Estimated Means
+
+lsm_hurdle <- emmeans(model.hurdle, ~ Treatment*Concentration, type = "response")
+lsm_pairs <- pairs(lsm_hurdle)
+lsm_pairs <- as.data.frame(lsm_pairs)
+lsm_pairs_int <- lsm_pairs[1:17,]
+lsm_pairs_int$null <- NULL
+lsm_pairs_int$df <- NULL
+lsm_pairs_int
+```
+
+
+From the boxplots we saw earlier, there clearly was no significant difference between Coconut oil and PBS and thus, it is not informative to look at those comparisons. We can only look at comparison between Chlohexidin and the other treatments at equal concentration levels. For example, we can compare Chlohexidin at 0 concentration to Coconut oil at 0 concentration and we see that it has a p-value of 1.00. This means that the difference between the two treatments at 0 concentration level is not statistically significant. This is supported by the boxplot as we see that at concentration of 0, the mean of Chlohexidin was so high and comparable to those of the other two treatments.
+
+## Conclusion
+
+In conclusion, the exploratory data analysis for the two experiments have been presented and based on the values of the response variable (Density), there seem to be so much issues with the data. Nevertheless, given the explanation from the client, he believes that experiment 1 has more plausible values. The data for experiments 1 had pseudo-replicates but accounting for that gives identical results as the one show here. We thus assume each replication in each treatment was true. We used a Gamma-hurdle model due to the bimodal nature of the data with some of the values being close to 0 and some greater than 4. From both exploratory data analysis and model, there may be a difference between Chlohexidin when diluted at the various concentrations compared to the other treatments but there was no significant difference between undiluted Chlohexidin and the other treatments. Also, there was no significant difference between Coconut oil and PBS. A significance level $\alpha = 0.05$ was used for the entire analysis. We encourage the researcher to repeat the experiment again and also take into account the initial density of X-mutants to account for any covariance.

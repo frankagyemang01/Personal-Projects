@@ -1,0 +1,111 @@
+---
+title: "Stat821_Assignment3"
+author: "Frank Agyemang"
+date: "2023-09-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(gmodels)
+library(doBy)
+```
+
+
+```{r}
+d <- read.csv("data.csv")
+d$t <- factor(d$Temp)
+d$w <- factor(d$Weeks)
+d$trt <- factor(d$trt)
+```
+
+
+```{r}
+result1 <- aov(acid ~ trt,data = d)
+summary(result1)
+```
+
+
+```{r}
+#result1 <- aov(d$acid ~ d$t + d$w + d$t*d$w,data = d)
+#summary(result1)
+```
+
+
+```{r}
+d$t <- ordered(factor(d$Temp))
+d$w <- ordered(factor(d$Weeks))
+```
+
+Breaking out the ANOVA
+```{r}
+wlin <- fit.contrast(result1, "trt", c(-3,-3,-3,-1,-1,-1,1,1,1,3,3,3))
+wlin
+
+wqua <- fit.contrast(result1, "trt", c(1,1,1,-1,-1,-1,-1,-1,-1,3,3,3))
+wqua
+
+tlin <- fit.contrast(result1, "trt", c(-1,0,1,-1,0,1,-1,0,1,-1,0,1))
+tlin
+
+tquad <- fit.contrast(result1, "trt", c(1,-2,1,1,-2,1,1,-2,1,1,-2,1))
+tquad
+
+wlinXtlin <- fit.contrast(result1, "trt", c(3,0,-3,1,0,-1,-1,0,1,-3,0,3))
+wlinXtlin
+
+wlinXtquad <- fit.contrast(result1, "trt", c(-3,6,-3,-1,2,-1,1,-2,1,3,-6,3))
+wlinXtquad
+
+wquadXtlin <- fit.contrast(result1, "trt", c(-1,0,1,1,0,-1,1,0,-1,-1,0,1))
+wquadXtlin
+
+wquadXtquad <- fit.contrast(result1, "trt", c(1,-2,1,-1,2,-1,-1,2,-1,1,-2,1))
+wquadXtquad
+```
+
+
+Fitting the model
+```{r}
+result2 <- aov(acid ~ w + t + w*t, data = d)
+summary(result2)
+summary(result2,split = list(w = list(Linear = 1, Quad = 2), t = list(Linear =1, Quad = 2)))
+summaryBy(acid ~ w, data = d, FUN = mean)
+summaryBy(acid ~ t, data = d, FUN = mean)
+summaryBy(acid ~ t + w, data = d, FUN = mean)
+```
+
+
+```{r}
+result3 <- lm( acid ~ I(Weeks) + I(Temp) + I(Temp^2) + I(Weeks*Temp), data = d)
+summary(result3)
+```
+
+
+```{r}
+w <- c(2, 5, 8)
+t <- seq(from = 0, to = 20, by = 0.1)
+f <- function(x,y){45.208333 + 0.158333*x + 0.950000*y - 0.061250*y*y - 0.157500*x*y}
+y.pred <- outer(w, t, f)
+
+nry <- nrow(y.pred)
+ncy <- ncol(y.pred)
+jet.colors <- colorRampPalette( c("blue", "green") )
+nbcol <- 100
+color <- jet.colors(nbcol)
+#yfacet <- y.pred[-1, -1] + y.pred[-1, -ncy] + z[-nry, -1] + z[-nry, -ncy]
+persp(w,t,y.pred, phi = 30, theta = -30)
+```
+
+
+```{r}
+w <- seq(from = 2, to = 8, by = 1)
+t <- seq(from = 0, to = 20, by = 5)
+f <- function(x,y){45.208333 + 0.158333*x + 0.950000*y - 0.061250*y*y - 0.157500*x*y}
+y.pred <- outer(w, t, f)
+persp(w,t,y.pred, phi = 30, theta = -30)
+```
+

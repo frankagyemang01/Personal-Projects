@@ -1,0 +1,444 @@
+---
+title: "Shabani_Muller"
+author: "Frank Agyemang"
+date: "2025-06-02"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Data Description
+In the data set named "tadpole_fin.csv", there were 175 tadpoles from the year 2021 to 2024. Two species of tadpoles were recorded in this data set, namely Bullfrog Tadpole and Native Tadpole. Out of the 175 tadpoles, 109 were Bullfrog and 66 were Native tadpoles respectively. For data set collected in 2021 and 2022, there were information on only Bullfrog Tadpole and Native Tadpole respectively. This is an important information because there may be confounding effect and thus care must be taken in the conclusion we make. There were eight predictor variables:Temperature, Collection Date, Site, Species, Dry Weight, Moisture and Lipid. The rest of the variables measured the concentration of chemicals that were detected in tadpoles over the four year period. Overall, twenty-eight of such chemicals were detected which would later be placed in five categories : Neonicotinoid, Fungicide, Herbicide, Legacy Agrochemical and Other.
+
+```{r}
+tadpole_fin <- read.csv("Tadpole_2021_2024_WetWeight_clean.csv")
+tadpole_fin$ThiamethoxamD <- as.numeric(tadpole_fin$ThiamethoxamD)
+tadpole_fin$ThiamethoxamD[is.na(tadpole_fin$ThiamethoxamD)] <- 1897.6
+
+
+# Changing all concentration values of 0.1 to 0.05
+vars_to_change <- c("Clothianidin", "ThiamethoxamD","Azoxystrobin", "Carbendazim", "Cyproconazole", "Fluoxastrobin", 
+                    "Fluxapyroxad", "Ipconazole", "Metconazole", "Propiconazole", "Pyraclostrobin", "Tebuconazole",
+                    "Tetraconazole", "Thiabendazole","Acetochlor", "Atrazine", "Dithiopyr", "Flufenacet", 
+                    "Metolachlor..R.and.S.", "Pendimethalin", "Penoxsulam","Cyfluthrin..all.isomers.", "Bifenthrin",
+                    "Desthiopro","ppDDD", "ppDDE", "ppDDT", "Pentachloroanisole" )
+
+# Replace 0.1 with 0.05 in the specified columns
+tadpole_fin[vars_to_change] <- lapply(tadpole_fin[vars_to_change], function(x) ifelse(x == 0.1, 0.05, x))
+
+#summary(tadpole_fin)
+
+
+```
+
+## Descriptive Statistics for Chemicals
+ Next, we show a table that provides a summary statistic for the various chemicals detected. As stated before, there were twenty eight chemicals that were detected. For each of the chemical, the mean, minimum, maximum and the category they fall in, (Neonicotinoid, Fungicide, Herbicide, Legacy Agro, Other), has been provided. Overall, the chemical,ThiamethoxamD, had the highest mean concentration, followed by Ipconazole,Desthiopro,Tebuconazole,ppDDE and Metolachlor..R.and.S. respectively. There were 12 chemicals classified as Fungicide, 7 as Herbicide, 4 as Legacy Agro, 2 as Neonicotinoid and 3 as Other. Using these compositions, we showed the proportion of chemicals in each of the five categories through a bar chart. From the bar chart, Fungicides and Herbicides constituted about 42.9 and 25 percent respectively while Neonicotinoids, Legacy Agro and Other constituted 7.1, 14.3, and 10.7 percent resepectively.
+```{r}
+chemicals <- tadpole_fin[,c(9:36)]
+# Summary statistics for numeric variables
+summary_table <- data.frame(
+  Chemical = names(chemicals),
+  Mean = sapply(chemicals, mean, na.rm = TRUE),
+  Median = sapply(chemicals, median, na.rm = TRUE),
+  Min = sapply(chemicals, min, na.rm = TRUE),
+  Max = sapply(chemicals, max, na.rm = TRUE),
+  SD = sapply(chemicals, sd, na.rm = TRUE)
+)
+
+
+library(dplyr)
+summary_table <- summary_table %>%
+  mutate(Category = case_when(
+    Chemical %in% c("Clothianidin", "ThiamethoxamD") ~ "Neonico",
+    Chemical %in% c("Azoxystrobin", "Carbendazim", "Cyproconazole", "Fluoxastrobin", 
+                    "Fluxapyroxad", "Ipconazole", "Metconazole", "Propiconazole", 
+                    "Pyraclostrobin", "Tebuconazole", "Tetraconazole", "Thiabendazole") ~ "Fungi",
+    Chemical %in% c("Acetochlor", "Atrazine", "Dithiopyr", "Flufenacet", 
+                    "Metolachlor..R.and.S.", "Pendimethalin", "Penoxsulam") ~ "Herbi",
+    Chemical %in% c("Cyfluthrin..all.isomers.", "Bifenthrin", "Desthiopro") ~ "Other",
+    Chemical %in% c("ppDDD", "ppDDE", "ppDDT", "Pentachloroanisole") ~ "Legacy_Agro",
+    TRUE ~ NA_character_  # Optional: Assign NA to unmatched values
+  ))
+sort(summary_table$Mean)
+###########################################################################################################
+library(ggplot2)
+library(dplyr)
+
+
+# Find global x-axis range
+x_max <- max(summary_table$Mean, na.rm = TRUE)
+
+# Plot
+# Plot with grid lines removed
+ggplot(summary_table, aes(x = Mean, y = reorder(Chemical, Mean), fill = Category)) +
+  geom_col() +
+  facet_wrap(~ Category, scales = "free_y") +
+  scale_x_continuous(limits = c(0, x_max)) +
+  labs(x = "Mean Concentration", y = "Chemical", title = "Mean Concentration of Chemicals by Category") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    panel.grid = element_blank(),         
+    panel.grid.major = element_blank(),   
+    panel.grid.minor = element_blank()
+  )
+
+#############################################################################################################
+# Proportion of chemicals in each Category - Pie Chart
+library(ggplot2)
+
+chem_summary <- summary_table %>%
+  count(Category) %>%
+  mutate(Proportion = n / sum(n),
+         Label = paste0(Category, " (", round(Proportion * 100, 1), "%)"))
+
+# Create the pie chart
+ggplot(chem_summary, aes(x = "", y = Proportion, fill = Category)) +
+  geom_col(width = 1) +
+  coord_polar(theta = "y") +
+  labs(title = "Proportion of Chemicals by Category") +
+  theme_void() +
+  geom_text(aes(label = Label), 
+            position = position_stack(vjust = 0.5), size = 4)
+
+
+# Convert from wide to long format
+# long_df <- wide_df %>%
+#   pivot_longer(
+#     cols = starts_with("Time"),     # columns to pivot
+#     names_to = "Time_Point",        # new column name for former column names
+#     values_to = "Value"             # new column name for values
+#   )
+# 
+# print(long_df)
+
+```
+
+
+
+
+
+
+```{r}
+library(tidyr)
+library(dplyr)
+
+## Coverting data from wide to long format
+conc_data <- tadpole_fin %>% 
+  pivot_longer(
+    cols = `Acetochlor`:`ThiamethoxamD`, 
+    names_to = "Chemical",
+    values_to = "Concentration"
+)
+
+conc_data[, c("Chemical")] <- lapply(conc_data[, c("Chemical")], as.factor)
+conc_data <- conc_data[order(conc_data$Chemical),]
+#conc_data$Chemical <- gsub("\\..*", "", conc_data$Chemical)
+############################################################################################################
+# Create a new variable with assigned categories
+conc_data <- conc_data %>%
+  mutate(Category = case_when(
+    Chemical %in% c("Clothianidin", "Thiamethoxam") ~ "Neonico",
+    Chemical %in% c("Azoxystrobin", "Carbendazim", "Cyproconazole", "Fluoxastrobin", 
+                    "Fluxapyroxad", "Ipconazole", "Metconazole", "Propiconazole", 
+                    "Pyraclostrobin", "Tebuconazole", "Tetraconazole", "Thiabendazole") ~ "Fungi",
+    Chemical %in% c("Acetochlor", "Atrazine", "Dithiopyr", "Flufenacet", 
+                    "Metolachlor", "Pendimethalin", "Penoxsulam") ~ "Herbi",
+    Chemical %in% c("Cyfluthrin", "Bifenthrin", "Desthiopro") ~ "Other",
+    Chemical %in% c("ppDDD", "ppDDE", "ppDDT", "Pentachloroanisole") ~ "Legacy_Agro",
+    TRUE ~ NA_character_  # Optional: Assign NA to unmatched values
+  ))
+
+conc_data[, c("Category", "Site")] <- lapply(conc_data[, c("Category","Site")], as.factor)
+levels(conc_data$Site)
+############################################################################################################
+library(lubridate)
+# Convert Date to Date format and extract year
+conc_data$Collection_date <- year(mdy(conc_data$Collection_date))
+conc_data$Collection_date <- as.factor(conc_data$Collection_date)
+
+
+
+```
+
+
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(purrr)
+
+# Filter chemicals by mean > 0.05 per year-category-chemical
+chem_threshold <- conc_data %>%
+  group_by(Collection_date, Category, Chemical) %>%
+  summarise(mean_conc = mean(Concentration, na.rm = TRUE), .groups = "drop") %>%
+  filter(mean_conc > 0.05)
+
+# Join back to the original data to keep only those chemicals
+summary_table_2 <- conc_data %>%
+  inner_join(chem_threshold, by = c("Collection_date", "Category", "Chemical"))
+
+# Step 3: Create boxplots per year-category
+plots <- summary_table_2 %>%
+  split(list(.$Collection_date, .$Category)) %>%
+  map(~ ggplot(.x, aes(x = Chemical, y = Concentration)) +
+         geom_boxplot(fill = "#56B4E9", outlier.size = 0.5) +
+         labs(title = paste("Year:", unique(.x$Collection_date), "| Category:", unique(.x$Category)),
+              x = "Chemical", y = "Concentration") +
+         theme_minimal() +
+         theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+               panel.grid.major.x = element_blank())
+  )
+
+# View first plot
+# Change number to get various plots
+print(plots[[8]])
+
+
+```
+
+
+
+
+
+
+## Persistence of concentration of the various chemicals in each species across the years 2021 to 2024
+The researcher was interested in determining whether the concentration of the various chemicals for each species persisted over time. We used a mean plot to demonstrate whether average concentration levels for the different chemicals and species increased or decreased over time. We can see that concentration levels for Acetochlor,Azoxystrobin,Cyproconazole,ppDDD,Propiconazole,Tetraconazole,Thiabendazole for Bullfrog species was higher from the years 2021 to 2023 and declined in 2024. Nevertheless, the concentration levels in Native tadpoles for the same chemicals remained almost the same for all years except for Propiconazole.  The plots also enable the researcher to make several comparisons. 
+```{r}
+# Convert to Date class (assumes mm/dd/yyyy format)
+tadpole_fin$Collection_date <- as.Date(tadpole_fin$Collection_date, format = "%m/%d/%Y")
+# Extract the year only
+tadpole_fin$Collection_date <- format(tadpole_fin$Collection_date, "%Y")
+# Now you can order by year
+tadpole_fin <- tadpole_fin[order(tadpole_fin$Collection_date), ]
+
+library(dplyr)
+
+
+# Compute means grouped by species and year
+tadpole_fin_means <- tadpole_fin %>%
+  group_by(Specices, Collection_date) %>%
+  summarise(across(where(is.numeric), mean, na.rm = TRUE), .groups = "drop")
+
+# Removing some variables in the data frame
+tadpole_fin_means <- tadpole_fin_means[, -c(3, 4, 5,6)]
+```
+
+
+## Mean Plot showing the persistence of concentration for the various chemicals and Species over the years 2021 to 2024
+```{r}
+# Mean plot showing the concentration for each chemical over time
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# Assuming your data frame is called 'df'
+# First reshape the data to long format
+tadpole_fin_means_long <- tadpole_fin_means %>%
+  pivot_longer(
+    cols = -c(Specices, Collection_date),
+    names_to = "Chemical",
+    values_to = "Concentration"
+  )
+
+# Calculate means (optional if you want pre-aggregated values)
+tadpole_fin_means_summary <- tadpole_fin_means_long %>%
+  group_by(Specices, Collection_date, Chemical) %>%
+  summarise(Mean_Concentration = mean(Concentration, na.rm = TRUE), .groups = "drop")
+
+# Plot
+ggplot(tadpole_fin_means_summary, aes(x = as.factor(Collection_date), y = Mean_Concentration, color = Specices, group = Specices)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~ Chemical, scales = "free_y") +
+  labs(
+    x = "Year",
+    y = "Mean Concentration",
+    title = "Mean Chemical Concentration by Year and Species"
+  ) +
+  theme_minimal()
+
+
+```
+
+```{r}
+tadpole_fin[] <- lapply(tadpole_fin, function(x) if (is.character(x)) as.factor(x) else x)
+
+library(dplyr)
+library(ggplot2)
+
+
+tadpole_fin_prop <- tadpole_fin %>%
+  group_by(Site, Specices) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(Site) %>%
+  mutate(Proportion = Count / sum(Count))
+
+
+ggplot(tadpole_fin_prop, aes(x = "", y = Proportion, fill = Specices)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  facet_wrap(~ Site) +
+  labs(title = "Specices Proportion in Each Site", fill = "Specices") +
+  theme_void() +
+  theme(strip.text = element_text(size = 12, face = "bold"))
+
+
+
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+# Step 1: Summarize proportions by Year, Site, and Species
+species_by_year_site <- tadpole_fin %>%
+  group_by(Collection_date, Site, Specices) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(Collection_date, Site) %>%
+  mutate(Proportion = Count / sum(Count))
+
+# Step 2: Create pie charts with facets
+ggplot(species_by_year_site, aes(x = "", y = Proportion, fill = Specices)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y") +
+  facet_grid(Collection_date ~ Site) +  
+  labs(title = "Specices Proportion by Year and Site", fill = "Specices") +
+  theme_void() +
+  theme(
+    strip.text = element_text(size = 10, face = "bold"),
+    plot.title = element_text(hjust = 0.5, face = "bold")
+  )
+
+```
+
+```{r}
+library(dplyr)
+tadpole_final <- tadpole_fin %>%
+  mutate(
+    Neonico = rowSums(tadpole_fin[, c("Clothianidin", "ThiamethoxamD")]),
+    Fungi = rowSums(tadpole_fin[, c("Azoxystrobin", "Carbendazim", "Cyproconazole", "Fluoxastrobin", 
+                    "Fluxapyroxad", "Ipconazole", "Metconazole", "Propiconazole", 
+                    "Pyraclostrobin", "Tebuconazole", "Tetraconazole", "Thiabendazole")]),
+    Herbi = rowSums(tadpole_fin[, c("Acetochlor", "Atrazine", "Dithiopyr", "Flufenacet", 
+                    "Metolachlor..R.and.S.", "Pendimethalin", "Penoxsulam")]),
+    Other = rowSums(tadpole_fin[, c("Cyfluthrin..all.isomers.", "Bifenthrin", "Desthiopro")]),
+    Legacy_Agro = rowSums(tadpole_fin[, c("ppDDD", "ppDDE", "ppDDT", "Pentachloroanisole")])
+  )
+
+
+## Removing variables 
+tadpole_final <- tadpole_final[, -c(9:36)]
+```
+
+
+
+```{r}
+tadpole_final_freq <- tadpole_final %>%
+  count(Specices, Collection_date) %>%
+  group_by(Specices, Collection_date) %>%
+  mutate(Relative_Freq = n / sum(n))
+
+
+library(dplyr)
+
+# Define which levels belong to each category
+undeveloped_countries <- c("P25","pre-25","p27","P27","26","27-30","28","30")
+developing_countries <- c("p31","33","34","35","36","37","38","39")
+developed_countries <- c("41")
+
+# Create new category variable
+tadpole_final <- tadpole_final %>%
+  mutate(Dev_stage = case_when(
+    Dev_stage %in% undeveloped_countries ~ "Undeveloped",
+    Dev_stage %in% developing_countries ~ "Developing",
+    Dev_stage %in% developed_countries ~ "Developed",
+    TRUE ~ NA_character_  # or "Other"
+  ))
+
+tadpole_final$Dev_stage <- as.factor(tadpole_final$Dev_stage)
+tadpole_final <- tadpole_final %>% 
+  rename(
+    Mass = Mass..g...dry.weight.,
+    Moisture = X..Moisture,
+    Lipid = X..Lipid
+  )
+
+library(dplyr)
+tadpole_final <- tadpole_final %>%
+  mutate(ID = c(1:175))
+tadpole_final <- tadpole_final %>% select(ID, Collection_date,Site,Specices, everything())
+
+
+# Proportion of missing values in each column
+missing_proportion <- sapply(tadpole_final, function(x) mean(is.na(x)))
+
+
+# Store it in a data frame
+missing_table <- data.frame(
+  Variable = names(missing_proportion),
+  Missing_Proportion = missing_proportion
+)
+# View the table
+print(missing_table)
+
+```
+
+## Plot showing the frequency of chemicals detected
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+
+
+# Filter for concentrations above the detection limit
+above_detection <- conc_data %>%
+  filter(Concentration > 0.05)
+
+#  Count frequency of each chemical
+chemical_counts <- above_detection %>%
+  group_by(Chemical) %>%
+  summarise(Frequency = n()) %>%
+  arrange(desc(Frequency))
+
+# Step 3: Plot the frequencies
+ggplot(chemical_counts, aes(x = reorder(Chemical, Frequency), y = Frequency)) +
+  geom_bar(stat = "identity", fill = "#0072B2") +
+  coord_flip() +
+  labs(title = "Frequency of Chemical Detections Above 0.05",
+       x = "Chemical",
+       y = "Frequency") +
+  theme_minimal() +
+  theme(panel.grid.major.x = element_blank())
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

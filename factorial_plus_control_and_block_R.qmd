@@ -1,0 +1,976 @@
+---
+title: "Exploring a 2 by 2 Factorial with Control: A Case Study In R"
+author: 
+  - Frank Agyemang
+  - Dr. Reka Howard
+  - Dr. Walter Stroup
+  - Dr. Erin Blankenship
+
+format: 
+  html:
+    toc: true
+    toc-depth: 3
+    toc-location: left
+  pdf:
+    pdf-engine: xelatex
+    syntax-highlighting: github
+    code-overflow: wrap
+    code-block-bg: "#f5f5f5"
+    code-block-border-left: "#f5f5f5"
+    code-line-numbers: false
+    toc: true
+    toc-depth: 3
+
+editor: visual
+
+execute:
+  echo: true
+  warning: false
+  message: false
+---
+
+\newpage
+
+## **Introduction**
+
+Factorial experiments are widely used in scientific research for evaluating the effects of multiple factors simultaneously. The simplest form of the factorial design is a 2 × 2 factorial design which involves two factors. For each factor we have two levels, resulting in four treatment combinations. However, in many practical scenarios, researchers may wish to compare these treatments not only among themselves but also against a standard or baseline treatment referred to as a control. In such cases, a 2 × 2 factorial design plus a control is adopted. There is an important difference between the traditional factorial design with a control and the problem which we attempt to address in this chapter. With the traditional factorial design with a control, we see all possible combinations of the factor levels including the control. For example, we may consider an experiment with two factors, type of fertilizer and irrigation each with two levels respectively. In this scenario, A and B are the levels of fertilizer types and the levels of irrigation are Yes and No, where the latter is a control. Then for a traditional 2 × 2 factorial design with control, we would have all possible combinations: (A, Yes), (A, No), (B, Yes) and (B, No). Nevertheless, the type of problems that we try to address in this chapter involves a 2 × 2 factorial design where the control serves as the fifth treatment. We begin this chapter with a detailed discussion of a 2 × 2 factorial design plus control as the fifth treatment and extend our discussion to a 2 × 2 factorial design plus control and blocks for a better understanding of our readers.
+
+In this chapter, we illustrate the concept of a 2 × 2 factorial design plus control, where the control is considered as the fifth treatment using the example below. Researchers are interested in evaluating the effects of two drugs on blood pressure. They would like to determine if a Soluble or Non-soluble form makes a difference. Another factor that affects performance of the drug is dosage (10 units and 15 units). Because this is a new study, they also chose a control group to serve as reference. In this experiment, the control group refers to experimental units that did not receive any of the treatments.
+
+A 2 × 2 factorial design plus control may also be utilized in experiments where methods are being tested for the first time or in new areas of study. In the case where methods are being tested for the first time, researchers may be interested in comparing the main effects of treatments with control. In the example we consider, we are interested in determining if the treatments are able to reduce blood pressure at all. In such instances, the control group serves as a baseline and enables us to answer such a question. That is, if we find out that the blood pressure of individuals taking any of the drugs at different concentrations are on average lower than those in the control group, then we know that taking a drug is at least better than taking nothing at all. Also, in situations where there may be a significant interaction effect, we can compare each treatment combination with the control.
+
+## Statistical Challenge
+
+As we stated in the introduction, with a 2 × 2 factorial design plus a control, the control is considered as the fifth treatment and does not appear in any other treatment combination unlike the traditional 2 × 2 factorial design with control.
+
+The statistical challenge is that the control is not part of the factorial structure and thus, it creates a non-orthogonal or partially unbalanced design. This is a problem because the control does not contribute to the estimation of the main effects and interaction effects of factors. Nevertheless, the control shares the same experimental error term with the treatments. When the traditional 2 × 2 factorial design is used to analyze these kinds of experiments, the implication is that the control contributes to the marginal means and also, both main effects and interactions are interpretable and balanced. This is incorrect.
+
+The 2 × 2 factorial design plus control enables the mean of the control to be estimated separately and computes factorial means only from the four factorial cells. Moreover, the variance of factorial effects are estimated only from factorial units and thus, control observations do not influence variance.
+
+## Exploratory Data Analysis
+
+In our example used to demonstrate the ideas in this chapter, we first conduct an exploratory data analysis to understand how data were generated, the type and description of the variables. We only present information that will be useful to the reader when using this design. We show the histogram which gives us information about the distribution of the response. We also show the interaction plot and boxplot for all treatment combinations and the control.
+
+Recall, the objective of the study is to evaluate the effects of two drugs on blood pressure. They would like to determine if a Soluble or Non-soluble form makes a difference. Another factor that affects performance of the drug is dosage (10 units and 15 units).
+
+### Data Description
+
+Data were simulated from the normal distribution with mean of $0$ and variance of $5$. To set up the 2 × 2 factorial design plus control in R, we first set up the treatment combination of drug type and dosage as a traditional factorial design and only add the control as an additional factor.
+
+We simulated data with a total of 15 observations, with three replicates from each treatment combination and the control. Both drug type (Soluble and Non-soluble) and dosage (10 units and 15 units) were considered as qualitative variables. The response variable in this experiment was blood pressure. Each individual in this experiment was considered as an experimental unit.
+
+
+
+```{r, warning=FALSE, echo = FALSE}
+#-----------------------------------------------------------#
+# Loading all required libraries for analysis
+# ggplot2 - Used to make graphs
+# dplyr - Data manipulation
+# lme4 - Mixed models
+# emmeans - Estimated marginal means
+# multcomp - Multiple comparisons
+# knitr - Tables/reports
+# lmerTest - Adds p-values to lme4 models
+#------------------------------------------------------------#
+
+library(ggplot2)
+library(dplyr)
+library(lme4)
+library(emmeans)
+library(multcomp)
+library(knitr)
+library(lmerTest)
+library(nlme)
+```
+
+```{r descriptive_table1, echo=FALSE,fig.cap="\\label{Table1} Table 1 shows the layout of the experiment. Drug Type has two levels (Soluble and Non-soluble) and Dosage has two levels (10 and 15 units) with control serving as a reference."}
+
+#---------------------------------------------------------------#
+# The data.frame () creates a data frame
+# Drug type, Dosage and Description are the variables
+# Drug type has two factor levels (Soluble, Non-soluble)
+# Dosage also has two factor levels (10, 15)
+#---------------------------------------------------------------#
+
+layout <- data.frame(
+  Drug_Type = c("Soluble", "Soluble",
+                "Non-soluble", "Non-soluble", "No Drug"),
+  Dosage = c(10, 15, 10, 15, 0),
+  Description = c(
+    "Soluble at low dosage",
+    "Soluble at high dosage",
+    "Non-soluble at low dosage",
+    "Non-soluble at high dosage",
+    "Control"
+  ),
+  Replicates = rep(3, 5)
+)
+
+#---------------------------------------------------------------#
+# kable() function in R is used to create clean tables from data frames
+#---------------------------------------------------------------#
+
+kable(
+  layout,
+  caption = "Experimental Drug Layout",
+  col.names = c("Drug Type", "Dosage", "Description", "Replicates")
+)
+```
+
+
+```{r, warning=FALSE}
+#-------------------------------------------------------------#
+# Set.seed() is used to reproduce simulated data
+# Simulate data with three replicates for each treatment combination
+#-------------------------------------------------------------#
+
+set.seed(2025)
+
+# Define levels for drug type 
+drug_type <- c("Soluble", "Non-soluble")
+
+# Define levels for dosage
+dosage <- c(10, 15)
+
+# Define number of replicates
+replicates <- 3
+
+# Generate factorial combinations
+factorial_df <- expand.grid(Drug = drug_type,
+                            Dosage = dosage)
+factorial_df <- factorial_df[rep(1:nrow(factorial_df),
+                                 each = replicates), ]
+
+# Simulate blood pressure (response variable)
+factorial_df$BloodPressure <- with(factorial_df,
+                                   130 -                           
+                                    ifelse(Drug == "Soluble", 5, 0) +       
+                                    ifelse(Dosage == 15, 3, 0) +            
+                                    ifelse(Drug == "Soluble" 
+                                          & Dosage == 15, -2, 0) +  
+                                    rnorm(nrow(factorial_df),
+                                          mean = 0, sd = 5)        
+)
+```
+
+
+
+
+```{r descriptive_table2, warning=FALSE,fig.cap="\\label{Table 2} Table 2 shows the simulated data which has three replicates for each treatment combination."}
+
+#------------------------------------------------------------#
+# Add control group to the simulated data
+#------------------------------------------------------------#
+control_df <- data.frame(
+  Drug = "control",
+  Dosage = 0,
+  BloodPressure = rnorm(replicates, mean = 135, sd = 5)
+)
+
+# Put the two date frames together by row
+bp_data <- rbind(factorial_df, control_df)
+
+# Convert drug type and dosage to factors 
+bp_data$Drug <- as.factor(bp_data$Drug)
+bp_data$Dosage <- as.factor(bp_data$Dosage)
+
+#-------------------------------------------------------------#
+# Creating a new variable called Control
+# Control serves as an indicator variable 
+# for whether control is present or not
+#-------------------------------------------------------------#
+
+bp_data <- bp_data %>%
+  mutate(Control = ifelse( Dosage== 0, "y", "n"))
+bp_data$Control <- as.factor(bp_data$Control)
+
+# Create formatted table
+kable(
+  bp_data,
+  caption = "Simulated Blood Pressure Data",
+  col.names = c("Drug Type", "Dosage", 
+                "Blood Pressure", "Control")
+)
+
+
+
+```
+
+### Distribution of Blood Pressure
+
+The histogram provides an overall view of how the blood pressure values are spread across the study, allowing for a quick assessment of the center, variability, and general shape of the simulated response distribution before comparing treatment combinations more specifically.
+
+Figure 1 shows the relative frequency density plot which displays the distribution of blood pressure measurements in the data. The x-axis represents blood pressure values, while the y-axis shows relative frequency density, meaning the total area under the bars sums to one. Most observations are concentrated between approximately $124$ and $136$, indicating this range contains the highest relative density of measurements. The distribution shows moderate spread, with fewer observations at the higher end near 140 mmHg, suggesting slight right-skewness. No extreme outliers are apparent, although the density decreases toward the upper tail. Overall, the plot suggests that blood pressure values are clustered around the mid-120s to mid-130s, with relatively low variability outside this range.
+
+```{r, warning=FALSE,fig.cap="\\label{fig:fig1} Shows the distribution of blood pressure. The x-axis shows blood pressure and the y-axis shows frequency."}
+
+#--------------------------------------------------------------#
+# ggplot() is used for visualization
+# geom_histogram() specifies a histogram
+#--------------------------------------------------------------#
+
+ggplot(bp_data, aes(x = BloodPressure)) +
+  geom_histogram(
+    bins = 6,
+    color = "black",
+    fill = "gray"
+  ) +
+  labs(
+    title = "Histogram showing the distribution of blood pressure",
+    x = "Blood Pressure",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+```
+
+### Boxplot of Blood Pressure and Treatments
+
+In this study, the boxplot helps compare blood pressure values across treatment groups and dosage levels, making it easier to identify differences in central tendency, variability, and unusual observations among the groups.
+
+Figure 2 displays the boxplot of blood pressure across different drug types, including soluble, non-soluble, and control groups, at three dosage levels: 0, 10, and 15 units. At dosage 0, only the control group is represented. In the simulated data, this group shows the highest median blood pressure, with values centered around the upper 130s and relatively low variability. This pattern reflects the baseline blood pressure distribution generated for the control condition in the absence of a simulated drug dosage.
+
+At dosage 10, the simulated soluble and non-soluble drug groups show lower median blood pressure values compared with the control group at dosage 0. The soluble drug group has the lowest median blood pressure and a relatively narrow interquartile range, indicating more consistent simulated responses. In contrast, the non-soluble drug group shows a higher median and greater variability, suggesting that the simulated responses for this group were more spread out.
+
+At dosage 15, the simulated soluble drug group continues to show the lowest median blood pressure with minimal variability. This indicates that, within the simulated dataset, the soluble drug condition was generated to have a stronger and more consistent reduction in blood pressure. The non-soluble drug group again shows higher median values and a wider spread, with observations extending across a broader range, reflecting greater variability in the simulated response.
+
+```{r boxplots1,fig.cap="\\label{fig:fig2} Shows the boxplot of BloodPressure by Drug Type and Dosage. From the boxplot, the control group has the highest mean blood pressure while soluble drug at 15 units have the lowest mean blood pressure."}
+
+#--------------------------------------------------------------#
+# geom_boxplot() creates boxplots of blood pressure for each drug type
+# aes() in ggplot2 is for aesthetic mapping
+# theme() used to control the appearance/style
+#---------------------------------------------------------------#
+
+ggplot(bp_data, aes(x = Drug, y = BloodPressure, 
+                    fill = Drug)) +
+  
+  # Draw boxplots
+  geom_boxplot() +
+  
+  # Create separate panels for each dosage level
+  facet_wrap(~ Dosage) +
+  
+  # Add plot title and axis labels
+  labs(
+    title = "Boxplot of Blood Pressure by Dosage and Drug Type",
+    x = "Drug",
+    y = "Blood Pressure"
+  ) +
+  
+  # Apply a clean theme
+  theme_minimal() +
+  
+  # Rotate x-axis labels for better readability
+  theme(
+    axis.text.x = element_text(
+      angle = 90,
+      vjust = 0.5,
+      hjust = 1
+    )
+  )
+
+```
+
+### Interaction Plot
+
+Figure 3 shows the interaction plot for drug type and dosage. The data for this example was generated to have no interaction and thus, we show this for completeness. The absence of an interaction for a 2 × 2 factorial design is usually illustrated by parallel lines. From the interaction plot shown in Figure 3, we see parallel lines which shows there is no interaction between the two factors.
+
+This implies that the effect of one factor, say drug type on blood pressure, is the same at all levels of dosage. Thus, the two factors are independent of each other. Nevertheless, we need to look at the ANOVA table.
+
+\newpage
+
+```{r,warning=FALSE, fig.cap="\\label{fig:fig3} Shows the interaction plot of Drug Type and Dosage plus control as reference (shown in green color)"}
+
+#-----------------------------------------------------------#
+# subset() removes or subsets the control group
+# interaction.plot() is used to make interaction plot
+#-----------------------------------------------------------#
+
+bp_data_sub <- subset(bp_data, Drug != "Control")
+
+# Create interaction plot
+interaction.plot(
+  
+  # Factor shown on the x-axis
+  x.factor = bp_data_sub$Drug,
+  
+  # Factor represented by separate lines
+  trace.factor = bp_data_sub$Dosage,
+  
+  # Response variable
+  response = bp_data_sub$BloodPressure,
+  
+  # Plot points connected by lines
+  type = "b",
+  
+  # Line colors for dosage levels
+  col = c("blue", "red"),
+
+#--------------------------------------------------------------#
+  # Use different line types:
+  # 2 = dashed line for dosage 10
+  # 1 = solid line for dosage 15
+#--------------------------------------------------------------#
+  lty = c(2, 1),
+  
+  # Line width
+  lwd = 2,
+  
+  # Plotting symbol
+  pch = 16,
+  
+  # Axis labels and title
+  ylab = "Average Blood Pressure",
+  xlab = "Drug",
+  trace.label = "Dosage",
+  main = "Interaction Plot of Drug and Dosage (plus control Reference)"
+)
+
+# Add horizontal line showing control group mean
+abline(
+  h = mean(bp_data$BloodPressure[bp_data$Drug == "Control"]),
+  col = "darkgreen",
+  lty = 2,
+  lwd = 2
+)
+
+# Add legend for control mean line
+legend(
+  "topleft",
+  legend = "Control Mean",
+  col = "darkgreen",
+  lty = 2,
+  lwd = 2,
+  bty = "n"
+)
+```
+
+\newpage
+
+## Advanced Analysis
+
+Recall, the main objective of the experiment is to understand how drug type and dosage levels affect blood pressure and also how the treatments perform in comparison to the control. Thus, we seek to answer two important questions with a single model.
+
+The statistical model thus seeks to evaluate whether average blood pressure of individuals taking a soluble drug differs from the blood pressure of individuals with non-soluble drug. Moreover, the model enables us to compare average blood pressure when a treatment was administered to that of the control group who did not receive any treatment all.
+
+Similarly, we are able to evaluate the effect of the dosage levels and compare their effect on blood pressure. In this chapter, we consider a simple linear model with assumption that blood pressure is independent and identically distributed and that we have homogeneous variance.
+
+### Statistical Model
+
+The linear model for a factorial design plus control is given as
+
+$$ y_{ijkl} = \mu + \alpha_i + \beta_j + (\alpha \beta)_{ij} + \gamma I_k +\varepsilon_{ijkl}$$
+
+with,
+
+$$
+I_k =
+\begin{cases}
+1 & \text{if the observation belongs to the control treatment} \\
+0 & \text{if the observation belongs to one of the factorial treatments},
+\end{cases}
+$$
+
+for $i= 1,2$, $j= 1,2,3$ and $k= 0,1$, where:
+
+$y_{ijkl}$ is the blood pressure of the $lth$ individual using the $ith$ type of drug at the $jth$ dose, \newline
+
+$\mu$ represents the baseline mean of the factorial treatments, \newline
+
+$\alpha_i$ is the effect of the $ith$ drug type, \newline
+
+$\beta_j$ is the effect of the $jth$ dosage, \newline
+
+$(\alpha\beta)_{ij}$ is their interaction effect, \newline
+
+$\gamma$ measures the difference between the control treatment and the factorial baseline, and \newline
+
+$\varepsilon_{ijkl}$ are assumed to be independently and normally distributed with mean zero and constant variance $\sigma^2$.
+
+### ANOVA Table Using Traditional 2 by 2 Factorial Design
+
+The ANOVA table is used to summarize the results of an analysis of variance by showing how much variation in the response variable is explained by each factor in the model. It typically includes sources of variation, degrees of freedom, sum of squares, mean squares, F-values, and p-values.
+
+Table 3 shows the ANOVA table when the data are analyzed as a traditional 2 by 2 factorial design. Note that analyzing the experiment in this manner is incorrect. Looking at Figure 4, we see that there is a significant effect of dosage with p-value = $0.02$. This is because the control is embedded in dosage and thus the estimated mean for dosage includes that of control. With this result, a researcher may believe that dosage of the drug was significant and may continue to explore which dosage led to the highest effect.
+
+```{r descriptive_table3, warning=FALSE, fig.cap="\\label{Table3} "}
+#------------------------------------------------------------#
+# bp.m0 - is the incorrect model
+# lm() - fits a linear model for the data 
+# anova() - for ANOVA table
+# bp.m0 uses the traditional factorial design
+#------------------------------------------------------------#
+
+# Analyzing as a traditional 2 by 2 factorial
+bp.m0 <- lm(BloodPressure ~ Dosage + Drug + Drug*Dosage, 
+            data = bp_data)
+
+# ANOVA table
+anova_tab <- anova(bp.m0)
+
+# Print as formatted table
+kable(
+  anova_tab,
+  caption = "ANOVA Table for 2x2 Factorial Model"
+)
+
+```
+
+### ANOVA Table Using 2 by 2 Factorial Design Plus Control
+
+Table 4 takes a look at the correct model. From Table 4, we see that the p-value for the control shown in the ANOVA table is statistically significant, p-value = $0.01$ and the p-value for dosage by drug interaction term is $0.92$. These values correspond to the interaction plot we saw earlier. Since there is no significant interaction effect, we can look at the main effects for Drug (soluble or non-soluble) to determine if there is any significant difference.
+
+```{r descriptive_table4, warning=FALSE, fig.cap="\\label{Table4} Table 4 shows the ANOVA table when data is analyzed using 2 by 2 factorial design plus control"}
+
+#------------------------------------------------------------#
+# bp.m1 - is the correct model
+# Analyzing as a traditional 2 by 2 factorial plus control
+#------------------------------------------------------------#
+
+bp.m1 <- lm(BloodPressure ~ Control + Dosage + Drug + Drug*Dosage,
+            data = bp_data)
+
+#summary(bp.m1)
+anova_tab1 <- anova(bp.m1)
+
+# Print as formatted table
+kable(
+  anova_tab1,
+  caption = "ANOVA Table for 2x2 Factorial Model"
+)
+```
+### Main Effects of Drug Type
+
+We proceed with further analysis by looking at the main effects of only the correct model. The main effect in a linear model describes the individual influence of one explanatory variable on the response variable while averaging over the levels of other factors in the model. 
+
+Table 5 shows the estimated marginal means for drug type. For drug type soluble and non-soluble, the estimated marginal means are $127$ and $132$ respectively with standard error $1.57$. The estimated mean for the control group is $137$ with standard error of $2.22$. The 95 percent confidence intervals are also shown in the last two columns of the same table.
+
+```{r, warning=FALSE, fig.cap="\\label{Table5} Table 5 shows the estimated marginal means of drug type when data is analyzed as a 2 by 2 factorial design plus a control. The standard error and confidence intervals are also shown."}
+
+#--------------------------------------------------------------#
+# The code chunk shows the estimated marginal means for drug 
+# Using the correct model
+#--------------------------------------------------------------#
+
+# Estimated marginal means for drug type correct model
+bp.m1.emmeans <- emmeans (bp.m1,  ~ Drug)
+
+# Print as formatted table
+kable(
+  bp.m1.emmeans,
+  caption = "Estimated marginal means of drug type(Correct Model)"
+)
+```
+### Main Effects of Dosage
+
+Table 6 shows the estimated marginal means for dosage. When dosage levels are at 10 and 15 units, the estimated marginal means are $130$ and $128$ respectively with standard error $1.57$. The estimated mean for the control group is again $137$ with standard error of $2.22$ indicating that the control group did not receive any treatment.
+
+```{r, warning=FALSE, fig.cap="\\label{Table6} Table 6 shows the estimated marginal means of dosage when data is analyzed as a 2 by 2 factorial design plus a control."}
+
+#--------------------------------------------------------------#
+# The code chunk shows the estimated marginal means for dosage 
+# Using the correct model
+#--------------------------------------------------------------#
+
+# Estimated marginal means for dosage (correct model)
+bp.m2.emmeans <- emmeans (bp.m1,  ~ Dosage)
+
+# Print as formatted table
+kable(
+  bp.m2.emmeans,
+  caption = "Estimated marginal means of dosage(Correct Model)"
+)
+```
+
+### Simple Effects
+
+Next, we show the simple effects of drug and dosage. A simple effect refers to the effect of one treatment factor at a specific level of another factor. One typically would need to look at simple effects if there is a significant interaction effect. It is used in factorial experiments to understand how factors interact. In our example, there was no significant interaction effect but we show the results here for completeness.
+
+From Table 7, the simple effect for dosage at 10 and 15 units when a soluble drug is used are $127$ and $126$ respectively. For non-soluble drug, the simple effect of dosage at 10 and 15 units are $132$ and $131$ respectively. Looking at the simple effects, we see a lower blood pressure when the drug is soluble. Nevertheless, without any drug or dosage, the blood pressure is high.
+
+```{r, warning=FALSE, fig.cap="\\label{Table7} Table 7 shows the simple effects of dosage at the given drug types. The estimated means, standard errors and confidence intervals are shown in the table."}
+
+#--------------------------------------------------------------#
+# The code chunk shows the simple effects of dosage 
+#  at the given drug type using the correct model
+#--------------------------------------------------------------#
+
+# Simple effects for dosage at each drug type level
+bp.m1.emmeans2 <- emmeans (bp.m1,  ~ Dosage | Drug)
+
+# Print as formatted table
+kable(
+  bp.m1.emmeans2,
+  caption = "Simple effects of dosage at the given drug types"
+)
+```
+
+The same results are obtained when we find the simple effect of drug type at given dosage levels. At dosage level of 10 units, the simple effect for soluble and non-soluble drugs are $127$ and $132$ respectively. While at a dosage level of 15 units, the simple effects of soluble and non-soluble drugs are $126$ and $131$ respectively.
+
+```{r, warning=FALSE, fig.cap="\\label{Table8}"}
+
+#--------------------------------------------------------------#
+# The code chunk shows the simple effects of drug type 
+#  at the given dosage levels using the correct model
+#--------------------------------------------------------------#
+
+# Estimated marginal means for drug at each dosage level correct model
+bp.m1.emmeans3 <- emmeans (bp.m1,  ~ Drug | Dosage)
+
+
+# Print as formatted table
+kable(
+  bp.m1.emmeans3,
+  caption = "Simple effects of drug types at the given dosage levels"
+)
+```
+
+## Comparison of Treatment Main Effects and Control
+
+Recall, the 2 × 2 factorial design plus control enables us to also compare the main effect of treatments to the control group. This is possible because of the variable control in the last column of the data set. It serves as an indicator variable and thus enables the model to average over the values of the treatments and compare them to the control group. 
+
+From Table 9, we see that on average the estimated blood pressure for individuals receiving a treatment compared to control group was $129$ and $137$ respectively. Thus, the blood pressure for individuals in the control group is higher on average compared to individuals who receive some type of treatment. The difference between the two values is shown by the contrast statement. From Table 9, we see that the difference is $8.25$ and with a standard deviation of $2.48$. The p-value is $0.01$, showing that there is a statistically significant difference between individuals that received some sort of treatment and the control group at $\alpha = 0.05$.
+
+```{r, warning=FALSE, fig.cap="\\label{Table9}Table 9 shows differences between treatment and control group. The estimated difference between treatments and the control group was $8.25$, showing that on average, the group that received some kind of treatment had a lower blood pressure than the control group."}
+
+#---------------------------------------------------------------#
+# The code chunk below compares main effect 
+# of treatment with the control using the correct model
+#---------------------------------------------------------------#
+
+
+bp.m1.emmeans4 <- emmeans (bp.m1,  ~ Control)
+
+# Difference between treatment and control 
+summary_means <- contrast(bp.m1.emmeans4, method = "trt.vs.ctrl")
+
+# Print as formatted table
+kable(
+  summary_means,
+  caption = "Comparison of main effect of treatment with the mean"
+)
+
+```
+### Comparison Between Pairs of Treatments
+
+In experiments where researchers are interested in finding the best out of several treatments, they may compare pairs of treatments to determine pairs that are significantly different statistically.
+
+Table 10 shows differences between pairs of treatment. This is obtained by writing contrast statements. Writing contrasts is very useful especially when there are many treatments and we may only be interested in a few comparisons. Therefore, we would write some contrast to determine if there is a significant difference between soluble and non-soluble drugs, soluble and control, non-soluble and control. We used the Dunnett adjustment to control for family-wise error.
+
+From Table 10, there is no significant difference in effect between soluble and non-soluble drug  at the various dosage levels. The p-values are $0.13$ and $0.17$ respectively at $5$ percent significance level.
+
+```{r, warning=FALSE, fig.cap="\\label{Table10}"}
+
+#--------------------------------------------------------------#
+# The code chunk shows the pairwise comparison
+# between treatments excluding the control group
+#--------------------------------------------------------------#
+# Compare treatments excluding control
+summary_means2 <- contrast(bp.m1.emmeans3, method = "pairwise"
+         ,adjust = "dunnett")
+
+# Print as formatted table
+kable(
+  summary_means2,
+  caption = "Comparison between pairs of treatment"
+)
+```
+
+\newpage
+
+We extend the discussion of a 2 × 2 factorial design plus control to a 2 × 2 factorial design plus control and blocks which is the main focus of this chapter. Recall, earlier the control was treated as a fifth treatment outside the factorial structure. That is, the four factorial combinations were formed from two factors, each with two levels, while the control treatment served as a separate reference group.
+
+When blocks are added to this design, treatments are randomized within each block. This produces a randomized complete block design (RCBD), where each block contains all four factorial treatment combinations and the control. The main purpose of including blocks is to account for variability among groups of experimental units that may be similar within blocks but different across blocks. We consider a second example where clinics serve as blocks because patients within the same clinic may be more alike than patients from different clinics.
+
+For a 2 × 2 factorial design plus control and blocks, the analysis allows researchers to control for block-to-block variation, compare the factorial treatments with the control, estimate the main effects of the two factors, and evaluate the interaction between the factors within the factorial portion of the design. The control remains outside the factorial treatment structure and is used as a baseline for comparison.
+
+Moreover, the addition of blocks introduces another source of variation. In this example, clinics may differ from one another because of differences in patient populations, clinic procedures, or other background conditions. If block effects are ignored, some of this block-to-block variation may be absorbed into the residual error term, which can affect the precision of the estimated treatment effects. Thus, the correct analysis must separate the control from the factorial treatment combinations while also accounting for block variation.
+
+## Exploratory Data Analysis
+
+For the second example considered, we also simulated a data set to demonstrate a 2 × 2 factorial design plus control and blocks. The study evaluates the effects of two drug-related factors on blood pressure. The first factor is drug type, with two levels: soluble and non-soluble. The second factor is dosage, with two levels: 10 units and 15 units. A control group is included to represent patients who did not receive either treatment.
+
+The experiment is conducted in five clinics. Each clinic is treated as a block, and each clinic receives all five treatments: the four factorial treatment combinations and the control. The exploratory analysis describes the layout of the study, the simulated data, the distribution of blood pressure, the relationship between drug type and dosage, and the role of blocks in the analysis.
+
+### Data Description
+
+There are 25 observations in the simulated data set. This includes five clinics, with one observation for each treatment combination within each clinic. Therefore, each of the four factorial treatment combinations has five observations, and the control group also has five observations.
+
+The response variable again is blood pressure. Drug type and dosage are treated as qualitative variables. The variable `control` is used as an indicator variable, where `n` identifies observations from the factorial treatment combinations and `y` identifies observations from the control group just as discussed in the previous section. Also, we only show the data used for this example and skip plots for the exploratory data analysis. This is because the plots are similar to the ones shown in Figures 1 and 2.
+
+Table 11 shows the general sources of variation for a 2 × 2 factorial design plus control and blocks. Compared with the previous chapter, the only additional source of variation is the block term.
+
+```{r general-anova-table, echo=FALSE, warning=FALSE, fig.cap="\\label{Table11} Table 11 shows the general ANOVA structure for a 2 x 2 factorial design with control and blocks."}
+
+
+# General ANOVA structure 
+anova_table <- data.frame(
+  Source = c("Block", "Factor A",
+             "Factor B", "A × B", "Control",
+             "Error", "Total"),
+  Degrees_of_Freedom = c(
+    "r - 1",
+    "a - 1",
+    "b - 1",
+    "(a - 1)(b - 1)",
+    "1",
+    "N - [r + ab]",
+    "N - 1"
+  )
+)
+
+kable(
+  anova_table,
+  caption = "General ANOVA Structure for a 2 × 2
+  Factorial Design With Control and Blocks",
+  col.names = c("Source", "Degrees of Freedom")
+)
+```
+
+Table 12 shows the layout of the experiment. Each clinic contains the four factorial treatment combinations and the control exactly once.
+
+```{r treatment-layout, echo=FALSE, warning=FALSE, fig.cap="\\label{Table12} Table showing the experimental drug layout with clinics as blocks."}
+
+
+# Create the treatment layout table
+drug_table <- data.frame(
+  `Drug Type` = c("Soluble", "Soluble",
+                  "Non-soluble", 
+                  "Non-soluble", 
+                  "No Drug"),
+  Dosage = c(10, 15, 10, 15, 0),
+  Description = c(
+    "Soluble at low dosage",
+    "Soluble at high dosage",
+    "Non-soluble at low dosage",
+    "Non-soluble at high dosage",
+    "Control"
+  ),
+  `Replicates` = c(
+    "1 per clinic × 5 clinics = 5",
+    "1 per clinic × 5 clinics = 5",
+    "1 per clinic × 5 clinics = 5",
+    "1 per clinic × 5 clinics = 5",
+    "1 per clinic × 5 clinics = 5"
+  ),
+  check.names = FALSE
+)
+
+kable(
+  drug_table,
+  caption = "Experimental Drug Layout With Clinics
+  as Blocks",
+  col.names = c("Drug Type", "Dosage",
+                "Description", "Replicates")
+)
+```
+
+Table 13 presents the degrees of freedom for the example. There are five clinics, so the block term has 4 degrees of freedom. Drug type, dosage, their interaction, and the control indicator each have 1 degree of freedom. The remaining 16 degrees of freedom are assigned to error.
+
+```{r degrees-of-freedom-table, echo=TRUE, warning=FALSE, fig.cap="\\label{Table13} Table showing the degrees of freedom for the drug experiment with clinics as blocks."}
+
+#---------------------------------------------------------------#
+# The code chunk shows the ANOVA table when blocks are included
+#---------------------------------------------------------------#
+
+# ANOVA degrees of freedom for the example
+anova_df <- data.frame(
+  Source = c(
+    "Block (Clinic)",
+    "Drug Type",
+    "Dosage",
+    "Drug Type × Dosage",
+    "Control",
+    "Error",
+    "Total"
+  ),
+  `Degrees of Freedom` = c(
+    "5 - 1 = 4",
+    "2 - 1 = 1",
+    "2 - 1 = 1",
+    "(2 - 1)(2 - 1) = 1",
+    "1",
+    "25 - (5 + 4) = 16",
+    "25 - 1 = 24"
+  ),
+  check.names = FALSE
+)
+
+kable(
+  anova_df,
+  caption = "Degrees of Freedom for the Drug
+  Experiment With Clinics as Blocks",
+  col.names = c("Source", "Degrees of Freedom")
+)
+```
+
+\newpage
+
+### Simulated Data for 2 by 2 Factorial Design plus Control and Blocks
+
+Table 14 shows the simulated data for a 2 by 2 factorial plus control and blocks. Each clinic contributes one observation for each treatment combination and one observation for the control.
+
+```{r simulate-data, echo=FALSE, warning=FALSE, fig.cap="\\label{Table14} Table showing the Simulated Blood Pressure Data With Control and Blocks."}
+set.seed(123)
+
+# Define the base structure
+Block <- rep(1:5, each = 5)
+Drug <- rep(c("Soluble", "Soluble",
+              "Non-soluble", "Non-soluble",
+              "Control"), times = 5)
+Dosage <- rep(c(10, 15, 10, 15, 0), times = 5)
+Control <- ifelse(Drug == "Control", "y", "n")
+
+# Generate clinic-level block effects
+n_blocks <- length(unique(Block))
+sigma_block <- 2
+block_effects <- rnorm(n_blocks, mean = 0,
+                       sd = sigma_block)
+
+# Generate blood pressure values
+BloodPressure <- numeric(length(Block))
+
+for (i in seq_along(Block)) {
+  base <- 130
+
+  drug_effect <- if (Drug[i] == "Soluble") {
+    if (Dosage[i] == 10) -1.5 else -2
+  } else if (Drug[i] == "Non-soluble") {
+    if (Dosage[i] == 10) 4 else 5
+  } else {
+    0
+  }
+
+  BloodPressure[i] <- base +
+    drug_effect +
+    block_effects[Block[i]] +
+    rnorm(1, mean = 0, sd = 1)
+}
+
+# Create the data frame
+df <- data.frame(
+  Block = factor(Block),
+  Drug = factor(Drug),
+  Dosage = factor(Dosage),
+  BloodPressure = round(BloodPressure, 4),
+  Control = factor(Control)
+)
+
+kable(
+  df,
+  caption = "Simulated Blood Pressure Data With
+  Control and Blocks",
+  col.names = c("Block", "Drug Type", "Dosage",
+                "Blood Pressure", "Control")
+)
+```
+
+## Advanced Analysis
+
+In this example, clinics are included as blocks but the objective of the analysis is the same as the one discussed in a 2 × 2 factorial design plus control without blocks. The model therefore contains the same factorial treatment structure and control indicator used in the previous chapter, with the addition of a block term.
+
+### Statistical Model
+
+The statistical model for a 2 × 2 factorial design plus control and blocks is given as
+
+$$
+y_{ijkl} = \mu + b_l + \alpha_i + \beta_j + (\alpha\beta)_{ij} + \gamma I_k + \varepsilon_{ijkl},
+$$
+
+with
+
+$$
+I_k =
+\begin{cases}
+1 & \text{if the observation belongs to the control treatment} \\
+0 & \text{if the observation belongs to one of the factorial treatments},
+\end{cases}
+$$
+
+for
+
+$y_{ijkl}$ is the blood pressure response for the experimental unit receiving the $ith$ drug type at the $jth$ dosage level in the $lth$ block,
+
+$\mu$ represents the baseline mean of the factorial treatments,
+
+$b_l$ is the effect of the $l$th block or clinic, assumed to be independently and normally distributed with mean 0 and variance $\sigma^2_{b}$ ,
+
+$\alpha_i$ is the effect of the $i$th drug type,
+
+$\beta_j$ is the effect of the $j$th dosage level,
+
+$(\alpha\beta)_{ij}$ is the interaction effect between drug type and dosage,
+
+$\gamma$ measures the difference between the control treatment and the factorial baseline,
+
+$\varepsilon_{ijkl}$ is the residual error term, assumed to be independently and normally distributed with mean 0 and constant variance $\sigma^2_{\epsilon}$,
+
+The only difference between this model and the model shown earlier is the addition of the block term, $b_l$. No block-by-treatment interaction is assumed. In the R analysis below, clinic is treated as a random block effect to estimate the amount of block-to-block variation.
+
+### Covariance Parameter Estimates
+
+Table 15 shows the variance components of the model. The block variance describes how much variability is associated with differences among clinics, while the residual variance describes variation among experimental units after accounting for the model terms.
+
+From Table 15, the estimate for block variance is $2.72$ and $1.07$ for the residual. The data was simulated in this way to illustrate the need for the blocks, especially when there is a lot of variability among blocks.
+
+```{r mixed-model-summary, echo=TRUE, warning=FALSE, fig.cap="\\label{Table15}"}
+
+#-------------------------------------------------------------#
+# Fit the mixed model with clinic as a random block effect
+# summary() - gets the estimates for fixed and random effects
+#-------------------------------------------------------------#
+model.random <- lmer(
+  BloodPressure ~ Control +
+    Drug:Control + Dosage:Control +
+    Drug:Dosage:Control +
+    (1 | Block),
+  data = df,
+  REML = TRUE
+)
+
+# Get estimates for variance components
+#summary(model.random)
+cov_parm <- VarCorr(model.random)
+cov_parm <- as.data.frame(cov_parm)
+cov_parm$var2 <- NULL
+
+kable(
+  cov_parm,
+  caption = "Covariance parameter estimate",
+  col.names = c("Group", "Name", "Variance", "SdCor")
+)
+```
+
+\newpage
+
+### ANOVA Table for Mixed Model
+
+Table 16 presents the ANOVA table for the mixed model using the Kenward-Roger degrees-of-freedom method. The `control` term compares the overall treatment groups with the control group. The `control:Drug` and `control:Dosage` terms estimate the factorial drug and dosage effects among the treatment observations. The `control:Drug:Dosage` term evaluates the interaction between drug type and dosage within the factorial treatment structure.
+
+```{r anova-model, echo=TRUE, fig.cap="\\label{Table16}", warning=FALSE}
+#------------------------------------------------------------#
+# ANOVA table for the mixed model
+#------------------------------------------------------------#
+anova_mix <- anova(model.random, ddf = "Kenward-Roger")
+
+# Print as formatted table
+kable(
+  anova_mix,
+  caption = "ANOVA table for the mixed model"
+)
+```
+
+From Table 16, the control effect is statistically significant, which indicates evidence of a difference between the control group and the treatment groups. The drug type effect is also statistically significant, meaning that soluble and non-soluble drugs differ in their average effect on blood pressure. The dosage effect is not statistically significant. The interaction term is statistically significant, suggesting that the relationship between dosage and blood pressure depends somewhat on drug type, at the 5 percent significance level.
+
+\newpage
+
+### Estimated Marginal Means for Drug-by-Dosage
+
+Table 17 shows the estimated marginal means for each drug-by-dosage combination and for the control group. The non-soluble treatments have higher estimated blood pressure values than the soluble treatments at both dosage levels. The control mean is separate from the factorial treatment means because the control is not part of the drug-by-dosage factorial structure.
+
+```{r emmeans-treatment-combinations, echo=TRUE, warning=FALSE, fig.cap="\\label{Table17} "}
+
+#---------------------------------------------------------------#
+# Estimated marginal means by drug and dosage within the control
+#--------------------------------------------------------------#
+emm <- emmeans(model.random, ~ Drug:Dosage | Control)
+
+# Print as formatted table
+kable(
+  emm,
+  caption = "Estimated marginal means by drug
+  and dosage within the control"
+)
+
+```
+
+\newpage
+
+### Comparison of Main Effects of Treatment and Control
+
+Table 17 compares the overall treatment mean with the control mean. This comparison is important because the control group serves as the baseline for determining whether receiving any treatment differs from receiving no treatment.
+
+```{r control-vs-treatment, echo=TRUE, warning=FALSE, fig.cap="\\label{Table17}"}
+#---------------------------------------------------------------#
+# The code chunk compares the treatment groups 
+# with the control group
+#---------------------------------------------------------------#
+lsm_control <- emmeans(model.random, ~ Control)
+
+# Contrast statement stored in variable contrast_tab
+contrast_tab <- pairs(lsm_control, adjust = "dunnett")
+
+
+# Print as formatted table
+kable(
+  contrast_tab,
+  caption = "Contrast statement comparing
+  treatment groups with the control group"
+)
+```
+
+The contrast shows a statistically significant difference between the treatment groups and the control group. This suggests that, on average, the blood pressure response differs between individuals receiving a treatment and those in the control group.
+
+\newpage
+
+### Main Effects of Drug Type 
+
+Table 18 compares the main effect of drug type within the treatment portion of the design. The comparison is shown for completeness, but when the interaction term is considered important, the simple effects should be emphasized.
+
+```{r drug-main-effect, echo=TRUE, warning=FALSE, fig.cap="\\label{Table18} "}
+# Compare drug types within the treatment portion of the design
+
+lsm_nested_trt <- emmeans(model.random,
+                          ~ Drug | Control)
+
+contrast_tab1 <- pairs(lsm_nested_trt, adjust = "dunnett")
+
+# Print as formatted table
+kable(
+  contrast_tab1,
+  caption = "Contrast statement comparing drug
+  types within the treatment portion of the design"
+)
+```
+
+### Simple Effects
+
+When an interaction is present or nearly present, it is useful to examine simple effects. A simple effect compares one factor at a specific level of another factor. In this example, simple effects help determine whether soluble and non-soluble drugs differ at each dosage level and whether dosage levels differ within each drug type.
+
+Table 19 compares all drug-by-dosage treatment combinations within the factorial portion of the design. These comparisons show that soluble and non-soluble drugs differ at both dosage levels. However, there is not strong evidence that increasing dosage from 10 units to 15 units changes blood pressure within the same drug type.
+
+```{r simple-effects, echo=TRUE, warning=FALSE, fig.cap="\\label{Table19}"}
+# Pairwise comparisons among drug-by-dosage treatment combinations
+lsm_nested_trt_pct <- emmeans(model.random,
+                              ~ Drug:Dosage | Control)
+
+contrast_tab2 <- contrast(lsm_nested_trt_pct, method = "pairwise")
+
+# Print as formatted table
+kable(
+  contrast_tab2,
+  caption = "Pairwise comparisons among drug-by-dosage
+  treatment combinations"
+)
+```
+
+\newpage
+
+### Multiple Comparison Using Dunnett Test
+
+Because multiple comparisons increase the chance of a Type I error, the Dunnett adjustment can be used when the main interest is comparing treatments with a control. The code below applies the Dunnett adjustment to the comparisons.
+
+```{r dunnett-adjustment, echo=TRUE, warning=FALSE}
+#--------------------------------------------------------------#
+# Dunnett-adjusted comparisons
+#--------------------------------------------------------------#
+
+
+pairs(lsm_nested_trt_pct, adjust = "dunnett")
+```
+
+## Conclusion
+
+In this chapter, we considered the 2 × 2 factorial design with control and blocks, and how experiments of this nature can be analyzed. We first considered the case without block for easy understanding and extended the concepts to the case where blocks are considered. The first example used to illustrate the concepts in this chapter was about evaluating the effects of two drugs on blood pressure which consisted of two factors and a control group. The second example involved two drug types, two dosage levels, a control group, and five clinics treated as blocks. The purpose of including blocks in the second example was to account for variation among clinics while still comparing the factorial treatments and the control group appropriately. These designs allowed researchers to answer some important questions which are usually present in studies that may be groundbreaking or there may not be enough research already done in that field.
+
+Overall, the 2 × 2 factorial design with control and blocks allows researchers to separate block-to-block variation from treatment variation. More importantly, both examples also preserve the correct interpretation of the control group as a separate baseline treatment rather than forcing the control into the factorial structure.

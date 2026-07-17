@@ -1,0 +1,76 @@
+﻿Plant,Hybrid,Treatment,Crown Rot Percentage,Chikoti Rating ,Crown Rot Rating  
+101,Sweet Corn,F. boothii,4,30,1
+102,Sweet Corn,F. graminearum,22,50,3
+103,Sweet Corn,F.solani,5,10,1
+104,Sweet Corn,Sterile Toothpick,1,0,0
+105,Sweet Corn,F. verticillioides,30,10,2
+106,Susceptible Dent ,Sterile Toothpick,0,0,0
+107,Susceptible Dent ,F.solani,10,10,2
+108,Susceptible Dent ,F. verticillioides,25,20,3
+109,Susceptible Dent ,F. boothii,5,10,2
+110,Susceptible Dent ,F. graminearum,23,60,3
+111,Resistant Dent,F. verticillioides,10,10,3
+112,Resistant Dent,Sterile Toothpick,0,0,0
+113,Resistant Dent,F. graminearum,3,0,1
+114,Resistant Dent,F.solani,5,0,1
+115,Resistant Dent,F. boothii,0,0,0
+201,Sweet Corn,F.solani,0,0,0
+202,Sweet Corn,Sterile Toothpick,0,0,0
+203,Sweet Corn,F. verticillioides,27,30,3
+204,Sweet Corn,F. graminearum,10,10,2
+205,Sweet Corn,F. boothii,0,0,0
+206,Susceptible Dent ,F. graminearum,45,80,5
+207,Susceptible Dent ,F. verticillioides,30,30,3
+208,Susceptible Dent ,F. boothii,20,10,2
+209,Susceptible Dent ,Sterile Toothpick,0,0,0
+210,Susceptible Dent ,F.solani,5,0,1
+211,Resistant Dent,Sterile Toothpick,6,0,0
+212,Resistant Dent,F. boothii,20,10,2
+213,Resistant Dent,F.solani,0,0,0
+214,Resistant Dent,F. verticillioides,25,0,3
+215,Resistant Dent,F. graminearum,0,0,0
+301,Sweet Corn,F. graminearum,1,0,1
+302,Sweet Corn,F. verticillioides,20,20,2
+303,Sweet Corn,Sterile Toothpick,0,0,1
+304,Sweet Corn,F. boothii,12,10,3
+305,Sweet Corn,F.solani,30,20,3
+306,Susceptible Dent ,F.solani,45,40,4
+307,Susceptible Dent ,Sterile Toothpick,5,0,1
+308,Susceptible Dent ,F. boothii,3,0,1
+309,Susceptible Dent ,F. graminearum,15,20,2
+310,Susceptible Dent ,F. verticillioides,5,10,2
+311,Resistant Dent,F. boothii,12,0,1
+312,Resistant Dent,F. graminearum,3,0,1
+313,Resistant Dent,F. verticillioides,5,20,1
+314,Resistant Dent,F.solani,0,30,2
+315,Resistant Dent,Sterile Toothpick,0,0,0
+401,Sweet Corn,F. verticillioides,10,0,0
+402,Sweet Corn,F. boothii,23,20,1
+403,Sweet Corn,F.solani,15,20,2
+404,Sweet Corn,Sterile Toothpick,60,20,2
+405,Sweet Corn,F. graminearum,30,80,4
+406,Susceptible Dent ,F. boothii,5,10,1
+407,Susceptible Dent ,F. graminearum,10,0,1
+408,Susceptible Dent ,F. verticillioides,27,10,2
+409,Susceptible Dent ,F.solani,0,40,3
+410,Susceptible Dent ,Sterile Toothpick,40,0,0
+411,Resistant Dent,F.solani,2,30,3
+412,Resistant Dent,Sterile Toothpick,12,0,1
+413,Resistant Dent,F. graminearum,20,20,2
+414,Resistant Dent,F. boothii,10,10,2
+415,Resistant Dent,F. verticillioides,20,0,1
+501,Sweet Corn,Sterile Toothpick,5,0,1
+502,Sweet Corn,F.solani,0,0,1
+503,Sweet Corn,F. boothii,25,10,2
+504,Sweet Corn,F. graminearum,10,20,1
+505,Sweet Corn,F. verticillioides,10,10,2
+506,Susceptible Dent ,F. verticillioides,26,30,3
+507,Susceptible Dent ,F. boothii,30,20,3
+508,Susceptible Dent ,F. graminearum,20,10,2
+509,Susceptible Dent ,F.solani,35,40,3
+510,Susceptible Dent ,Sterile Toothpick,0,0,0
+511,Resistant Dent,F. graminearum,3,0,1
+512,Resistant Dent,F. verticillioides,0,0,0
+513,Resistant Dent,F.solani,10,0,2
+514,Resistant Dent,Sterile Toothpick,5,0,0
+515,Resistant Dent,F. boothii,20,10,2

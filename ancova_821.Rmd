@@ -1,0 +1,75 @@
+---
+title: "Ancova"
+author: "Frank Agyemang"
+date: "2023-11-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(car)
+library(emmeans)
+library(dae)
+```
+
+
+```{r}
+f=read.csv("file")
+```
+
+
+```{r}
+## X1 Y1 X2 Y2 X3 Y3  
+f1=stack(f, select=c("X1","X2","X3"))
+f2=stack(f,select=c("Y1","Y2","Y3"))
+f3=cbind(f1,f2)
+names(f3)=c("x","xtrt","y","trt")
+f3$trt=ordered(factor(f3$trt))
+```
+
+
+```{r}
+plot(f3)
+prec=aov(x~trt,data=f3)
+summary(prec)
+```
+
+
+```{r}
+plot(f3$y~f3$x,xlab="X",ylab="Y")
+resc0=aov(y~trt, data=f3)
+summary(resc0) 
+summary(aov(y~x,data=f3));
+```
+
+
+```{r}
+resc=aov(y~trt+x, data=f3)
+resc$coefficients
+summary(resc) 
+Anova(resc, type="III")
+lsms=emmeans(resc, ~trt)
+pairs(lsms)
+resc0=aov(y~trt, data=f3)
+summary(resc0)
+```
+
+```{r}
+prec=aov(x~trt,data=f3)
+summary(prec)
+summary(aov(y~x,data=f3))
+
+```
+
+
+```{r}
+resc=aov(y~trt+x, data=f3)
+resc$coefficients
+Anova(resc, type="III")
+```
+

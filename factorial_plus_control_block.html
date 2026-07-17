@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Chapter 2: Factorial with Control and Block</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="factorial_plus_control_block_files/libs/clipboard/clipboard.min.js"></script>
+<script src="factorial_plus_control_block_files/libs/quarto-html/quarto.js"></script>
+<script src="factorial_plus_control_block_files/libs/quarto-html/popper.min.js"></script>
+<script src="factorial_plus_control_block_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="factorial_plus_control_block_files/libs/quarto-html/anchor.min.js"></script>
+<link href="factorial_plus_control_block_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="factorial_plus_control_block_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="factorial_plus_control_block_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="factorial_plus_control_block_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="factorial_plus_control_block_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="factorial_plus_control_block.pdf"><i class="bi bi-file-pdf"></i>PDF</a></li></ul></div></div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Chapter 2: Factorial with Control and Block</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="exploring-a-2-2-factorial-with-control-with-blocks" class="level2">
+<h2 class="anchored" data-anchor-id="exploring-a-2-2-factorial-with-control-with-blocks">Exploring a 2 × 2 Factorial With Control with Blocks</h2>
+<p>We extend our discussion of a 2 × 2 factorial with control to a 2 × 2 factorial design with a control that involves blocking. If blocks are used, treatments are randomized within each block. This results in a randomized complete block design (RCBD), where each treatment (including control if embedded) appears once per block.</p>
+<p>Recall, in a 2 × 2 factorial with control presented in the previous chapter, the four factorial combinations were: A1B1, A1B2, A2B1, A2B2. The control treatment (C) was treated as a fifth, independent treatment, outside the factorial combinations. It was not associated with any level of factor A or B. The control is usually included as a reference, not involved in interaction effects. For a 2 × 2 factorial with control and blocks, this allows the analysis to:</p>
+<ol type="1">
+<li><p>Control for block-to-block variation</p></li>
+<li><p>Compare each factorial treatment to the control within and across blocks</p></li>
+<li><p>Estimate main effects and interaction effects within the factorial structure</p></li>
+<li><p>Maintain orthogonality between blocks and treatments</p></li>
+</ol>
+<p>The analysis of variance for a 2 × 2 factorial design with control and blocks is shown using the R and SAS codes below. The data.frame() function in R creates the data frame with source of variation and degrees of freedom. We also show the corresponding output in SAS below. The anova table presented in this chapter is similar to the one in the previous chapter. The only addition this time is the extra source of variation, which is the block and its corresponding degrees of freedom.</p>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="interpretation-of-r-and-sas-codes" class="level2">
+<h2 class="anchored" data-anchor-id="interpretation-of-r-and-sas-codes">Interpretation of R and SAS Codes</h2>
+<p>The data.frame() function in R again creates a data frame with variables Source and Degrees of Freedom. We see that the sources of variation is the same as the one we saw in the previous chapter. Only additional source of variation is the block term. We use the function print() in R to print out our data frame. For the SAS code, we obtain the same table with the codes provided. All codes are similar to the ones provided in the previous chapter.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">R Code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">SAS Code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>   Source Degrees_of_Freedom
+    Block              r - 1
+ Factor A              a - 1
+ Factor B              b - 1
+    A × B     (a - 1)(b - 1)
+  Control                  1
+    Error   n - [r + ab + 1]
+    Total              n - 1</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<pre class="sas"><code>data anova_table; /* this creates the data frame */
+length Source $20 Degrees_of_Freedom $30;
+input Source $20 Degrees_of_Freedom $30; /* creates the columns Source and Degrees of Freedom */
+datalines; 
+    Block                  (r - 1)
+    A                      (a - 1)
+    B                      (b - 1)
+    A_x_B                  (a - 1)(b - 1)
+    Control                    1
+    Error                  (n - [r + ab + 1])
+    Total                  (n - 1)
+;
+run;
+
+proc print data=anova_table noobs; 
+    title "Symbolic ANOVA Table";
+run;</code></pre>
+<p><img src="rcbd_dat_contrl.png" class="img-fluid" alt="YourImage">{fig-align = “center”}</p>
+</div>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="example" class="level2">
+<h2 class="anchored" data-anchor-id="example"><strong>Example</strong></h2>
+<p>Researchers are interested in evaluating the effect of two drugs on blood pressure. They want to know whether the drug type (soluble vs.&nbsp;non-soluble) and dosage (10 units vs.&nbsp;15 units) influence outcomes. A control group (no drug) is also included to serve as a baseline for comparison.</p>
+<p>Furthermore, to reduce variability arising from different clinics and other extraneous factors, the experiment is conducted as a randomized complete block design. The R code below presents a summary table which describes how the experiment was conducted, that is, the type of treatments, and replicates per clinics. We also show same results in the SAS output below.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">R Code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">SAS Code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>   Drug Type Dosage    Description Replicates per Clinic (Block)
+     Soluble     10 Treatment A1B1  1 per clinic × 3 clinics = 3
+     Soluble     15 Treatment A1B2                             3
+ Non-soluble     10 Treatment A2B1                             3
+ Non-soluble     15 Treatment A2B2                             3
+     No Drug      0        Control          3 (1 in each clinic)</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<pre class="sas"><code>data drug_table;
+    length 
+        Drug_Type $15 
+        Dosage 8 
+        Description $20 
+        Replicates_per_Clinic_Block $40;
+    input 
+        Drug_Type $ 
+        Dosage 
+        Description $20. 
+        Replicates_per_Clinic_Block &amp; $40.;
+    datalines;
+Soluble       10  Treatment_A1B1  1  per clinic × 3 clinics = 3
+Soluble       15  Treatment_A1B2  3
+Non-soluble   10  Treatment_A2B1  3
+Non-soluble   15  Treatment_A2B2  3
+No_Drug        0  Control         3 (1 in each clinic)
+;
+run;
+
+proc print data=drug_table noobs label;
+    label 
+        Drug_Type = "Drug Type"
+        Replicates_per_Clinic_Block = "Replicates per Clinic (Block)";
+    title "Drug Treatment Table";
+run;</code></pre>
+<p><img src="drug_trt_table.png" class="img-fluid" alt="YourImage">{fig-align = “center”}</p>
+</div>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<p>In this RCBD, each clinic receives all treatments, including the control, randomly assigned within the clinic. Clinic in this experiment is considered as the block. We present the anova table using both R and SAS in the code below. We see from the output that the degree of freedom for clinic is 2. The degrees of freedom for drug type and dosage are 1 respectively, as well as their interaction. Lastly, the degrees of freedom for the control and error terms are 1 and 9 respectively. The same result is obtained in the SAS output.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">R Code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">SAS Code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>             Source Degrees of Freedom (DF)
+     Block (Clinic)               3 – 1 = 2
+          Drug Type               2 – 1 = 1
+             Dosage               2 – 1 = 1
+ Drug Type × Dosage      (2 – 1)(2 – 1) = 1
+            Control                       1
+              Error        15 – (2 + 4) = 9
+              Total             15 – 1 = 14</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<pre class="sas"><code>data anova_df;
+    length 
+        Source $30 
+        DF $25;
+    input 
+        Source &amp; $30. 
+        DF &amp; $25.;
+    datalines;
+Block (Clinic)           3 – 1 = 2
+Drug Type                2 – 1 = 1
+Dosage                   2 – 1 = 1
+Drug Type × Dosage       (2 – 1)(2 – 1) = 1
+Control                  1
+Error                    15 – (2 + 4) = 9
+Total                    15 – 1 = 14
+;
+run;
+
+proc print data=anova_df noobs label;
+    label 
+        Source = "Source"
+        DF = "Degrees of Freedom (DF)";
+    title "ANOVA Table";
+run;</code></pre>
+<p><img src="clinic_ctrl.png" class="img-fluid" alt="YourImage">{fig-align = “center”}</p>
+</div>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="model" class="level2">
+<h2 class="anchored" data-anchor-id="model"><strong>Model</strong></h2>
+<p>Next, we present the statistical model for the design above. The model below is similar to the model in chapter 1. In this model, we include the block term. Note that we do not assume block by interaction in this model.</p>
+<p><span class="math inline">\(y_{ijk} = \mu + \beta_{i} + \tau_{jl} + \delta_{kl} + \tau\delta_{jkl} + control_{l} + \epsilon_{ijkl}\)</span></p>
+<p>where,</p>
+<p><span class="math inline">\(y_{ijk}\)</span> is the blood pressure of the kth individual using the ith drug type at the jth dose</p>
+<p><span class="math inline">\(\mu\)</span> is the intercept</p>
+<p><span class="math inline">\(\beta_{i}\)</span> is the effect from the ith block, block is considered fixed</p>
+<p><span class="math inline">\(\tau_{jl}\)</span> is the effect from the jth drug type nested in the Control</p>
+<p><span class="math inline">\(\delta_{kl}\)</span> is the effect from the kth dose level nested in the control</p>
+<p><span class="math inline">\(\tau\delta_{jkl}\)</span> is the interaction between drug type and dosage level in the Control</p>
+<p><span class="math inline">\(control_{l}\)</span> is the control</p>
+<p><span class="math inline">\(\epsilon_{ijkl}\)</span> is the residual, <span class="math inline">\(\epsilon_{ijkl}\)</span> ~ <span class="math inline">\(N(0,\sigma^{2})\)</span></p>
+<div style="page-break-after: always;"></div>
+<p>For a 2 × 2 factorial design with a control and blocks, we again create a control variable that nests the treatment combination. Where “n” indicates there is no control and “y” indicates otherwise. The R code below shows the data frame including the control variable. We print out the output below.</p>
+<p>In the R code below, we have 3 blocks with 5 replicates. This is because, for an RCBD, we have each treatment combination and a control. This means we have 5 treatments in each block overall. The SAS code and output also produces similar results.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href="">R Code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href="">SAS Code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>   Block        Drug Dosage BloodPressure Control
+1      1     Soluble     10      129.9395       n
+2      1     Soluble     15      129.7698       n
+3      1 Non-soluble     10      137.5587       n
+4      1 Non-soluble     15      137.0705       n
+5      1     Control      0      132.1293       y
+6      2     Soluble     10      130.2151       n
+7      2     Soluble     15      128.4609       n
+8      2 Non-soluble     10      132.7349       n
+9      2 Non-soluble     15      134.3131       n
+10     2     Control      0      129.5543       y
+11     3     Soluble     10      127.7241       n
+12     3     Soluble     15      126.3598       n
+13     3 Non-soluble     10      132.4008       n
+14     3 Non-soluble     15      133.1107       n
+15     3     Control      0      127.4442       y</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<pre class="sas"><code>data pressure;
+    input Block Drug $15. Dosage BloodPressure Control $;
+    datalines;
+1 Soluble       10 129.9395 n
+1 Soluble       15 129.7698 n
+1 Non-soluble   10 137.5587 n
+1 Non-soluble   15 137.0705 n
+1 Control        0 132.1293 y
+2 Soluble       10 130.2151 n
+2 Soluble       15 128.4609 n
+2 Non-soluble   10 132.7349 n
+2 Non-soluble   15 134.3131 n
+2 Control        0 129.5543 y
+3 Soluble       10 127.7241 n
+3 Soluble       15 126.3598 n
+3 Non-soluble   10 132.4008 n
+3 Non-soluble   15 133.1107 n
+3 Control        0 127.4442 y
+;
+run;
+
+proc print data=pressure;
+run;</code></pre>
+<p><img src="fact_ctrl_blk.png" class="img-fluid" alt="YourImage">{fig-align = “center”}</p>
+</div>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<p>The explanatory analysis for this data can be seen in the previous chapter where we presented an example with the same data but we did not consider blocking.</p>
+<p>The table below shows the variance components for block and residual. Looking at the table, the variance for block is 3.615 and the variance for residual is 0.941. The block variance measures how much of the total variability in the response variable is being explained by the block.In this example, we see that a large proportion of the total variation is due to the block.</p>
+<p>Secondly, we show the estimates of fixed effects in the output below. Nevertheless, with this type of design, such estimates can be misleading. Therefore, we do not use information from this table for inference or conclusions.</p>
+<div style="page-break-after: always;"></div>
+<p>The results we get in this ANOVA table are very similar to the one we obtained previous chapter without the block. In the anova table, the variance for the block and residual terms are 3.615 and 0.941 respectively. This means that, there is a lot of variation among blocks but not so much among treatments with blocks.</p>
+<p>Next, we show the estimated marginal means table also in the output below. The estimated mean for non-soluble and soluble drugs at 10 percent dosage level were 132 and 127 respectively. Also, for non-soluble and soluble drugs at 15 percent dosage, the estimated means were 131 and 126 respectively. Lastly, the estimate for control is 137, which is higher than all other treatment combinations.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true" href="">R Code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false" href="">SAS Code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: 
+BloodPressure ~ Control + Drug:Control + Dosage:Control + Drug:Dosage:Control +  
+    (1 | Block)
+   Data: df
+
+REML criterion at convergence: 39.3
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-1.34999 -0.36006  0.03301  0.38654  1.42985 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Block    (Intercept) 3.615    1.9014  
+ Residual             0.941    0.9701  
+Number of obs: 15, groups:  Block, 3
+
+Fixed effects:
+                                  Estimate Std. Error t value
+(Intercept)                       128.1968     1.2324 104.022
+Controly                            1.5124     0.7921   1.910
+Controln:DrugNon-soluble            6.6346     0.7921   8.376
+Controln:Dosage10                   1.0961     0.7921   1.384
+Controln:DrugNon-soluble:Dosage10  -1.6960     1.1201  -1.514
+
+Correlation of Fixed Effects:
+            (Intr) Cntrly Cn:DN- Cn:D10
+Controly    -0.321                     
+Cntrln:DrN- -0.321  0.500              
+Cntrln:Ds10 -0.321  0.500  0.500       
+Cnt:DN-:D10  0.227 -0.354 -0.707 -0.707
+fit warnings:
+fixed-effect model matrix is rank deficient so dropping 13 columns / coefficients</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+                    npar  Sum Sq Mean Sq  F value
+Control                1   8.929   8.929   9.4891
+Control:Drug           1 100.454 100.454 106.7486
+Control:Dosage         1   0.185   0.185   0.1962
+Control:Drug:Dosage    1   2.157   2.157   2.2926</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<pre class="sas"><code>proc glimmix data = pressure; 
+title "BloodPressure";
+class Block Drug Dosage Control ;
+model BloodPressure =  Control Drug(Control) Dosage(Control) Drug*Dosage(Control)/solution ddfm=kr;
+lsmeans Control Drug(Control) Drug*Dosage(Control)/diff adjust=dunnett;
+random Block;
+run;</code></pre>
+<p><img src="results.png" class="img-fluid" alt="YourImage">{fig-align = “center”}</p>
+</div>
+</div>
+</div>
+<div style="page-break-after: always;"></div>
+<p>We also show the differences in the Drug by Dosage treatment combination in the table below.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true" href="">R Code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false" href="">SAS Code</a></li></ul>
+<div class="tab-content">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code> Control emmean   SE   df lower.CL upper.CL
+ n          132 1.13 2.05      127      136
+ y          130 1.23 2.84      126      134
+
+Results are averaged over the levels of: Dosage, Drug 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Control = n:
+ Drug        emmean   SE   df lower.CL upper.CL
+ Non-soluble    135 1.17 2.30      130      139
+ Soluble        129 1.17 2.30      124      133
+
+Control = y:
+ Drug        emmean   SE   df lower.CL upper.CL
+ Control        130 1.23 2.84      126      134
+
+Results are averaged over the levels of: Dosage 
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Control = n:
+ Drug        Dosage emmean   SE   df lower.CL upper.CL
+ Non-soluble 10        134 1.23 2.84      130      138
+ Soluble     10        129 1.23 2.84      125      133
+ Non-soluble 15        135 1.23 2.84      131      139
+ Soluble     15        128 1.23 2.84      124      132
+
+Control = y:
+ Drug        Dosage emmean   SE   df lower.CL upper.CL
+ Control     0         130 1.23 2.84      126      134
+
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code> contrast estimate    SE df t.ratio p.value
+ n - y        1.93 0.626  8   3.080  0.0151
+
+Results are averaged over the levels of: Dosage, Drug 
+Degrees-of-freedom method: kenward-roger </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Control = n:
+ contrast                estimate   SE df t.ratio p.value
+ (Non-soluble) - Soluble     5.79 0.56  8  10.332  &lt;.0001
+
+Control = y:
+ contrast                estimate   SE df t.ratio p.value
+ (nothing)                 nonEst   NA NA      NA      NA
+
+Results are averaged over some or all of the levels of: Dosage 
+Degrees-of-freedom method: kenward-roger </code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Control = n:
+ contrast                                        estimate    SE df t.ratio
+ (Non-soluble Dosage10) - Soluble Dosage10           4.94 0.792  8   6.235
+ (Non-soluble Dosage10) - (Non-soluble Dosage15)    -0.60 0.792  8  -0.757
+ (Non-soluble Dosage10) - Soluble Dosage15           6.03 0.792  8   7.619
+ Soluble Dosage10 - (Non-soluble Dosage15)          -5.54 0.792  8  -6.993
+ Soluble Dosage10 - Soluble Dosage15                 1.10 0.792  8   1.384
+ (Non-soluble Dosage15) - Soluble Dosage15           6.63 0.792  8   8.376
+ p.value
+  0.0012
+  0.8889
+  0.0003
+  0.0005
+  0.5756
+  0.0002
+
+Control = y:
+ contrast                                        estimate    SE df t.ratio
+ (nothing)                                         nonEst    NA NA      NA
+ p.value
+      NA
+
+Degrees-of-freedom method: kenward-roger 
+P value adjustment: dunnettx method for varying numbers of tests </code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<pre class="sas"><code>proc glimmix data = pressure; 
+title "BloodPressure";
+class Block Drug Dosage Control ;
+model BloodPressure =  Control Drug(Control) Dosage(Control) Drug*Dosage(Control)/solution ddfm=kr;
+lsmeans Control Drug(Control) Drug*Dosage(Control)/diff adjust=dunnett;
+random Block;
+run;</code></pre>
+<p><img src="dff_ctrl.png" class="img-fluid" alt="YourImage">{fig-align = “center”}</p>
+</div>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,292 @@
+---
+title: "Chris_Termunde"
+author: "Frank Agyemang"
+date: "2025-10-18"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+    toc_depth: 2
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.align = 'center')
+```
+
+
+\newpage 
+
+# Introduction
+
+This report analyzes the effect of hybrid and treatment on crown rot percentage of plants.The experiment was repeated after 3 weeks under different environmental conditions and thus, data collected on the two experiments were analyzed separately. The experiment utilized a randomized complete block design with 5 blocks and each treatment combination present in each block. There were 75 observations in total from each experiment. The response variable was crown rot percentage, but the primaary goal is to use the results to determine ratings of each treatment combination. 
+
+# Data Description and Preparation
+
+The exploratory data analysis was been conducted in R, using a fully reproducible R Markdown workflow and the rest of the analysis was conducted in SAS. As with every data analysis, an exploratory data analysis was conducted, where the relative frequency density plots and boxplots were created to understand the nature of the data for both experiments. The methods taken to obtain the relative frequency density plots for data sets 1 and 2 is shown respectively below.
+
+```{r, warning=FALSE, message=FALSE,echo=FALSE}
+## Data Set 1
+
+hybrid <- read.csv("Hybrid_Isolate_Test.csv")
+hybrid$Hybrid.number <- NULL
+# Creating block
+hybrid$Table <- floor(hybrid$Plant / 100)
+
+hybrid$Hybrid <- as.factor(hybrid$Hybrid)
+hybrid$Treatment <- as.factor(hybrid$Treatment)
+hybrid$Crown.Rot.Rating <- as.factor(hybrid$Crown.Rot.Rating)
+hybrid$Table <- as.factor(hybrid$Table)
+hybrid$Crown.Rot.Percentage <- hybrid$Crown.Rot.Percentage / 100
+hybrid$Chikoti.Rating <- NULL
+
+
+
+## Relative Frequency Density Plots
+library(ggplot2)
+
+ggplot(hybrid, aes(x = Crown.Rot.Percentage)) +
+  geom_histogram(aes(y = ..density..), 
+                 bins = 30, 
+                 fill = "steelblue", 
+                 color = "black") +
+  labs(
+    x = "Crown.Rot.Percentage",
+    y = "Relative Frequency (Density)",
+    title = "Relative Frequency Density Plot of Crown.Rot.Percentage for data 1"
+  ) +
+  theme_minimal()
+
+## Data Set 2
+
+hybrid2 <- read.csv("Hybrid_Isolate_Test2.csv")
+# Creating block
+hybrid2$Table <- floor(hybrid2$Plant / 100)
+
+hybrid2$Chikoti.Rating <- NULL
+hybrid2$Hybrid <- as.factor(hybrid2$Hybrid)
+hybrid2$Treatment <- as.factor(hybrid2$Treatment)
+hybrid2$Crown.Rot.Rating <- as.factor(hybrid2$Crown.Rot.Rating)
+hybrid2$Table <- as.factor(hybrid2$Table)
+hybrid2$Crown.Rot.Percentage <- hybrid2$Crown.Rot.Percentage / 100
+
+
+ggplot(hybrid2, aes(x = Crown.Rot.Percentage)) +
+  geom_histogram(aes(y = ..density..), 
+                 bins = 30, 
+                 fill = "steelblue", 
+                 color = "black") +
+  labs(
+    x = "Crown.Rot.Percentage",
+    y = "Relative Frequency (Density)",
+    title = "Relative Frequency Density Plot of Crown.Rot.Percentage for data 2"
+  ) +
+  theme_minimal()
+
+## write data into .csv file
+write.csv(hybrid, "hybrid.csv", row.names = FALSE)
+write.csv(hybrid2, "hybrid2.csv", row.names = FALSE)
+
+
+```
+\newpage
+
+From the relative density plots above, we see that the distribution of the crown rot percentage is right-skewed in both data sets but the distributions are not exactly the same. Because the distributions are right-skewed, any assumption of normality for the data will be flawed. Moreover, crown rot percentage values were observed to be percentages between zero and one, and thus we consider Beta distribution.
+
+## Boxplots
+
+Next, we make a boxplot to determine if there is any variation arising due to the blocks(tables) in which each treatment and hybrid combination was applied. The R code below shows how the boxplots were obtained.
+
+```{r, warning=FALSE, message=FALSE,echo=FALSE}
+# Data 1
+
+library(ggplot2)
+
+ggplot(hybrid, aes(x = Table, y = Crown.Rot.Percentage, fill = Table)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(
+    title = "Crown Rot Percentage by Table for data 1",
+    x = "Table",
+    y = "Crown Rot Percentage"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
+
+# Data 2
+
+ggplot(hybrid2, aes(x = Table, y = Crown.Rot.Percentage, fill = Table)) +
+  geom_boxplot() +
+  theme_bw() +
+  labs(
+    title = "Crown Rot Percentage by Table for data 2",
+    x = "Table",
+    y = "Crown Rot Percentage"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    plot.title = element_text(hjust = 0.5)
+  )
+```
+
+From the boxplot of data 1, there seem to be a lot of variation across the different blocks(tables). The mean for tables 1,2, and 3 are about the same but the size of the boxplots are not the same. Table 4 seems to have the highest mean. For data set 2, we also see that the mean crown rot percentage across table (blocks) are about the same for tables 1, 2, 4 and 5 but they have different variabilities. For data 2, table 3 had the highest mean. Variation is determined by the size of the boxplots. Thus, we may want to know if there is a significant block (table) by treatment interaction effect.
+
+\newpage 
+
+## Interaction Plots
+
+Next, we take a lot at the interaction between Hybrid and Treatment. Because this experiment involved factorial arrangement of treatment, it is reasonable to make interaction plots to determine if there is any significant interaction between Hybrid and Treatment. We show the interaction plots for data 1 and 2 using the r codes below.
+
+```{r, warning=FALSE, message=FALSE,echo=FALSE}
+## Data 1
+
+with(hybrid, interaction.plot(
+  x.factor = Hybrid,
+  trace.factor = Treatment,
+  response = Crown.Rot.Percentage,
+  type = "b",           # both points and lines
+  col = 1:5,            # color for lines (adjust as needed)
+  pch = 19,             # solid circles
+  xlab = "Hybrid",
+  ylab = "Crown Rot Percentage",
+  trace.label = "Treatment",
+  main = "Crown rot percentage for data 1"
+))
+
+## Data 2
+ 
+with(hybrid2, interaction.plot(
+  x.factor = Hybrid,
+  trace.factor = Treatment,
+  response = Crown.Rot.Percentage,
+  type = "b",           # both points and lines
+  col = 1:5,            # color for lines (adjust as needed)
+  pch = 19,             # solid circles
+  xlab = "Hybrid",
+  ylab = "Crown Rot Percentage",
+  trace.label = "Treatment",
+  main = "Crown rot percentage for data 2"
+))
+```
+From plots 1 and 2, we can see that there is some interaction between hybrid and treatment. For plot 2, we see that the lines for F. verticillioides, F. graminearum and F. solani are parallel (that is, they have the same shape), but F. boothii and Sterile Toothpick interact with F. solani. Further analysis needs to be conducted to determine if there is any significant interaction. Because there is significant interaction in both plots, it will be incorrect to look at the main of hybrid or treatment. We can only look at the simple effect, which is each hybrid by treatment effect.
+
+\newpage 
+
+## Model
+
+The statistical model for this experiment was a randomized complete block design with factorial arrangement of treatment. The models used in derivng the ANOVA tables for both data sets were implemented in SAS on demand. The results are attached below and the SAS code is attached accordingly.
+
+```{r,echo=FALSE, out.width="70%", fig.align='center',fig.cap="\\label{fig:fig1}Fit Statistics table, Covariance Parameter Estimates and Type III Tests of Fixed Effects tables for Data 1" }
+# Data 1
+knitr::include_graphics("im1.png")
+```
+
+In the exploratory data analysis, we saw that our response variable did not follow a normal distribution. Thus, for non-normal distributions we need to determine if our model is a right fit for the data. For this data, the distribution is assumed to be beta which can be used to model proportions or data between 0 and 1 inclusive. It can be determined that from the table of Fit Statistics for Conditional Distribution, the Pearson Ch-Square/DF = 1.10 for data 1. Since this value is closer to 1, we know that the distribution and model chosen for the data is a good fit.
+
+Looking at the Type III Tests of Fixed Effects table, we see that hybrid by treatment interaction is not statistically significant, $p_value = 0.6116$. But the numerator degrees of freedom for hybrid by treatment is 8, thus, we need to look further into the interaction.
+
+
+```{r,echo=FALSE, out.width="70%", fig.align='center',fig.cap="\\label{fig:fig2}Fit Statistics table, Covariance Parameter Estimates and Type III Tests of Fixed Effects tables for Data 2" }
+# Data 2
+knitr::include_graphics("im5.png")
+```
+
+For data 2, we see that the Pearson Ch-Square/DF = 0.97. Since these values are closer to 1, we know that the distribution and model chosen for the data is a good fit. 
+
+\newpage
+
+Next, we look at the Covariance Parameter Estimates table which gives the variance estimates for the block (table) and scale respectively. Notice that the blocks (tables) were treated as random effects hence the variance component. For data 1, the variance estimate for table was 0.002877 and 0.02039 for tables in data 2. This means that there were some variation among the blocks (tables). 
+
+We also show the anova tables for data 1 and 2 from the Type III Tests of Fixed Effect tables. The p-value is 0.6116 for hybrid by treatment in data 1 but the degrees of freedom is 8. For data 2, there is a significant interaction effect. The p-value is  0.0068. We see that in the anova table for data 1, hybrid is statistically significant at an $\alpha = 0.05$. The p-values for hybrid in both data are 0.0687 and 0.0118 which are less than 0.05. For treatment,  we see that the p-value is $0.5591$ for data 2 which is not statistically significant but the p-value for treatment in data 2 is $0.0001$ which is much lesser than 0.05. Therefore, in data 2 the factor treatment was statistically significant. We can only consider the simple effect (hybrid by treatment least square means) in both data sets because of the significant interaction effect. 
+
+\newpage
+
+## Simple Effects for Data 1
+
+We now present the estimated means of hybrid. For a non-normal distribution like the beta distribution, two results of the estimates are presented, one on a data scale (original values) and one on a model scale. Results on the model scale are not used for interpretation. 
+
+```{r,echo=FALSE, out.width="70%", fig.align='center',fig.cap="\\label{fig:fig3}Treatment Least Squares Means tables for Data 1" }
+
+## Simple Effect for Data 1
+knitr::include_graphics("im4.png")
+
+
+```
+
+
+From the Hybrid by Treatment Least Squares Means table for data 1, we see the column " Estimate" and "Mean". The column "Estimate" is the model scale and the column "Mean" is the data scale. We are interested in the data scale. Though the primary goal is to assign crown rot ratings based on crown rot percentage, this can not be done because the confidence interval given in the columns " Lower Mean" and "Upper Mean" overlaps for each of the intervals created for the ratings. For example, we can see that Susceptible by Sterile Toothpick and Sweet Corn by Sterile Toothpick have means of $20.10$ and $12.59$ percent respectively, nevertheless, their confidence intervals overlap and thus, assigning a rating would be incorrect. We can only make statements about the crown rate percentage which is still very useful information.
+
+
+\newpage
+
+## Simple Effects for data 2
+
+We also look at the estimated means for each of hybrid and treatment combinations in data 2. These are called simple effects due to the significant hybrid by treatment interaction effect. We show the results below.
+
+```{r,echo=FALSE, out.width="70%", fig.align='center', fig.cap="\\label{fig:fig3}Treatment Least Squares Means tables for Data 2"}
+
+## Data 2
+knitr::include_graphics("im8.png")
+```
+
+
+Lastly, we take a look at the "Mean" column and based on the estimates the highest crown rot percentage will be $58.49$ percent for Sweet Corn and F. boothii. This was followed by Susceptible Dent and F. solani with crown rot percentage of $56$ percent. Sweet Corn and F. solani also had crown rot percentage of $44.03$ percent. Other treatments is interpreted in a similar manner.
+
+\newpage
+
+## Conclusion
+
+In conclusion, it can be observed that the results in the two data sets were a little bit different. We see that there was variation between blocks and thus, the effects of treatment on reducing crown rot percentage differed from block to block. The results show that the type of hybrid and treatment play an important role in determining the crown rot percent. Due to the different results we see from the two data sets, I believe there may be additional factors that might have affected the outcome of the study and recommend that further experiments may be conducted since the client made mention of uncontrolled temperature in the greenhouse after certain level. 
+
+
+
+```{r}
+## Boxplot of Fungi Isolate and Hybrid for data 1 and 2
+library(ggplot2)
+treatments <- unique(hybrid$Treatment)
+
+for (tr in treatments) {
+  temp <- subset(hybrid, Treatment == tr)
+
+  p <- ggplot(temp, aes(x = Hybrid, y = Crown.Rot.Percentage, fill = Hybrid)) +
+    geom_boxplot() +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      title = paste("Crown Rot Percentage for Treatment:", tr),
+      x = "Hybrid",
+      y = "Crown Rot (%)"
+    )
+
+  print(p)
+}
+
+## For Data Set 2
+library(ggplot2)
+treatments2 <- unique(hybrid2$Treatment)
+
+for (tr in treatments2) {
+  temp2 <- subset(hybrid2, Treatment == tr)
+
+  p <- ggplot(temp2, aes(x = Hybrid, y = Crown.Rot.Percentage, fill = Hybrid)) +
+    geom_boxplot() +
+    theme_bw() +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+    labs(
+      title = paste("Crown Rot Percentage for Treatment:", tr),
+      x = "Hybrid",
+      y = "Crown Rot (%)"
+    )
+
+  print(p)
+}
+
+```
+
+
+
+
+
+

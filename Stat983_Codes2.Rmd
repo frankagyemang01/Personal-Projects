@@ -1,0 +1,74 @@
+---
+title: "Stat983"
+author: "Frank Agyemang"
+date: "2025-11-29"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1b
+
+```{r}
+# EM-style iterative routine for the multinomial example
+# Observed counts:
+n1 <- 70
+n2 <- 64
+n3 <- 34
+n4 <- 32
+n  <- n1 + n2 + n3 + n4
+
+# Function: log-likelihood as a function of theta
+loglik_theta <- function(theta, n1, n2, n3, n4) {
+  # ensure p_i positive
+  p1 <- (1 + theta) / 3
+  p2 <- (1 - theta) / 3
+  p3 <- (1 + theta) / 6
+  p4 <- (1 - theta) / 6
+  if (any(c(p1,p2,p3,p4) <= 0)) return(-Inf)
+  ll <- n1*log(p1) + n2*log(p2) + n3*log(p3) + n4*log(p4)
+  return(ll)
+}
+
+# EM-style update (M-step closed form)
+mstep_update <- function(n1, n2, n3, n4) {
+  ( (n1 + n3) - (n2 + n4) ) / (n1 + n2 + n3 + n4)
+}
+
+# Iterative EM-like loop
+em_iter <- function(n1, n2, n3, n4, theta_init = 0, tol = 1e-8, max.iter = 100) {
+  theta <- theta_init
+  history <- data.frame(iter = integer(0),
+                        theta = numeric(0), 
+                        logLik = numeric(0),
+                        change = numeric(0))
+  for (it in 1:max.iter) {
+    # E-step: here the observed aggregated cell counts are the sufficient stats,
+    # so nothing to do (E-step does not change counts).
+    # M-step: closed-form update
+    theta_new <- mstep_update(n1, n2, n3, n4)
+    ll_new <- loglik_theta(theta_new, n1, n2, n3, n4)
+    change <- abs(theta_new - theta)
+    history <- rbind(history, data.frame(iter = it, 
+                                         theta = theta_new,
+                                         logLik = ll_new, change = change))
+    # print progress
+    cat(sprintf("iter %2d: theta = %.8f, logLik = %.6f, change = %.4e\n",
+                it, theta_new, ll_new, change))
+    if (change < tol) break
+    theta <- theta_new
+  }
+  return(list(theta = theta_new, history = history))
+}
+
+# run
+res <- em_iter(n1, n2, n3, n4, theta_init = 0.5, tol = 1e-12, max.iter = 20)
+res$theta
+res$history
+
+```
+

@@ -1,0 +1,277 @@
+---
+title: "AddisonCoriSpring2026"
+author: "Frank Agyemang"
+date: "2026-01-22"
+output:
+  pdf_document: default
+  html_document: default
+  warning: false
+  message: false
+  echo: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Exploratory Data Analysis using data from petri dishes 1 and 2 respectively
+
+This document explores the data set which seeks to determine whether there is a significant difference in effect between fluoride tooth paste and nano-hydroxide toothpaste. The experiment considered three different concentration levels of fluoride (high - $1:10$, medium - $1:100$, low - $1:1000$) respectively. There were also two other treatments, BHI and BHI with Streptococcus, where the latter served as control. Treatments were randomly assigned to cultures in each column of a petri dish. For each treatment in each column, 4 rows also received sucrose. In this data, trt 1 to 8 represents BHI, BHI+Strep, Nano-Oxide at high concentration, Nano-Oxide at medium concentration, Nano-Oxide at low concentration, Fluoride at high concentration, Fluoride at medium concentration, and Fluoride at low concentration respectively.The response variable $y$ measures the amount of reduction in bacteria by each treatment.  Each treatment (fluoride or nano-oxide) together with a given concentration was considered as a separate treatment due to the nature of the experiment. The experiment is analyzed as a *completely randomized design* with *factorial arrangement of treatments* where the factors are Treatment and X, each with 8 and 2 levels respectively.
+
+
+```{r, echo = FALSE, warning = FALSE}
+# Loading libraries
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(car)
+library(stats)
+library(glmmTMB)
+library(emmeans)
+```
+
+
+The section below converts the data from wide to a long format and treatment factors, X (sucrose, no sucrose) and Treatment (trt1 to 9) are treated as such. The first 6 rows of the data is shown below.
+
+```{r, warning=FALSE}
+# Reading in the first data set
+petri1 <- read.csv("Addison.csv")
+
+# changing from wide to long format
+
+petri1_long <- petri1 %>%
+  pivot_longer(
+    cols = starts_with("trt"),
+    names_to = "Treatment",
+    values_to = "Y"
+  )
+petri1_long$Treatment <- as.factor(petri1_long$Treatment)
+petri1_long$X <- as.factor(petri1_long$X)
+head(petri1_long)
+```
+
+Next, we show the boxplot of each Treatment and X. The boxplots in orange are treatments with no sucrose and those in green are treatments with sucrose. From the boxplots, treatments without sucrose generally seems to have lower mean than their counterparts except for treatment 8 (Fluoride with medium concentration) where treatment with sucrose had a lower mean when data from petri dish 1 was used. Nevertheless, there is high variability in the data. This is shown by the size of the boxplots for both treatments with sucrose and without sucrose. 
+
+```{r, warning=FALSE}
+# Boxplot 
+
+ggplot(petri1_long, aes(x = Treatment, y = Y, fill = X)) +
+  geom_boxplot(position = position_dodge(0.8)) +
+  labs(x = "Treatment", y = "Y", fill = "X") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+## Distribution of y for data set in petri dish 1
+
+We also show the distribution of the response through the relative frequency density plot. The plot shows a bi-modal shape (two peaks) for this data. This means that the response variable *does not* follow a normal distribution and thus, we need to account for the distribution in our analysis.
+
+```{r, warning=FALSE}
+# Distribution of response
+ggplot(petri1_long, aes(x = Y)) +
+  geom_histogram(aes(y = ..density..), 
+                 bins = 30, 
+                 fill = "steelblue", 
+                 color = "black") +
+  labs(
+    x = "Y",
+    y = "Relative Frequency (Density)",
+    title = "Relative Frequency Density Plot of Y for petri dish 1"
+  ) +
+  theme_minimal()
+```
+Lastly, we show an interaction plot using data from petri dish 1. There is an interaction between the two factors. What this means is that, the effect of a particular treatment depend on whether sucrose was added or not. We still need to analyze the data to confirm whether the interaction is statistically significant.
+
+```{r, warning=FALSE}
+# Interaction plot
+with(petri1_long, interaction.plot(
+  x.factor = Treatment,
+  trace.factor = X,
+  response = Y,
+  type = "b",           
+  col = 1:5,            
+  pch = 19,             
+  xlab = "Treatment",
+  ylab = "Y",
+  trace.label = "X",
+  main = "Interaction plot of Treatment and X"
+))
+```
+
+## Model fit for data on petri dish 1
+
+We fit a generalized linear model for data on petri dish 1 using the hurdle model due to the bi-modal nature of the data. Fixed effects of X, Treatment, and their interaction were tested using Chi-square.  Estimated marginal means were obtained on the response scale with 95% confidence intervals. The Analysis of Deviance Table shows that there is a significant Treatment by X (sucrose or no sucrose) interaction. Therefore, finding the main effect of treatments is *not* appropriate since the effect of each treatment depends on whether sucrose was used or not. Nevertheless, the simple effects, that is, the effect of each treatment at a given level of sucrose or no sucrose can be obtained. Thus, for example we can compare the effect of fluorides that had sucrose to nano-oxides that had sucrose and vice versa. But we can not compare fluorides with sucrose with nano-oxides without sucrose.The Chi-square test was used to determine if there is any significant effect from any or all of the treatment factors.
+
+
+```{r, warning=FALSE}
+# Model Fit for Petri dish 2 data
+
+hurdle_fit <- glmmTMB(
+  Y ~ X * Treatment,
+  ziformula = ~ X * Treatment,
+  family = Gamma(link = "log"),
+  data = petri1_long
+)
+
+
+# Get anova table
+Anova(
+  hurdle_fit,
+  type = 3
+)
+```
+
+```{r, warning=FALSE}
+# Get least square means
+lsm0 <- emmeans(hurdle_fit, ~ X * Treatment, type = "response")
+lsm0
+```
+
+## Contrast Statements
+
+Since there was a significant interaction effect, we can only look at the simple and interaction effects. This is because looking at the main effects does not give any useful information. The table below shows specific contrasts that the client was interested in. Since the client is interested in treatments with sucrose, we show the Differences of X*Treatment Least Squares Means in the table below. In particular, we are interested in comparison between treatments (3 vs 7), (4 vs 8) and (5 vs 9). From the table, we see that the p-values for treatments (3 vs 7), (4 vs 8) and (5 vs 9) are 0.5746, 0.2886, and 1.0000 respectively. This means that for data on petri dish 1, there are no significant differences between these treatments.
+
+```{r}
+# EMMs only for sucrose
+lsm0 <- emmeans(
+  hurdle_fit,
+  ~ Treatment,
+  at = list(X = "sucrose"),
+  type = "response"
+)
+
+# Pairwise treatment differences (with p-values)
+pairs(lsm0)
+```
+
+
+
+## Exploratory Data Analysis for petri dish 2
+
+We use a similar process to transform our data from wide to long format. Again, the first six rows are show below.
+
+```{r}
+# Reading in the data
+petri2 <- read.csv("petri2.csv")
+
+# changing from wide to long format
+
+petri2_long <- petri2 %>%
+  pivot_longer(
+    cols = starts_with("trt"),
+    names_to = "Treatment",
+    values_to = "Y"
+  )
+
+# Treating X and Treatment as factors
+petri2_long$Treatment <- as.factor(petri2_long$Treatment)
+petri2_long$X <- as.factor(petri2_long$X)
+head(petri2_long)
+
+#write.csv(petri2_long,"petri2_long.csv")
+```
+
+We now consider data from petri dish 2 and show the boxplots of each Treatment and X. Again, boxplots in orange are treatments with no sucrose and those in green are treatments with sucrose. From the boxplots, treatments without sucrose generally seems to have lower mean than their counterparts except for treatment 8 (Fluoride with medium concentration) where treatment with sucrose had about the same mean as treatment without sucrose. Nevertheless, there is less variability with treatments without sucrose compared to treatments with sucrose in this data. This is shown by the size of the boxplots for both treatments with sucrose and without sucrose respectively.
+
+```{r}
+# Boxplot 
+
+ggplot(petri2_long, aes(x = Treatment, y = Y, fill = X)) +
+  geom_boxplot(position = position_dodge(0.8)) +
+  labs(x = "Treatment", y = "Y", fill = "X") +
+  theme_minimal(base_size = 14) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Distribution of data in petri dish 2
+
+For data in petri dish 2, we see a strong right skewness. This means that the assumption of normality again fails and thus, the appropriate distribution should be used. We consider the gamma distribution as an appropriate distribution for this data.
+
+```{r}
+# Distribution of response
+ggplot(petri2_long, aes(x = Y)) +
+  geom_histogram(aes(y = ..density..), 
+                 bins = 30, 
+                 fill = "steelblue", 
+                 color = "black") +
+  labs(
+    x = "Y",
+    y = "Relative Frequency (Density)",
+    title = "Relative Frequency Density Plot of Y for petri dish 1"
+  ) +
+  theme_minimal()
+```
+
+
+Lastly for a factorial design, we again check for any interaction effect. We see that the lines are not parallel indicating and interaction between treatments and whether a sucrose was added or not. In other, words, the effect of each of the treatments depend on whether sucrose was added or not. 
+
+```{r}
+# Interaction plot
+with(petri2_long, interaction.plot(
+  x.factor = Treatment,
+  trace.factor = X,
+  response = Y,
+  type = "b",           
+  col = 1:5,            
+  pch = 19,             
+  xlab = "Treatment",
+  ylab = "Y",
+  trace.label = "X",
+  main = "Interaction plot of Treatment and X"
+))
+```
+
+## Model Fit for data on petri dish 2
+
+We fit a generalized linear model for data in petri dish 2 using the gamma distribution which uses the log as its link function. Fixed effects of X, Treatment, and their interaction were tested using Type III F-tests. Estimated marginal means were obtained on the response scale with 95% confidence intervals. The anova table is shown below. The anova table shows a significant interaction effect between Treatment and X (no sucrose or sucrose). Since there is a significant interaction effect, it is not advisable to find the main effect of treatment since the effect of a given treatment or toothpaste depends on whether sucrose was added. Therefore, we will only consider the simple effects - effect of each treatment at a given level of sucrose or no sucrose.
+
+Also, this means that we can compare for example, fluorides with sucrose to nano-oxide with sucrose but we cannot compare fluoride with sucrose to nano-oxides without sucrose. 
+
+```{r}
+# Model Fit for Petri dish 2 data
+
+glm_fit <- glm(
+  Y ~ X * Treatment,
+  data = petri2_long,
+  family = Gamma(link = "log")
+)
+
+# Get anova table
+Anova(
+  glm_fit,
+  type = 3,
+  test.statistic = "F"
+)
+```
+
+
+```{r}
+# Get least square means
+lsm <- emmeans(glm_fit, ~ X * Treatment, type = "response")
+lsm
+
+```
+
+## Contrasts comparing treatments with sucrose
+
+In the second data, the client is also interested in treatments with sucrose, and thus, we show the Differences of X*Treatment Least Squares Means in the table below. In particular, we are interested in comparison between treatments (3 vs 7), (4 vs 8) and (5 vs 9). Looking at the table and the relevant contrasts, we see that there is a significant difference in treatment effect between treatments 3 and 7, 4 and 8, 5 and 9. The p-values obtained using the student t-test are $0.0002$, and $0.0001$ respectively.
+
+Also, if the researcher wanted to know how the level of concentration affected these treatments, we can also look at the contrasts for treatments (3 vs 4), (3 vs 5), (4 vs 5), (7 vs 8), (7 vs 9) and so on.
+
+```{r, warning=FALSE}
+# EMMs only for sucrose
+lsm_sucrose <- emmeans(
+  glm_fit,
+  ~ Treatment,
+  at = list(X = "sucrose"),
+  type = "response"
+)
+
+# Pairwise treatment differences (with p-values)
+pairs(lsm_sucrose)
+
+```
+

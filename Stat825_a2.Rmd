@@ -1,0 +1,164 @@
+---
+title: "Data_analysis_2"
+author: "Frank Agyemang"
+date: "2024-10-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Reading in the data
+```{r}
+## Loading in some libraries
+library(lme4)
+library(lmerTest)
+library(emmeans)
+```
+
+##Introduction 
+In this study, researchers were interested in how Starch content is affected by the type of tissues in pine, the treatment
+(drought and control) and time or dayPeriod when the tissue was collected (and potential interactions). In
+the data set, the “row” and the “column” describes a physical location where the tissue was collected
+within a sample. The client recorded these two variables as “chamber” because not all row-column
+combination was present in the data. Therefore, we will use the variable chamber which uniquely identifies row and column in each of the two locations. Moreover, the variable was not described in the data set and therefore it is difficult to understand how to use this variable. Lastly, the variable species has only one factor in the data set and can be removed but we will maintain it in our analysis because of a possible two or three way interaction with treatment or tissue.
+```{r}
+starch <- read.csv("stat825.csv")
+```
+
+## Exploratory Analysis
+We begin our analysis with some data exploration. To get a better sense of the data, we rearrange the variables in the data frame and the resulting table with a few rows are shown below.
+```{r}
+# Specify the variables you want to treat as factors
+factor_vars <- c("campagne", "sample", "col","row","aspect","time","dayPeriod","treatment","species","tissu","chamber")
+
+# Create a boxplot for each row and column combination, distinguished by location
+ggplot(starch, aes(x = factor(col), y = StarchNscTissue, fill = campagne)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Values by Row and Column",
+       x = "Col",
+       y = "StarchNscTissue") +
+  facet_grid(row ~ col, labeller = label_both) +
+  theme_minimal() +
+  theme(legend.position = "top")
+
+# Convert specified variables to factors
+starch[factor_vars] <- lapply(starch[factor_vars], as.factor)
+
+
+#Rearranging the variables in the data frame 
+starch <- starch[c("campagne", "chamber", "dayPeriod","time","treatment","species","tissu","sample","StarchNscTissue")]
+head(starch)
+
+
+```
+
+
+Because our goal is to analyze the data, provide some model description and formulation, and check assumptions, we attempt to understand the effect of each variable and the distribution of the response variable(StarchNscTissue). The first boxplot that is shown below shows the mean starch content of each sample blocked by the two locations which is separated by the two colors. From the boxplot, we can see that the average starch content in location two is greater than the average starch content in location one.   Nevertheless, location 2 has higher variability for it samples than in location 1.
+
+Also, the amount of starch content differ by the sample in each of the locations. In location 1, sample 391 has the highest average starch content and same can be said for sample 579 in location 2. The next plot of starch content when treatment (drought or control) was used shows that the control had a slightly higher starch content with a higher variability than drought. We also looked at the effect of tissue (tissu) on starch content. Tissues (LM and UM) had higher starch contents whilst tissues (END and IT) had relatively lower starch contents.
+
+Nevertheless, across all boxplots, there is an evidence of right skeweness which we will investigate later.
+
+```{r}
+# Load ggplot2 package
+library(dplyr)
+library(ggplot2)
+
+
+
+#Row & Col combination == Sample in a particular location
+ggplot(starch, aes(x = sample, y = StarchNscTissue, fill = campagne)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Starch by location",
+       x = "sample",
+       y = "StarchNscTissue") +
+  theme_minimal()
+
+
+#Treatments
+ggplot(starch, aes(x = treatment, y = StarchNscTissue, fill = treatment)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Starch by treatment",
+       x = "treatment",
+       y = "StarchNscTissue") +
+  theme_minimal()
+#Tissu
+ggplot(starch, aes(x = tissu, y = StarchNscTissue, fill = tissu)) +
+  geom_boxplot() +
+  labs(title = "Boxplot of Starch by location",
+       x = "tissu",
+       y = "StarchNscTissue") +
+  theme_minimal()
+
+#NB: We only have one species so we did not make any plot.
+```
+
+
+# Histogram for Starch content to check the distribution
+We also make histograms to access the distribution of StachNscTissue. From the histogram, we see a right-skewness we confirms our suspicion from the the boxplots that we saw earlier. This is a useful information because the assumption of normality therefore does not hold. We may either need to transform the data or use a generalized linear mixed model that takes into account the right-skewness. Some distributions that account for these skewness for this type of response are the gamma or inverse gaussian distributions. We will run these in our analysis and assess their performance.
+```{r}
+library(ggplot2)
+ggplot(starch, aes(x = StarchNscTissue)) +
+  geom_histogram(binwidth = 0.5, fill = "blue", color = "black") +
+  labs(title = "Histogram of Values",
+       x = "StarchNscTissue",
+       y = "Frequency") +
+  theme_minimal()
+
+
+
+```
+
+##Two way Interaction Plots
+The client is also interested in all possible interactions and therefore we look into all possible two-way interactions. These are shown in the plots below. There is an interaction effect between IT tissue and END at a given level of treatment (Control and Drought). But we cannot say the same for LM and UM.
+```{r}
+# Two-way interaction plot between treatment and species
+# ggplot(starch, aes(x = treatment, y = StarchNscTissue , color = species, group = species)) +
+#   geom_point() +
+#   geom_line() +
+#   labs(title = "Two-Way Interaction Plot between treatment and species",
+#        x = "treatment",
+#        y = "StarchNscTissue") +
+#   theme_minimal()
+
+# Two-way interaction plot between treatment and tissu
+ggplot(starch, aes(x = treatment, y = StarchNscTissue , color = tissu, group = tissu)) +
+  geom_point() +
+  geom_line() +
+  labs(title = "Two-Way Interaction Plot between treatment and tissue",
+       x = "treatment",
+       y = "StarchNscTissue") +
+  theme_minimal()
+
+# Two-way interaction plot between tissu and species
+ggplot(starch, aes(x = tissu, y = StarchNscTissue , color = species, group = species)) +
+  geom_point() +
+  geom_line() +
+  labs(title = "Two-Way Interaction Plot between tissue and species",
+       x = "tissu",
+       y = "StarchNscTissue") +
+  theme_minimal()
+
+# # Two-way interaction plot
+# ggplot(starch, aes(x = tissu, y = StarchNscTissue, fill = species)) +
+#   stat_summary(fun = mean, geom = "bar", position = position_dodge(width = 0.9)) +
+#   labs(title = "Two-Way Interaction Plot for treatment and tissue",
+#        x = "treatment",
+#        y = "Mean Response") +
+#   theme_minimal()
+```
+
+##Three-Way Interaction Plot
+```{r}
+# Three-way interaction plot
+ggplot(starch, aes(x = tissu, y = StarchNscTissue, fill =treatment )) +
+  stat_summary(fun = mean, geom = "bar", position = position_dodge(width = 0.9)) +
+  facet_grid(. ~ species) +
+  labs(title = "Three-Way Interaction Plot of treatment, species and tissu",
+       x = "tissu",
+       y = "Mean Response") +
+  theme_minimal()
+
+```

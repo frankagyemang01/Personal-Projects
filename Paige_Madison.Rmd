@@ -1,0 +1,192 @@
+---
+title: "Paige_Madison_Consulting"
+author: "Frank Agyemang"
+date: "2025-02-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Preliminary EDA 
+
+```{r}
+library(readxl)
+## Checking the worksheets 
+excel_sheets("Paige_Madison.xlsx")
+cornboard <- read_excel("Paige_Madison.xlsx", sheet = 1)  
+Performance <- read_excel("Paige_Madison.xlsx", sheet = 2)
+Final_Performance <- read_excel("Paige_Madison.xlsx", sheet = 3)
+Livers_2_Important <- read_excel("Paige_Madison.xlsx", sheet = 4)
+Assign <- read_excel("Paige_Madison.xlsx", sheet = 5)
+```
+
+## CornBoard Data
+```{r}
+cornboard$Pen <- as.character(cornboard$Pen)
+cornboard$Block <- as.factor(cornboard$Block)
+cornboard$Rep <- as.character(cornboard$Rep)
+cornboard$TRT <- as.factor(cornboard$TRT)
+summary(cornboard)
+```
+
+## PCA on Cornboard Data Set
+```{r}
+mat <- as.matrix(cbind(cornboard$Initial,cornboard$HCW,cornboard$CAFBW,cornboard$ADG,cornboard$DMI,cornboard$`G:F`,cornboard$`F:G`,cornboard$REA,cornboard$`Yield Grade`,cornboard$Fat,cornboard$Marbling)) 
+names <- c("Initial","HCW","CAFBW","ADG","DMI","`G:F`","`F:G`","REA","`Yield Grade`","Fat","Marbling") 
+colnames(mat)=names 
+i = diag(c(rep(1,40)))
+
+## compute correlation matrix
+one <- matrix(c(rep(1,40)))
+m <- (i - one%*%(solve(t(one)%*%one))%*%t(one)) 
+cov = t(mat)%*%m%*%mat / 39
+d <- sqrt(solve(diag(diag(cov)))); 
+corr <- d%*%cov%*%d 
+colnames(corr)=names
+rownames(corr)=names 
+corr
+```
+## Eigen Value and Eigen Vectors
+```{r}
+ ecorr <- eigen(corr)         
+ ## pca on correlation matrix 
+pctexpcor = 100*(ecorr$values/11) 
+lcor <- sqrt(ecorr$values);  
+ecor <- ecorr$vectors
+rownames(ecor)=names     
+rrcor <- t(lcor*t(ecor))       
+ecorr$values
+pctexpcor
+ecor
+t_var = 5.5375006072 + 2.8692623645 + 0.9150094947 + 0.6516347744 + 0.5724888496 + 0.3239052529 + 0.0936985697 + 0.0322793851 + 0.0028176774 + 0.0010384931 + 0.0003645313
+t3 = 5.5375006072 + 2.8692623645 + 0.9150094947
+t_perc = t3/t_var
+pc1_3 <- ecor[, 1:3]  
+pc1_3
+```
+
+
+
+## Selecting The needed variables for EDA
+```{r}
+library(dplyr)
+library(tidyr)
+## Subsetting the Corn board data set
+cornboard_sub <- cornboard[, c("Pen","Block" , "Rep", "TRT","ADG", "DMI","F:G")]
+
+# Extract percentage and treatment
+cornboard_sub <- cornboard_sub %>%
+  mutate(TRT = gsub("%", "", TRT)) %>%  # Remove "%" symbol
+  separate(TRT, into = c("Percentage", "Treatment"), sep = " ", extra = "merge") %>%
+  mutate(Percentage = as.numeric(Percentage))  # Convert percentage to numeric
+
+# Replace NA in 'Value' with 0
+cornboard_sub$Percentage[is.na(cornboard_sub$Percentage)] <- 0
+
+# Replace NA in 'Treatment' with "control"
+cornboard_sub$Treatment[is.na(cornboard_sub$Treatment)] <- "control"
+```
+
+
+## Exploratory Data Analysis
+```{r}
+# Distribution of the Responses
+hist(cornboard_sub$ADG)
+hist(cornboard_sub$DMI)
+hist(cornboard_sub$`F:G`)
+```
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+#Bloxplot for the treatment combinations
+# Create boxplot with different colors for blocks
+ggplot(cornboard_sub, aes(x = interaction(Percentage, Treatment), y = ADG, fill = Block)) +
+  geom_boxplot() +
+  labs(title = "Boxplot for ADG",
+       x = "Treatment Combination",
+       y = "ADG") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set1")
+
+ggplot(cornboard_sub, aes(x = interaction(Percentage, Treatment), y = DMI, fill = Block)) +
+  geom_boxplot() +
+  labs(title = "Boxplot for DMI",
+       x = "Treatment Combination",
+       y = "DMI") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set2")
+
+
+ggplot(cornboard_sub, aes(x = interaction(Percentage, Treatment), y = `F:G`, fill = Block)) +
+  geom_boxplot() +
+  labs(title = "Boxplot for F:G",
+       x = "Treatment Combination",
+       y = "F:G") +
+  theme_minimal() +
+  scale_fill_brewer(palette = "Set3")
+
+```
+
+
+### Model
+```{r}
+# Creating a new column Control (y or n)
+# Yes if treatment is a control and No otherwise
+cornboard_sub$Control <- ifelse(cornboard_sub$Treatment == "control", "y", "n")
+# Write to CSV file
+write.csv(cornboard_sub, "cornboard_sub.csv", row.names = FALSE)
+```
+
+
+## Factorial Plus Control
+
+```{r}
+drug_table <- data.frame(
+  `Drug Type` = c("Soluble", "Soluble", "Non-soluble", "Non-soluble", "No Drug"),
+  Dosage = c(10, 15, 10, 15, 0),
+  Description = c("Treatment A1B1", "Treatment A1B2", "Treatment A2B1", "Treatment A2B2", "Control"),
+  `Replicates per Clinic (Block)` = c(
+    "1 per clinic × 3 clinics = 3",
+    "3",
+    "3",
+    "3",
+    "3 (1 in each clinic)"
+  ),
+  check.names = FALSE  # To allow special characters in column names
+)
+
+# Print the table
+print(drug_table, row.names = FALSE)
+
+
+
+anova_df <- data.frame(
+  Source = c(
+    "Block (Clinic)",
+    "Drug Type",
+    "Dosage",
+    "Drug Type × Dosage",
+    "Control",
+    "Error",
+    "Total"
+  ),
+  `Degrees of Freedom (DF)` = c(
+    "3 – 1 = 2",
+    "2 – 1 = 1",
+    "2 – 1 = 1",
+    "(2 – 1)(2 – 1) = 1",
+    "1",
+    "15 – (2 + 4) = 9",
+    "15 – 1 = 14"
+  ),
+  check.names = FALSE  # Allows special characters in column names
+)
+
+# Print the table
+print(anova_df, row.names = FALSE)
+```
+

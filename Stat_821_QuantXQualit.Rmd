@@ -1,0 +1,74 @@
+---
+title: "stat821_sf"
+author: "Frank Agyemang"
+date: "2023-09-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Factorial treatment design
+Loading the required libraries
+```{r}
+library(gmodels)
+library(doBy)
+```
+
+Loading the dataset
+```{r}
+d <- data.frame("file path")
+d$trt <- factor(d$trt)
+result1 <- aov(y ~ trt)
+summary(result1)
+```
+
+
+Contrast statements
+```{r}
+var.eff <- fit.contrast(result1, "trt", c())
+var.eff
+```
+
+f by linear contrast
+```{r}
+flin <- fit.contrast(result1, "trt", c())
+flin
+```
+
+f by quadratic contrast
+```{r}
+fquad <- fit.contrast(result1, "trt", c())
+fquad
+```
+
+variety by f linear contrast
+```{r}
+varxflin <- fit.contrast(result1, "trt", c())
+varxflin
+```
+
+variety by f contrast
+```{r}
+varxfqua <- fit.contrast(result1, "trt", c())
+varxfqua
+```
+
+
+
+Treating f as quantitative
+```{r}
+d$fun <- ordered(factor(d$f))
+result2 = aov(y ~ fun + variety + variety * fun)
+summary(result2, split = list(fun = list(Linear = 1, Quad = 2)))
+summarBy(y ~ fun + variety, data = d, Fun = mean)
+```
+
+
+Interactio plot
+```{r}
+interaction.plot(d$fun, d$variety,d$y)
+```
+
